@@ -4,6 +4,7 @@ import {
   runGenerate,
   runModules,
   runPlan,
+  runExamples,
   runTemplates,
   runUpgrade,
   runUsage,
@@ -19,6 +20,7 @@ USO
   calec <comando> [descripcion] [opciones]
 
 COMANDOS
+  examples   Ejemplos listos para copiar y pegar (empieza por aqui)
   generate   Analiza los requisitos y genera el proyecto completo
   plan       Muestra la arquitectura propuesta sin escribir ficheros
   templates  Lista las plantillas de producto y su encaje con un enunciado
@@ -43,6 +45,8 @@ OPCIONES
   --quiet, -q            Silencia los registros del pipeline
 
 EJEMPLOS
+  calec examples                  # ver todos los ejemplos
+  calec examples tienda           # el comando exacto para una tienda online
   calec plan "Marketplace de productos artesanales con pagos y valoraciones"
   calec templates "Tienda online con carrito y pagos"
   calec generate --file requisitos.md --framework vue --out ./mi-proyecto
@@ -94,6 +98,9 @@ export async function runCli(argv: readonly string[]): Promise<CommandResult> {
         return await runGenerate(options);
       case 'plan':
         return await runPlan(options);
+      case 'examples':
+      case 'ejemplos':
+        return await runExamples(options);
       case 'templates':
         return await runTemplates(options);
       case 'usage':

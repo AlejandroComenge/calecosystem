@@ -38,7 +38,12 @@ export const ecommerceTemplate: ProjectTemplate = {
       ],
       entities: ['Product', 'Order', 'Cart', 'Customer'],
       features: ['payments'],
-      antiSignals: ['landing', 'captacion de leads'],
+      // Un panel interno gestiona pedidos y productos, pero no es una tienda:
+      // generarle un carrito y un proceso de compra es ruido, no valor.
+      antiSignals: [
+        'landing', 'captacion de leads', 'panel interno', 'uso interno',
+        'empleados', 'backoffice', 'back office', 'herramienta interna',
+      ],
     });
   },
 

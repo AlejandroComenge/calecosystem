@@ -4,6 +4,7 @@ import { EcosystemError, writeFileTree } from '@calecosystem/core';
 import { CodeGenerator } from '@calecosystem/generator';
 import { DEFAULT_PLANS } from '@calecosystem/billing';
 import { bootstrapEcosystem } from './bootstrap.ts';
+import { SCENARIOS, scenarioById } from '../../../examples/scenarios.ts';
 
 export interface CommandOptions {
   readonly description?: string;
@@ -334,7 +335,85 @@ export async function runTemplates(options: CommandOptions): Promise<CommandResu
   }
 }
 
+/**
+ * `calec examples`: catalogo de ejemplos listos para copiar y pegar.
+ *
+ * Existe para que alguien que no programa pueda probar el producto sin
+ * inventarse un enunciado. Con un id concreto (`calec examples tienda`)
+ * imprime el comando completo de ese caso.
+ */
+export async function runExamples(options: CommandOptions): Promise<CommandResult> {
+  const requested = options.description?.trim();
+
+  if (requested) {
+    const scenario = scenarioById(requested);
+    if (!scenario) {
+      return {
+        exitCode: 1,
+        output:
+          `No existe el ejemplo "${requested}".\n\n` +
+          `Disponibles: ${SCENARIOS.map((candidate) => candidate.id).join(', ')}`,
+      };
+    }
+    if (options.json) return { exitCode: 0, output: JSON.stringify(scenario, null, 2) };
+
+    return {
+      exitCode: 0,
+      output: [
+        `${scenario.title}`,
+        `Para: ${scenario.audience}`,
+        '',
+        'Enunciado:',
+        ...wrap(scenario.brief, 74).map((line) => `  ${line}`),
+        '',
+        'Copia y pega este comando:',
+        '',
+        `  npm run calec -- generate "${scenario.brief}"` +
+          (scenario.framework ? ` --framework ${scenario.framework}` : '') +
+          ` --out ./pruebas/${scenario.id}`,
+        '',
+        'Deberia generar, entre otros:',
+        ...scenario.expectFiles.map((file) => `  - ${file}`),
+      ].join('\n'),
+    };
+  }
+
+  if (options.json) return { exitCode: 0, output: JSON.stringify(SCENARIOS, null, 2) };
+
+  const lines = [
+    `Ejemplos disponibles (${SCENARIOS.length}). Para ver uno: calec examples <id>`,
+    '',
+  ];
+  for (const scenario of SCENARIOS) {
+    lines.push(`  ${scenario.id.padEnd(16)} ${scenario.title}`);
+    lines.push(`  ${' '.repeat(16)} ${scenario.audience}`);
+    lines.push('');
+  }
+  lines.push('Para probarlos todos de golpe: npm run validate');
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
 /* --- Presentacion ----------------------------------------------------- */
+
+/** Parte un texto en lineas de ancho maximo, sin cortar palabras. */
+function wrap(text: string, width: number): string[] {
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let current = '';
+
+  for (const word of words) {
+    if (current === '') current = word;
+    else if (current.length + 1 + word.length <= width) current += ` ${word}`;
+    else {
+      lines.push(current);
+      current = word;
+    }
+  }
+  if (current !== '') lines.push(current);
+  return lines;
+}
+
 
 /** Barra de consumo en texto. Un numero se lee; una barra se entiende. */
 function usageBar(used: number, limit: number, width = 20): string {

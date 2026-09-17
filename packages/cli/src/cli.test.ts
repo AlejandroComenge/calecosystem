@@ -85,3 +85,36 @@ test('version devuelve la version publicada', async () => {
   assert.equal(result.exitCode, 0);
   assert.match(result.output, /^\d+\.\d+\.\d+$/);
 });
+
+test('examples lista el catalogo completo', async () => {
+  const result = await runCli(['examples']);
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.output, /tienda/);
+  assert.match(result.output, /saas/);
+  assert.match(result.output, /landing/);
+});
+
+test('examples <id> da un comando listo para copiar', async () => {
+  const result = await runCli(['examples', 'tienda']);
+
+  assert.equal(result.exitCode, 0);
+  assert.match(result.output, /npm run calec -- generate "/);
+  assert.match(result.output, /--out \.\/pruebas\/tienda/);
+});
+
+test('un ejemplo inexistente sugiere los que hay', async () => {
+  const result = await runCli(['examples', 'no-existe']);
+
+  assert.equal(result.exitCode, 1);
+  assert.match(result.output, /Disponibles:/);
+  assert.match(result.output, /tienda/);
+});
+
+test('examples --json sirve para encadenar con otras herramientas', async () => {
+  const result = await runCli(['examples', '--json']);
+  const scenarios = JSON.parse(result.output) as { id: string }[];
+
+  assert.ok(scenarios.length >= 6);
+  assert.ok(scenarios.every((scenario) => typeof scenario.id === 'string'));
+});

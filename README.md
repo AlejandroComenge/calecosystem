@@ -101,11 +101,17 @@ Conviene decirlo antes de que lo descubra un cliente:
 Requiere Node.js 22.18 o superior (usa el soporte nativo de TypeScript; no
 hace falta compilar nada).
 
+> **¿Primera vez?** Empieza por [`EMPEZAR.md`](EMPEZAR.md): guia de 5 minutos
+> escrita para alguien que no programa, con comandos para copiar y pegar.
+
 ```bash
 git clone <este-repositorio> && cd calecosystem
 npm install
-npm run verify        # typecheck + 199 pruebas
+npm run verify        # typecheck + 247 pruebas
+npm run validate      # comprueba que el codigo GENERADO es valido
+npm run demo:comercial # demostracion para enseñar a un cliente
 
+npm run calec -- examples                  # 8 ejemplos listos para copiar
 npm run calec -- plan "Panel interno para gestionar pedidos y clientes"
 npm run calec -- generate --file requisitos.md --framework vue --out ./mi-proyecto
 npm run calec -- modules
@@ -113,6 +119,7 @@ npm run calec -- modules
 
 | Comando | Para que sirve |
 |---------|----------------|
+| `calec examples [id]` | Ejemplos listos para copiar y pegar |
 | `calec plan <texto>` | Muestra la arquitectura propuesta sin escribir nada |
 | `calec generate <texto>` | Genera el proyecto completo |
 | `calec templates [texto]` | Plantillas disponibles y su encaje con un enunciado |
@@ -233,9 +240,19 @@ packages/
   billing/     Cuotas por plan, contador de uso y Stripe.
   telemetry/   Registro estructurado de uso.
   cli/         Interfaz de linea de comandos.
-docs/          Arquitectura, precios, limites, extension y decisiones (ADR).
-examples/      Demos ejecutables, incluido el caso de uso e-commerce.
+docs/          Arquitectura, pruebas, precios, venta y decisiones (ADR).
+examples/      Catalogo de ejemplos y demos ejecutables.
+scripts/       Validador de la salida generada.
 tests/         Pruebas de integracion del ecosistema completo.
+```
+
+| Documento | Para quien |
+|-----------|-----------|
+| [`EMPEZAR.md`](EMPEZAR.md) | Alguien que no programa y quiere probarlo |
+| [`docs/PRUEBAS.md`](docs/PRUEBAS.md) | Quien necesita verificar que funciona |
+| [`docs/demo-comercial.md`](docs/demo-comercial.md) | Quien va a enseñarlo a un cliente |
+| [`docs/case-study-ecommerce.md`](docs/case-study-ecommerce.md) | Quien quiere las cifras del caso real |
+| [`docs/architecture.md`](docs/architecture.md) | Quien va a tocar el codigo |
 ```
 
 ## Licencia
@@ -246,9 +263,47 @@ El modelo de licencia definitivo —licencia dual con nucleo abierto para
 pendiente y esta anotada como tal en `docs/pricing.md`. No se distribuye bajo
 ninguna licencia de codigo abierto mientras tanto.
 
+## Como se verifica
+
+Dos capas que responden preguntas distintas. Confundirlas es el error tipico
+al evaluar un generador de codigo:
+
+| | `npm test` | `npm run validate` |
+|---|---|---|
+| Verifica | Que el **generador** funciona | Que el **codigo generado** es valido |
+| Alcance | 247 pruebas | 8 ejemplos completos |
+| Incluye | Analisis, planificacion, plantillas, cuotas, Stripe, integracion | Sintaxis de todo el TS, JSON, YAML, y **ejecuta las pruebas que el generador entrega** |
+
+Ultima ejecucion de `npm run validate`:
+
+```
+8 ejemplos | 663 ficheros | 20194 lineas | 505 TS sin errores de sintaxis
+          | 54 pruebas generadas en verde
+
+TODO CORRECTO: la salida del generador es valida en todos los ejemplos.
+```
+
+Un generador puede pasar sus propias pruebas y producir codigo que no compila.
+Por eso existen las dos capas. Guia completa en [`docs/PRUEBAS.md`](docs/PRUEBAS.md).
+
+## Para enseñarlo a un cliente
+
+Pagina de demostracion lista para enviar:
+**https://claude.ai/artifact/GmgDzFTqHzQzuQyMrWFLha**
+
+```bash
+npm run demo:comercial          # 8 pasos, ~30 segundos
+npm run demo:comercial -- --caso saas
+```
+
+El guion, los beneficios con sus supuestos economicos y los argumentos por
+plan estan en [`docs/demo-comercial.md`](docs/demo-comercial.md). El paso 7 de
+la demo enseña a proposito **lo que el sistema no hace**: una demo que solo
+enseña lo bueno gana la reunion y pierde al cliente tres semanas despues.
+
 ## Estado del proyecto
 
-v0.2.0 — 199 pruebas, sin dependencias de ejecucion.
+v0.2.0 — 247 pruebas + validacion de salida, sin dependencias de ejecucion.
 Lo previsto para las siguientes versiones esta en
 [`docs/roadmap.md`](docs/roadmap.md), separando lo comprometido de lo que
 todavia es una hipotesis.

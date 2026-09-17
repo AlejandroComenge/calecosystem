@@ -25,7 +25,11 @@ ambas cosas es como se construyen las hojas de ruta que nadie cumple.
 - [x] Integracion basica con Stripe: sesion de pago y verificacion de webhooks.
 - [x] Telemetria de uso (`@calecosystem/telemetry`), desactivada por defecto.
 - [x] Caso de uso e-commerce con metricas verificadas por pruebas.
-- [x] 199 pruebas.
+- [x] Catalogo de 8 ejemplos y comando `calec examples`.
+- [x] Validador de la salida generada (`npm run validate`): sintaxis, JSON,
+      YAML y ejecucion de las pruebas que el generador entrega.
+- [x] Guia de inicio para quien no programa, guia de pruebas y material de venta.
+- [x] 247 pruebas.
 
 ## v0.3 — publicable
 

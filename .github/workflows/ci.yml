@@ -22,8 +22,13 @@ jobs:
       - name: Comprobacion de tipos
         run: npm run typecheck
 
-      - name: Pruebas
+      - name: Pruebas del generador
         run: npm test
 
-      - name: La demo debe seguir ejecutandose
-        run: npm run demo
+      - name: Validacion del codigo generado
+        run: npm run validate
+
+      - name: Las demos deben seguir ejecutandose
+        run: |
+          npm run demo
+          npm run demo:comercial -- --rapido
