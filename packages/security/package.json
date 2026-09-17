@@ -1,0 +1,13 @@
+{
+  "name": "@calecosystem/security",
+  "version": "0.1.0",
+  "description": "Auditor de seguridad: revisa el codigo generado y el blueprint frente a fallos conocidos.",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@calecosystem/contracts": "0.1.0",
+    "@calecosystem/core": "0.1.0"
+  },
+  "license": "UNLICENSED"
+}

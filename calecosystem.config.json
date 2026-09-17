@@ -1,0 +1,6 @@
+{
+  "$schema": "https://calecosystem.dev/schemas/config.json",
+  "tier": "community",
+  "output": "./generated",
+  "plugins": []
+}

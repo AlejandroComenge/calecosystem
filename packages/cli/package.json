@@ -1,0 +1,19 @@
+{
+  "name": "@calecosystem/cli",
+  "version": "0.1.0",
+  "description": "Interfaz de linea de comandos del ecosistema CalEcosystem.",
+  "type": "module",
+  "bin": { "calec": "./src/bin.ts" },
+  "exports": { ".": "./src/index.ts" },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@calecosystem/contracts": "0.1.0",
+    "@calecosystem/core": "0.1.0",
+    "@calecosystem/documenter": "0.1.0",
+    "@calecosystem/generator": "0.1.0",
+    "@calecosystem/optimizer": "0.1.0",
+    "@calecosystem/security": "0.1.0",
+    "@calecosystem/tester": "0.1.0"
+  },
+  "license": "UNLICENSED"
+}

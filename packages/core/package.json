@@ -1,0 +1,14 @@
+{
+  "name": "@calecosystem/core",
+  "version": "0.1.0",
+  "description": "Kernel del ecosistema: hooks, plugins, entitlements y sistema de ficheros virtual.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@calecosystem/contracts": "0.1.0"
+  },
+  "license": "UNLICENSED"
+}

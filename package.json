@@ -1,0 +1,25 @@
+{
+  "name": "calecosystem",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Ecosistema interconectado de desarrollo web automatizado: generacion, optimizacion, seguridad, testing y documentacion.",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test \"packages/**/*.test.ts\" \"tests/**/*.test.ts\"",
+    "test:watch": "node --test --watch \"packages/**/*.test.ts\"",
+    "demo": "node examples/demo.ts",
+    "calec": "node packages/cli/src/bin.ts",
+    "verify": "npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.3",
+    "typescript": "^5.9.3"
+  }
+}

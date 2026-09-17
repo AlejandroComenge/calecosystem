@@ -1,0 +1,13 @@
+{
+  "name": "@calecosystem/optimizer",
+  "version": "0.1.0",
+  "description": "Optimizador de rendimiento: detecta cuellos de botella estructurales antes de que lleguen a produccion.",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@calecosystem/contracts": "0.1.0",
+    "@calecosystem/core": "0.1.0"
+  },
+  "license": "UNLICENSED"
+}

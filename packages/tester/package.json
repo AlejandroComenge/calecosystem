@@ -1,0 +1,13 @@
+{
+  "name": "@calecosystem/tester",
+  "version": "0.1.0",
+  "description": "Testeador automatico: genera la bateria inicial de pruebas del proyecto y detecta zonas sin cobertura.",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@calecosystem/contracts": "0.1.0",
+    "@calecosystem/core": "0.1.0"
+  },
+  "license": "UNLICENSED"
+}

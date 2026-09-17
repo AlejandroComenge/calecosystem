@@ -1,0 +1,15 @@
+{
+  "name": "@calecosystem/generator",
+  "version": "0.1.0",
+  "description": "Generador de codigo base: analiza requisitos en lenguaje natural y produce una arquitectura completa frontend + backend + despliegue.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@calecosystem/contracts": "0.1.0",
+    "@calecosystem/core": "0.1.0"
+  },
+  "license": "UNLICENSED"
+}
