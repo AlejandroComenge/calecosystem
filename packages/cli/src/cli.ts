@@ -1,8 +1,16 @@
 import { parseArgs } from 'node:util';
 import { EcosystemError } from '@calecosystem/core';
-import { runGenerate, runModules, runPlan, type CommandResult } from './commands.ts';
+import {
+  runGenerate,
+  runModules,
+  runPlan,
+  runTemplates,
+  runUpgrade,
+  runUsage,
+  type CommandResult,
+} from './commands.ts';
 
-export const VERSION = '0.1.0';
+export const VERSION = '0.2.0';
 
 const HELP = `
 calec - CalEcosystem, ecosistema de desarrollo web automatizado
@@ -13,7 +21,10 @@ USO
 COMANDOS
   generate   Analiza los requisitos y genera el proyecto completo
   plan       Muestra la arquitectura propuesta sin escribir ficheros
-  modules    Lista plugins, modulos y adaptadores disponibles
+  templates  Lista las plantillas de producto y su encaje con un enunciado
+  modules    Lista plugins, modulos, adaptadores y middlewares activos
+  usage      Consumo del periodo y limites del plan
+  upgrade    Informacion para cambiar de plan
   help       Muestra esta ayuda
   version    Muestra la version
 
@@ -23,7 +34,9 @@ OPCIONES
   --name <nombre>        Nombre del proyecto (si no, se infiere del texto)
   --framework <nombre>   react | vue | angular
   --database <nombre>    postgres | mysql | mongodb | sqlite
-  --deployment <destino> docker-compose | vercel | aws-ecs | kubernetes
+  --deployment <destino> docker-compose | vercel | netlify | aws-ecs | kubernetes
+  --user <id>            Identifica al usuario para aplicar y medir cuotas
+  --tier <plan>          Plan destino del comando upgrade: pro | enterprise
   --dry-run              Muestra que se generaria sin escribir nada
   --force                Sobrescribe ficheros existentes en el destino
   --json                 Salida en JSON, para encadenar con otras herramientas
@@ -31,13 +44,15 @@ OPCIONES
 
 EJEMPLOS
   calec plan "Marketplace de productos artesanales con pagos y valoraciones"
+  calec templates "Tienda online con carrito y pagos"
   calec generate --file requisitos.md --framework vue --out ./mi-proyecto
-  calec generate "Panel interno para gestionar pedidos y clientes" --dry-run
+  calec generate "Panel interno para pedidos" --user ana --dry-run
+  calec usage --user ana
   calec modules --json
 
 CODIGOS DE SALIDA
   0  correcto
-  1  generado con hallazgos criticos de seguridad, o error de uso
+  1  hallazgos criticos de seguridad, cuota agotada o error de uso
   2  error inesperado
 `.trim();
 
@@ -65,6 +80,8 @@ export async function runCli(argv: readonly string[]): Promise<CommandResult> {
     ...(values.framework ? { framework: values.framework } : {}),
     ...(values.database ? { database: values.database } : {}),
     ...(values.deployment ? { deployment: values.deployment } : {}),
+    ...(values.user ? { user: values.user } : {}),
+    ...(values.tier ? { tier: values.tier } : {}),
     dryRun: values['dry-run'] === true,
     force: values.force === true,
     json: values.json === true,
@@ -77,6 +94,12 @@ export async function runCli(argv: readonly string[]): Promise<CommandResult> {
         return await runGenerate(options);
       case 'plan':
         return await runPlan(options);
+      case 'templates':
+        return await runTemplates(options);
+      case 'usage':
+        return await runUsage(options);
+      case 'upgrade':
+        return await runUpgrade(options);
       case 'modules':
       case 'doctor':
         return await runModules(options);
@@ -102,6 +125,8 @@ const OPTION_SCHEMA = {
   framework: { type: 'string' },
   database: { type: 'string' },
   deployment: { type: 'string' },
+  user: { type: 'string' },
+  tier: { type: 'string' },
   'dry-run': { type: 'boolean' },
   force: { type: 'boolean' },
   json: { type: 'boolean' },

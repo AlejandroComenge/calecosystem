@@ -1,0 +1,13 @@
+{
+  "name": "@calecosystem/telemetry",
+  "version": "0.2.0",
+  "description": "Registro estructurado de uso del ecosistema para analisis y mejora del producto.",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@calecosystem/contracts": "0.1.0",
+    "@calecosystem/core": "0.1.0"
+  },
+  "license": "UNLICENSED"
+}

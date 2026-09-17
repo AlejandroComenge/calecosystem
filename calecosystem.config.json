@@ -2,5 +2,14 @@
   "$schema": "https://calecosystem.dev/schemas/config.json",
   "tier": "community",
   "output": "./generated",
-  "plugins": []
+  "plugins": [],
+  "usage": {
+    "file": "./.calec/usage.jsonl",
+    "requireUser": false
+  },
+  "telemetry": {
+    "enabled": false,
+    "file": "./.calec/telemetry.jsonl",
+    "includeRequirementText": false
+  }
 }

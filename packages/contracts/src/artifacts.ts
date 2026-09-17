@@ -2,6 +2,7 @@
 import type { Blueprint } from './blueprint.ts';
 import type { RequirementsModel } from './requirements.ts';
 import type { ModuleReport } from './reports.ts';
+import type { DependencyConflict } from './dependencies.ts';
 
 export interface VirtualFile {
   /** Ruta relativa POSIX dentro del proyecto generado. */
@@ -28,7 +29,20 @@ export interface GenerationMetrics {
   readonly durationMs: number;
   readonly fileCount: number;
   readonly totalBytes: number;
+  /** Lineas de codigo generadas. Es la metrica que pide todo el mundo. */
+  readonly lineCount: number;
+  /** Componentes de interfaz emitidos. */
+  readonly componentCount: number;
   readonly phaseTimings: Readonly<Partial<Record<PipelinePhase, number>>>;
+}
+
+/** Plantilla de producto aplicada, cuando alguna supero el umbral. */
+export interface AppliedTemplate {
+  readonly id: string;
+  readonly name: string;
+  readonly kind: string;
+  readonly score: number;
+  readonly signals: readonly string[];
 }
 
 export interface GenerationResult {
@@ -38,4 +52,9 @@ export interface GenerationResult {
   readonly reports: readonly ModuleReport[];
   readonly warnings: readonly string[];
   readonly metrics: GenerationMetrics;
+  readonly template: AppliedTemplate | null;
+  /** Paquetes con versiones incompatibles declaradas por productores distintos. */
+  readonly dependencyConflicts: readonly DependencyConflict[];
+  /** Identificador de esta ejecucion; correlaciona logs, telemetria y cuotas. */
+  readonly requestId: string;
 }

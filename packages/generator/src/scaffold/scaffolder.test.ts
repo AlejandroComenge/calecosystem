@@ -18,8 +18,8 @@ async function scaffoldWith(framework: FrontendFramework, kernel?: EcosystemKern
     hints: { frontend: framework },
   });
   const blueprint = new ArchitecturePlanner({ logger }).plan(requirements);
-  const tree = await new Scaffolder({ kernel: activeKernel, logger }).scaffold(blueprint);
-  return { tree, blueprint };
+  const outcome = await new Scaffolder({ kernel: activeKernel, logger }).scaffold(blueprint);
+  return { tree: outcome.tree, outcome, blueprint };
 }
 
 for (const framework of ['react', 'vue', 'angular'] as const) {

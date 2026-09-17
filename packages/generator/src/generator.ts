@@ -1,17 +1,23 @@
 import type {
+  AppliedTemplate,
   Blueprint,
+  DependencyConflict,
   DeploymentPlan,
+  GenerationContext,
   GenerationMetrics,
   GenerationResult,
   Logger,
   ModuleReport,
   ModuleRunContext,
   PipelinePhase,
+  Principal,
+  ProjectTemplate,
   RequirementsInput,
   RequirementsModel,
   VirtualFile,
 } from '@calecosystem/contracts';
 import { FileTree, GenerationError, toError, type EcosystemKernel } from '@calecosystem/core';
+import { randomUUID } from 'node:crypto';
 import { RequirementsAnalyzer } from './analysis/requirements-analyzer.ts';
 import { ArchitecturePlanner, type PlannerOptions } from './planning/architecture-planner.ts';
 import { Scaffolder } from './scaffold/scaffolder.ts';
@@ -25,6 +31,15 @@ export interface GeneratorOptions {
    * scaffolding puro sin esperar a optimizador, auditor, tests ni docs.
    */
   readonly runModules?: boolean;
+  /** Con `false` no se aplica ninguna plantilla de producto. */
+  readonly useTemplates?: boolean;
+}
+
+export interface GenerateOptions {
+  /** Quien lanza la generacion. Necesario para que apliquen las cuotas. */
+  readonly principal?: Principal;
+  /** Identificador propio de la ejecucion; si falta se genera uno. */
+  readonly requestId?: string;
 }
 
 /**
@@ -54,11 +69,36 @@ export class CodeGenerator {
     this.#options = options;
   }
 
-  async generate(input: RequirementsInput): Promise<GenerationResult> {
+  /**
+   * Ejecuta el pipeline completo.
+   *
+   * La ejecucion va envuelta en la cadena de middlewares del kernel, que es
+   * donde viven las cuotas y la telemetria. Un middleware puede rechazar la
+   * peticion antes de que se analice una sola palabra.
+   */
+  async generate(
+    input: RequirementsInput,
+    options: GenerateOptions = {},
+  ): Promise<GenerationResult> {
+    const requestId = options.requestId ?? randomUUID();
+    const context: GenerationContext = {
+      input,
+      ...(options.principal ? { principal: options.principal } : {}),
+      logger: this.#logger,
+      requestId,
+      state: new Map<string, unknown>(),
+    };
+
+    return this.#kernel.middleware.run(context, () => this.#runPipeline(input, requestId));
+  }
+
+  async #runPipeline(input: RequirementsInput, requestId: string): Promise<GenerationResult> {
     const startedAt = performance.now();
     const phaseTimings: Partial<Record<PipelinePhase, number>> = {};
     const warnings: string[] = [];
     let phase: PipelinePhase = 'analyze';
+    let applied: AppliedTemplate | null = null;
+    let template: ProjectTemplate | undefined;
 
     try {
       const requirements = await this.#runPhase('analyze', phaseTimings, async () => {
@@ -68,23 +108,46 @@ export class CodeGenerator {
 
       const blueprint = await this.#runPhase('plan', phaseTimings, async () => {
         phase = 'plan';
-        return this.#plan(requirements, warnings);
+        const selection = this.#selectTemplate(requirements);
+        if (selection) {
+          template = selection.template;
+          applied = {
+            id: selection.template.id,
+            name: selection.template.name,
+            kind: String(selection.template.kind),
+            score: selection.score,
+            signals: selection.signals,
+          };
+        }
+        return this.#plan(requirements, warnings, template);
       });
 
-      const tree = await this.#runPhase('scaffold', phaseTimings, async () => {
+      const outcome = await this.#runPhase('scaffold', phaseTimings, async () => {
         phase = 'scaffold';
-        return new Scaffolder({ kernel: this.#kernel, logger: this.#logger }).scaffold(blueprint);
+        return new Scaffolder({
+          kernel: this.#kernel,
+          logger: this.#logger,
+          ...(template ? { template } : {}),
+        }).scaffold(blueprint);
       });
+
+      for (const conflict of outcome.conflicts) {
+        warnings.push(
+          `Conflicto de version en "${conflict.name}" (${conflict.workspace}): se usa ` +
+            `${conflict.resolved}; tambien se pidio ` +
+            `${conflict.requests.map((request) => request.version).join(', ')}.`,
+        );
+      }
 
       const reports = await this.#runPhase('augment', phaseTimings, async () => {
         phase = 'augment';
-        return this.#augment(blueprint, tree, warnings);
+        return this.#augment(blueprint, outcome.tree, warnings);
       });
 
       return await this.#runPhase('finalize', phaseTimings, async () => {
         phase = 'finalize';
-        const files = await this.#kernel.hooks.applyTransform('files:finalized', tree.toArray());
-        const metrics = buildMetrics(startedAt, files, phaseTimings);
+        const files = await this.#kernel.hooks.applyTransform('files:finalized', outcome.tree.toArray());
+        const metrics = buildMetrics(startedAt, files, phaseTimings, outcome.componentCount);
         const result: GenerationResult = {
           requirements,
           blueprint,
@@ -92,11 +155,14 @@ export class CodeGenerator {
           reports,
           warnings,
           metrics,
+          template: applied,
+          dependencyConflicts: outcome.conflicts as readonly DependencyConflict[],
+          requestId,
         };
         await this.#kernel.hooks.emit('generation:completed', result);
         this.#logger.info(
-          `Generacion completada: ${files.length} ficheros, ${reports.length} informes, ` +
-            `${metrics.durationMs.toFixed(0)} ms.`,
+          `Generacion completada: ${files.length} ficheros, ${metrics.lineCount} lineas, ` +
+            `${reports.length} informes, ${metrics.durationMs.toFixed(0)} ms.`,
         );
         return result;
       });
@@ -107,9 +173,27 @@ export class CodeGenerator {
     }
   }
 
+  /** Plantilla que mejor encaja, salvo que se hayan desactivado. */
+  #selectTemplate(requirements: RequirementsModel) {
+    if (this.#options.useTemplates === false) return undefined;
+    const framework = this.#options.planner?.defaultFrontend ?? requirements.hints.frontend;
+    const selection = this.#kernel.selectTemplate(
+      requirements,
+      framework ?? 'react',
+    );
+    if (selection) {
+      this.#logger.info(
+        `Plantilla "${selection.template.name}" aplicada (encaje ${(selection.score * 100).toFixed(0)}%).`,
+      );
+    }
+    return selection;
+  }
+
   /** Solo analiza y planifica: util para previsualizar sin generar ficheros. */
   async plan(input: RequirementsInput): Promise<Blueprint> {
-    return this.#plan(await this.#analyze(input));
+    const requirements = await this.#analyze(input);
+    const selection = this.#selectTemplate(requirements);
+    return this.#plan(requirements, [], selection?.template);
   }
 
   async #analyze(input: RequirementsInput): Promise<RequirementsModel> {
@@ -129,9 +213,20 @@ export class CodeGenerator {
     return this.#kernel.hooks.applyTransform('requirements:analyzed', draft);
   }
 
-  async #plan(requirements: RequirementsModel, warnings: string[] = []): Promise<Blueprint> {
+  async #plan(
+    requirements: RequirementsModel,
+    warnings: string[] = [],
+    template?: ProjectTemplate,
+  ): Promise<Blueprint> {
     const planner = new ArchitecturePlanner({ logger: this.#logger, ...this.#options.planner });
-    const draft = this.#reconcileWithCapabilities(planner.plan(requirements), warnings);
+    let planned = planner.plan(requirements);
+
+    // La plantilla completa el blueprint ANTES de reconciliar capacidades:
+    // puede anadir entidades y vistas, pero no puede exigir un adaptador
+    // que esta instalacion no tenga.
+    if (template) planned = template.refine(planned);
+
+    const draft = this.#reconcileWithCapabilities(planned, warnings);
 
     // El plan de despliegue se expone por separado porque es lo que mas
     // varia entre clientes: el mismo producto va a Docker en una PYME y a
@@ -265,13 +360,24 @@ function buildMetrics(
   startedAt: number,
   files: readonly VirtualFile[],
   phaseTimings: Partial<Record<PipelinePhase, number>>,
+  componentCount: number,
 ): GenerationMetrics {
   let totalBytes = 0;
-  for (const file of files) totalBytes += Buffer.byteLength(file.contents, 'utf8');
+  let lineCount = 0;
+  for (const file of files) {
+    totalBytes += Buffer.byteLength(file.contents, 'utf8');
+    // Se cuentan lineas no vacias: es la cifra que un equipo reconoceria
+    // como "codigo escrito", y la que no se infla con espaciado.
+    for (const line of file.contents.split('\n')) {
+      if (line.trim() !== '') lineCount += 1;
+    }
+  }
   return {
     durationMs: performance.now() - startedAt,
     fileCount: files.length,
     totalBytes,
+    lineCount,
+    componentCount,
     phaseTimings,
   };
 }

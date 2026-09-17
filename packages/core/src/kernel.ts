@@ -1,18 +1,24 @@
 import type {
   BackendAdapter,
+  ComponentRenderer,
+  ComponentSpec,
   DeploymentAdapter,
   EcosystemModule,
   FrontendAdapter,
   Logger,
+  MiddlewareRegistration,
   ModuleKind,
   Plugin,
   PluginApi,
+  ProjectTemplate,
   RequirementsEnricher,
+  RequirementsModel,
   ServiceToken,
   Tier,
 } from '@calecosystem/contracts';
-import { AUGMENT_ORDER } from '@calecosystem/contracts';
+import { AUGMENT_ORDER, TEMPLATE_MATCH_THRESHOLD } from '@calecosystem/contracts';
 import { HookBus } from './hook-bus.ts';
+import { MiddlewareChain } from './middleware-chain.ts';
 import { Entitlements } from './entitlements.ts';
 import { assertValidPlugin, resolvePluginOrder } from './plugin-registry.ts';
 import { createLogger } from './logger.ts';
@@ -39,6 +45,9 @@ export interface KernelDiagnostics {
   readonly frontendAdapters: readonly string[];
   readonly backendAdapters: readonly string[];
   readonly deploymentAdapters: readonly string[];
+  readonly templates: readonly { id: string; kind: string; tier: Tier }[];
+  readonly components: number;
+  readonly middlewares: readonly string[];
 }
 
 /**
@@ -51,6 +60,8 @@ export interface KernelDiagnostics {
  */
 export class EcosystemKernel {
   readonly hooks: HookBus;
+  /** Middlewares que envuelven la generacion completa. Ver `middleware-chain.ts`. */
+  readonly middleware = new MiddlewareChain();
   readonly logger: Logger;
   readonly entitlements: Entitlements;
 
@@ -63,6 +74,9 @@ export class EcosystemKernel {
   readonly #backendAdapters = new Map<string, BackendAdapter>();
   readonly #deploymentAdapters = new Map<string, DeploymentAdapter>();
   readonly #enrichers: RequirementsEnricher[] = [];
+  readonly #templates = new Map<string, ProjectTemplate>();
+  readonly #components = new Map<string, ComponentSpec>();
+  readonly #renderers = new Map<string, ComponentRenderer>();
   readonly #services = new Map<string, unknown>();
   #initialized = false;
 
@@ -171,6 +185,50 @@ export class EcosystemKernel {
     return this.#enrichers;
   }
 
+  templates(): ProjectTemplate[] {
+    return [...this.#templates.values()].sort((a, b) => a.id.localeCompare(b.id));
+  }
+
+  template(id: string): ProjectTemplate | undefined {
+    return this.#templates.get(id);
+  }
+
+  /**
+   * Elige la plantilla que mejor encaja con los requisitos.
+   *
+   * Devuelve `undefined` si ninguna supera el umbral: generar una tienda
+   * porque el enunciado menciona "productos" de pasada seria peor que no
+   * aplicar plantilla.
+   */
+  selectTemplate(
+    requirements: RequirementsModel,
+    framework?: string,
+  ): { template: ProjectTemplate; score: number; signals: readonly string[] } | undefined {
+    const candidates = this.templates()
+      .filter(
+        (template) =>
+          !framework ||
+          !template.frameworks ||
+          template.frameworks.length === 0 ||
+          template.frameworks.includes(framework),
+      )
+      .map((template) => ({ template, ...template.detect(requirements) }))
+      .filter((candidate) => candidate.score >= TEMPLATE_MATCH_THRESHOLD)
+      // Empate resuelto por id para que la seleccion sea reproducible.
+      .sort((a, b) => b.score - a.score || a.template.id.localeCompare(b.template.id));
+
+    return candidates[0];
+  }
+
+  /** Catalogo de componentes registrado por todos los plugins. */
+  components(): ComponentSpec[] {
+    return [...this.#components.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  componentRenderer(framework: string): ComponentRenderer | undefined {
+    return this.#renderers.get(framework);
+  }
+
   resolveService<T>(token: ServiceToken<T>): T | undefined {
     return this.#services.get(token.key) as T | undefined;
   }
@@ -191,6 +249,13 @@ export class EcosystemKernel {
       frontendAdapters: [...this.#frontendAdapters.keys()].sort(),
       backendAdapters: [...this.#backendAdapters.keys()].sort(),
       deploymentAdapters: [...this.#deploymentAdapters.keys()].sort(),
+      templates: this.templates().map((template) => ({
+        id: template.id,
+        kind: String(template.kind),
+        tier: template.tier,
+      })),
+      components: this.#components.size,
+      middlewares: this.middleware.names(),
     };
   }
 
@@ -203,12 +268,16 @@ export class EcosystemKernel {
         this.logger.error(`Error al liberar "${plugin.name}": ${toError(error).message}`);
       }
       this.hooks.removeBySource(plugin.name);
+      this.middleware.removeByName(plugin.name);
     }
     this.#registered.clear();
     this.#modules.clear();
     this.#frontendAdapters.clear();
     this.#backendAdapters.clear();
     this.#deploymentAdapters.clear();
+    this.#templates.clear();
+    this.#components.clear();
+    this.#renderers.clear();
     this.#services.clear();
     this.#enrichers.length = 0;
     this.#initialized = false;
@@ -260,6 +329,32 @@ export class EcosystemKernel {
       },
       registerRequirementsEnricher: (enricher) => {
         this.#enrichers.push(enricher);
+      },
+
+      registerTemplate: (template) => {
+        this.entitlements.assert(template.tier, template.id);
+        if (this.#templates.has(template.id)) {
+          throw new PluginError(
+            'DUPLICATE_TEMPLATE',
+            `La plantilla "${template.id}" ya esta registrada.`,
+            { template: template.id },
+          );
+        }
+        this.#templates.set(template.id, template);
+      },
+
+      registerComponent: (component) => {
+        // Se permite reemplazar: asi una plantilla puede sustituir un
+        // componente del catalogo base por su propia version.
+        this.#components.set(component.name, component);
+      },
+
+      registerComponentRenderer: (renderer) => {
+        this.#renderers.set(renderer.framework, renderer);
+      },
+
+      registerMiddleware: (registration: MiddlewareRegistration) => {
+        this.middleware.register({ ...registration, name: registration.name || source });
       },
 
       provide: (token, value) => {

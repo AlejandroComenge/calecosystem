@@ -48,15 +48,33 @@ Regla: **las dependencias solo apuntan hacia abajo**. Ningun modulo importa a
 otro modulo. Si el auditor necesitara algo del generador, seria senal de que
 ese algo pertenece a `contracts`.
 
-| Paquete | Responsabilidad | Lineas aprox. |
-|---------|-----------------|---------------|
-| `contracts` | Tipos, interfaces y funciones puras. Sin logica de negocio. | ~700 |
-| `core` | Kernel de plugins, bus de hooks, entitlements, ficheros virtuales. | ~900 |
-| `generator` | Analisis de requisitos, planificacion y scaffolding. | ~1.900 |
-| `optimizer` / `security` / `tester` / `documenter` | Un modulo cada uno. | ~200 c/u |
-| `cli` | Interpretacion de argumentos y presentacion. | ~400 |
+| Paquete | Responsabilidad |
+|---------|-----------------|
+| `contracts` | Tipos, interfaces y funciones puras. Sin logica de negocio. |
+| `core` | Kernel de plugins, bus de hooks, cadena de middlewares, entitlements, ficheros virtuales, registro de dependencias. |
+| `generator` | Analisis, planificacion, scaffolding, catalogo de componentes y plantillas de producto. |
+| `optimizer` / `security` / `tester` / `documenter` | Un modulo cada uno. |
+| `billing` | Cuotas por plan, contador de consumo y pasarela de pago. |
+| `telemetry` | Registro estructurado de uso a partir de los hooks. |
+| `cli` | Interpretacion de argumentos y presentacion. |
 
-## 3. El pipeline de generacion
+## 3. Dos superficies de extension, no una
+
+Es la distincion que mas confusion evita al escribir un plugin:
+
+| | Hooks | Middlewares |
+|---|---|---|
+| Alcance | Dentro del pipeline | Alrededor de la ejecucion entera |
+| Puede cancelar | No (los eventos) | Si, no llamando a `next` |
+| Ve el resultado final | Solo `generation:completed` | Si, como valor de retorno |
+| Casos tipicos | Ajustar el blueprint, anadir ficheros | Cuotas, autorizacion, medicion extremo a extremo |
+
+Las cuotas son middleware por una razon concreta: tienen que decir "no" antes
+de que se analice una sola palabra. Hacerlo con un hook habria exigido que un
+evento pudiera abortar el pipeline, rompiendo la garantia de que un evento
+observa y no interfiere. Ver `adr/0004-limites-de-uso.md`.
+
+## 4. El pipeline de generacion
 
 Cinco fases. Cada una publica sus puntos de extension.
 
@@ -76,6 +94,34 @@ Cinco fases. Cada una publica sus puntos de extension.
       |
   writeFileTree()  <- unico punto que toca el disco
 ```
+
+### Plantillas: que se genera, no como
+
+Un adaptador sabe escribir React; una plantilla sabe como es una tienda. Son
+ejes distintos y por eso son contratos distintos. Una plantilla interviene en
+`refine` (completa el blueprint) y en `scaffold` (aporta sus pantallas).
+
+Como `refine` opera sobre el blueprint, lo que anade la plantilla pasa por el
+auditor, el optimizador y el testeador igual que todo lo demas. El caso
+concreto que lo demuestra: la plantilla de e-commerce anade el riesgo
+`RISK-STOCK-RACE`, y el testeador, que no sabe nada de tiendas, emite un
+hallazgo porque ese riesgo no tiene prueba. Ver `adr/0005-plantillas-de-producto.md`.
+
+### Dependencias declaradas, no escritas
+
+Antes cada adaptador escribia su propio `package.json`. Eso se rompe en cuanto
+una plantilla necesita anadir un paquete: dos productores pelean por el mismo
+fichero.
+
+Ahora cada productor **declara** (`dependencies.require(...)`) y el generador
+construye un unico manifiesto por workspace. Efectos:
+
+- el `package.json` puede explicar **por que** esta cada dependencia;
+- las capacidades detectadas se traducen en paquetes sin que nadie los
+  escriba: pagos anade `stripe`, autenticacion anade `argon2` y limitacion de
+  intentos;
+- dos versiones incompatibles del mismo paquete se registran como conflicto y
+  llegan al usuario como aviso, en lugar de que una pise a la otra en silencio.
 
 ### Por que separar `plan` de `scaffold`
 
@@ -104,7 +150,7 @@ Consecuencias:
 escribe fuera de su directorio de destino es un fallo de seguridad, no un
 detalle de comodidad.
 
-## 4. El sistema de hooks
+## 5. El sistema de hooks
 
 Dos familias, deliberadamente separadas:
 
@@ -123,7 +169,7 @@ dos ejecuciones identicas producirian proyectos distintos.
 
 Catalogo completo en [`hooks.md`](hooks.md).
 
-## 5. Adaptadores: como se anaden frameworks
+## 6. Adaptadores y componentes
 
 `Scaffolder` no sabe escribir React, Fastify ni Docker. Resuelve el adaptador
 registrado para lo que el blueprint pidio y le delega. Anadir Svelte es
@@ -145,7 +191,13 @@ comercial: los tres soportados son la base gratuita, y los adaptadores
 especificos de cliente (design system propio, plantilla corporativa) son
 entregables facturables que no requieren tocar el producto.
 
-## 6. Entitlements
+**Los componentes son datos, no cadenas de texto.** Una `ComponentSpec`
+describe nombre, props tipadas y cuerpo; un `ComponentRenderer` la traduce a
+un framework. El catalogo se escribe una vez y anadir Vue seria escribir otro
+renderizador, no otro catalogo. Hoy solo existe el de React, y esta declarado
+como limitacion en lugar de fingirse.
+
+## 7. Entitlements y cuotas
 
 `Entitlements` decide que plugins y modulos se activan segun el plan
 contratado. Es **empaquetado de producto, no una frontera de seguridad**:
@@ -159,7 +211,11 @@ Community debe seguir generando proyectos aunque la configuracion mencione
 modulos de pago. Con `strictEntitlements: true` el comportamiento se invierte,
 que es lo que quiere una instalacion corporativa con configuracion controlada.
 
-## 7. El analizador de requisitos
+Las **cuotas** son el segundo eje: `Entitlements` decide **que se carga**,
+`QuotaGuard` decide **cuanto se puede usar**. Detalle completo en
+[`usage-limits.md`](usage-limits.md).
+
+## 8. El analizador de requisitos
 
 Es deterministico: lexicos en espanol e ingles, deteccion por palabra
 completa y reglas de implicacion (quien cobra necesita saber a quien cobra,
@@ -182,7 +238,7 @@ Cuando el texto no da para decidir, el analizador **no inventa**: baja
 `confidence` y deja las dudas en `openQuestions`, que acaban en el README del
 proyecto generado. Es lo que haria un consultor antes de dibujar nada.
 
-## 8. Decisiones tecnicas del repositorio
+## 9. Decisiones tecnicas del repositorio
 
 | Decision | Motivo | Coste asumido |
 |----------|--------|---------------|
@@ -192,7 +248,7 @@ proyecto generado. Es lo que haria un consultor antes de dibujar nada.
 | npm workspaces | Publicacion independiente por paquete con una sola instalacion | Resolucion algo mas lenta que pnpm |
 | `exports` apuntando a `src/*.ts` | Desarrollo sin paso de compilacion | Publicar en npm exigira anadir un build; ver `roadmap.md` |
 
-## 9. Limites conocidos
+## 10. Limites conocidos
 
 Documentados para que nadie los descubra en produccion:
 
@@ -204,3 +260,9 @@ Documentados para que nadie los descubra en produccion:
   irrelevante a 40 ms y dejara de serlo en cuanto entre un LLM.
 - **Un solo modulo por tipo en la practica.** El kernel admite varios, pero no
   hay estrategia de resolucion de conflictos entre dos optimizadores.
+- **Componentes y plantillas solo para React.** El diseno separa los ejes para
+  que portarlos sea barato, pero el trabajo esta sin hacer.
+- **El contador de uso es local.** Manipulable por diseno; la verdad de
+  facturacion vivira en el servidor.
+- **La resolucion de versiones es "gana la primera".** No se comparan rangos
+  semver; los choques se avisan pero no se resuelven.

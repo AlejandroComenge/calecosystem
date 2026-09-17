@@ -247,6 +247,8 @@ function detectLocale(text: string): Locale {
 const NAME_STOPWORDS = new Set([
   'de', 'del', 'para', 'por', 'con', 'sin', 'los', 'las', 'el', 'la', 'un',
   'una', 'que', 'en', 'y', 'e', 'o', 'u', 'al', 'donde', 'the', 'for', 'of', 'to',
+  // Calificativos genericos: describen el medio, no el producto.
+  'online', 'web', 'digital', 'nueva', 'nuevo', 'interna', 'interno',
 ]);
 
 function inferProjectName(raw: string, text: string): string {

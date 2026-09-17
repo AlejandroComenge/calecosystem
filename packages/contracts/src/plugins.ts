@@ -2,6 +2,9 @@
 import type { HookRegistry } from './hooks.ts';
 import type { EcosystemModule, ModuleKind } from './modules.ts';
 import type { BackendAdapter, DeploymentAdapter, FrontendAdapter, RequirementsEnricher } from './adapters.ts';
+import type { ComponentRenderer, ComponentSpec } from './components.ts';
+import type { ProjectTemplate } from './templates.ts';
+import type { MiddlewareRegistration } from './middleware.ts';
 import type { Logger } from './logger.ts';
 import type { Tier } from './tiers.ts';
 
@@ -30,6 +33,15 @@ export interface PluginApi extends HookRegistry {
   registerBackendAdapter(adapter: BackendAdapter): void;
   registerDeploymentAdapter(adapter: DeploymentAdapter): void;
   registerRequirementsEnricher(enricher: RequirementsEnricher): void;
+
+  /** Plantilla de producto (e-commerce, SaaS, landing...). */
+  registerTemplate(template: ProjectTemplate): void;
+  /** Componente reutilizable del catalogo. Un mismo nombre sustituye al anterior. */
+  registerComponent(component: ComponentSpec): void;
+  /** Renderizador de componentes para un framework concreto. */
+  registerComponentRenderer(renderer: ComponentRenderer): void;
+  /** Middleware alrededor de la generacion completa (cuotas, telemetria...). */
+  registerMiddleware(registration: MiddlewareRegistration): void;
 
   /** Publica un servicio para otros plugins. */
   provide<T>(token: ServiceToken<T>, value: T): void;

@@ -11,6 +11,8 @@ export * from './hook-bus.ts';
 export * from './entitlements.ts';
 export * from './file-tree.ts';
 export * from './plugin-registry.ts';
+export * from './dependency-registry.ts';
+export * from './middleware-chain.ts';
 export * from './kernel.ts';
 export * from './config.ts';
 export * from './write-tree.ts';

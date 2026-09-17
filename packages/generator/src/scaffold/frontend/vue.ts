@@ -1,8 +1,23 @@
-import type { DomainEntity, FrontendAdapter, ScaffoldContext, VirtualFile } from '@calecosystem/contracts';
-import { banner, displayField, entityInterface, fileFactory, jsonFile, listColumns } from '../shared.ts';
+import type {
+  DependencySpec,
+  DomainEntity,
+  FrontendAdapter,
+  ScaffoldContext,
+  VirtualFile,
+} from '@calecosystem/contracts';
+import { banner, displayField, entityInterface, fileFactory, listColumns } from '../shared.ts';
 
 const TOOL = '@calecosystem/generator (vue)';
 const file = fileFactory(TOOL);
+
+const dep = (name: string, version: string, reason: string, dev = false): DependencySpec => ({
+  name,
+  version,
+  workspace: 'web',
+  dev,
+  reason,
+  requestedBy: TOOL,
+});
 
 /** Adaptador de frontend para Vue 3 (composition API) + Vite. */
 export const vueAdapter: FrontendAdapter = {
@@ -11,28 +26,24 @@ export const vueAdapter: FrontendAdapter = {
   framework: 'vue',
   tier: 'community',
 
-  scaffold({ blueprint }: ScaffoldContext): VirtualFile[] {
+  scaffold({ blueprint, dependencies }: ScaffoldContext): VirtualFile[] {
     const root = 'apps/web';
     const files: VirtualFile[] = [];
 
-    files.push(
-      file(
-        `${root}/package.json`,
-        jsonFile({
-          name: `${blueprint.slug}-web`,
-          private: true,
-          type: 'module',
-          scripts: { dev: 'vite', build: 'vue-tsc --noEmit && vite build', preview: 'vite preview' },
-          dependencies: { vue: '^3.5.0', 'vue-router': '^4.4.0' },
-          devDependencies: {
-            '@vitejs/plugin-vue': '^5.2.0',
-            typescript: '^5.9.0',
-            'vue-tsc': '^2.1.0',
-            vite: '^6.0.0',
-          },
-        }),
-      ),
-    );
+    dependencies.requireAll([
+      dep('vue', '^3.5.0', 'Framework de interfaz elegido en el blueprint.'),
+      dep('vue-router', '^4.4.0', `Enrutado de las ${blueprint.pages.length} vistas planificadas.`),
+      dep('@vitejs/plugin-vue', '^5.2.0', 'Compilacion de componentes de un solo fichero.', true),
+      dep('typescript', '^5.9.0', 'Tipado del frontend.', true),
+      dep('vue-tsc', '^2.1.0', 'Comprobacion de tipos dentro de los ficheros .vue.', true),
+      dep('vite', '^6.0.0', 'Servidor de desarrollo y empaquetado.', true),
+    ]);
+    dependencies.contribute({
+      workspace: 'web',
+      requestedBy: TOOL,
+      fields: { type: 'module' },
+      scripts: { dev: 'vite', build: 'vue-tsc --noEmit && vite build', preview: 'vite preview' },
+    });
 
     files.push(
       file(

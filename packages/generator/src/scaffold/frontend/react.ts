@@ -1,8 +1,17 @@
-import type { FrontendAdapter, ScaffoldContext, VirtualFile } from '@calecosystem/contracts';
-import { banner, displayField, entityInterface, fileFactory, jsonFile, listColumns } from '../shared.ts';
+import type { DependencySpec, FrontendAdapter, ScaffoldContext, VirtualFile } from '@calecosystem/contracts';
+import { banner, displayField, entityInterface, fileFactory, listColumns } from '../shared.ts';
 
 const TOOL = '@calecosystem/generator (react)';
 const file = fileFactory(TOOL);
+
+const dep = (name: string, version: string, reason: string, dev = false): DependencySpec => ({
+  name,
+  version,
+  workspace: 'web',
+  dev,
+  reason,
+  requestedBy: TOOL,
+});
 
 /**
  * Adaptador de frontend para React + Vite.
@@ -18,36 +27,31 @@ export const reactAdapter: FrontendAdapter = {
   framework: 'react',
   tier: 'community',
 
-  scaffold({ blueprint }: ScaffoldContext): VirtualFile[] {
+  scaffold({ blueprint, dependencies }: ScaffoldContext): VirtualFile[] {
     const root = 'apps/web';
     const entities = blueprint.entities;
     const files: VirtualFile[] = [];
 
-    files.push(
-      file(
-        `${root}/package.json`,
-        jsonFile({
-          name: `${blueprint.slug}-web`,
-          private: true,
-          type: 'module',
-          scripts: {
-            dev: 'vite',
-            build: 'tsc --noEmit && vite build',
-            preview: 'vite preview',
-          },
-          dependencies: {
-            react: '^19.0.0',
-            'react-dom': '^19.0.0',
-            'react-router-dom': '^7.0.0',
-          },
-          devDependencies: {
-            '@vitejs/plugin-react': '^4.3.0',
-            typescript: '^5.9.0',
-            vite: '^6.0.0',
-          },
-        }),
-      ),
-    );
+    // Las dependencias se declaran, no se escriben: el generador construye
+    // un unico `package.json` por workspace. Ver `dependency-registry.ts`.
+    dependencies.requireAll([
+      dep('react', '^19.0.0', 'Libreria de interfaz elegida en el blueprint.'),
+      dep('react-dom', '^19.0.0', 'Renderizado de React en el navegador.'),
+      dep('react-router-dom', '^7.0.0', `Enrutado de las ${blueprint.pages.length} vistas planificadas.`),
+      dep('@vitejs/plugin-react', '^4.3.0', 'Integracion de React con Vite.', true),
+      dep('typescript', '^5.9.0', 'Tipado del frontend.', true),
+      dep('vite', '^6.0.0', 'Servidor de desarrollo y empaquetado.', true),
+    ]);
+    dependencies.contribute({
+      workspace: 'web',
+      requestedBy: TOOL,
+      fields: { type: 'module' },
+      scripts: {
+        dev: 'vite',
+        build: 'tsc --noEmit && vite build',
+        preview: 'vite preview',
+      },
+    });
 
     files.push(
       file(

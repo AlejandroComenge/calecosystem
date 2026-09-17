@@ -1,9 +1,24 @@
-import type { DomainEntity, FrontendAdapter, ScaffoldContext, VirtualFile } from '@calecosystem/contracts';
-import { banner, displayField, entityInterface, fileFactory, jsonFile, listColumns } from '../shared.ts';
+import type {
+  DependencySpec,
+  DomainEntity,
+  FrontendAdapter,
+  ScaffoldContext,
+  VirtualFile,
+} from '@calecosystem/contracts';
+import { banner, displayField, entityInterface, fileFactory, listColumns } from '../shared.ts';
 import { camelCase, kebabCase } from '../../analysis/text.ts';
 
 const TOOL = '@calecosystem/generator (angular)';
 const file = fileFactory(TOOL);
+
+const dep = (name: string, version: string, reason: string, dev = false): DependencySpec => ({
+  name,
+  version,
+  workspace: 'web',
+  dev,
+  reason,
+  requestedBy: TOOL,
+});
 
 /** Adaptador de frontend para Angular (standalone components + signals). */
 export const angularAdapter: FrontendAdapter = {
@@ -12,34 +27,32 @@ export const angularAdapter: FrontendAdapter = {
   framework: 'angular',
   tier: 'community',
 
-  scaffold({ blueprint }: ScaffoldContext): VirtualFile[] {
+  scaffold({ blueprint, dependencies }: ScaffoldContext): VirtualFile[] {
     const root = 'apps/web';
     const files: VirtualFile[] = [];
 
-    files.push(
-      file(
-        `${root}/package.json`,
-        jsonFile({
-          name: `${blueprint.slug}-web`,
-          private: true,
-          scripts: { start: 'ng serve', build: 'ng build', test: 'ng test' },
-          dependencies: {
-            '@angular/common': '^19.0.0',
-            '@angular/compiler': '^19.0.0',
-            '@angular/core': '^19.0.0',
-            '@angular/platform-browser': '^19.0.0',
-            '@angular/router': '^19.0.0',
-            rxjs: '^7.8.0',
-            'zone.js': '^0.15.0',
-          },
-          devDependencies: {
-            '@angular/cli': '^19.0.0',
-            '@angular/compiler-cli': '^19.0.0',
-            typescript: '^5.6.0',
-          },
-        }),
-      ),
-    );
+    for (const name of [
+      '@angular/common',
+      '@angular/compiler',
+      '@angular/core',
+      '@angular/platform-browser',
+      '@angular/router',
+    ]) {
+      dependencies.require(dep(name, '^19.0.0', 'Paquete base de Angular.'));
+    }
+    dependencies.requireAll([
+      dep('rxjs', '^7.8.0', 'Flujos asincronos que usa el cliente HTTP de Angular.'),
+      dep('zone.js', '^0.15.0', 'Deteccion de cambios de Angular.'),
+      dep('@angular/cli', '^19.0.0', 'Herramientas de desarrollo y build.', true),
+      dep('@angular/compiler-cli', '^19.0.0', 'Compilacion anticipada de plantillas.', true),
+      dep('typescript', '^5.6.0', 'Version soportada por Angular 19.', true),
+    ]);
+    dependencies.contribute({
+      workspace: 'web',
+      requestedBy: TOOL,
+      scripts: { start: 'ng serve', build: 'ng build', test: 'ng test' },
+    });
+    void blueprint;
 
     files.push(
       file(

@@ -30,6 +30,10 @@ export default definePlugin({
 | `registerBackendAdapter(adapter)` | Anadir un runtime de backend |
 | `registerDeploymentAdapter(adapter)` | Anadir un destino de despliegue |
 | `registerRequirementsEnricher(enricher)` | Refinar el analisis de requisitos (aqui entra un LLM) |
+| `registerTemplate(template)` | Anadir una plantilla de producto (tienda, SaaS, landing...) |
+| `registerComponent(spec)` | Anadir o sustituir un componente del catalogo |
+| `registerComponentRenderer(renderer)` | Traducir el catalogo a otro framework |
+| `registerMiddleware(registration)` | Envolver la generacion completa (cuotas, telemetria) |
 | `provide(token, value)` / `resolve(token)` | Publicar y consumir servicios entre plugins |
 | `hasModule(kind)` | Adaptar el comportamiento a lo que haya cargado |
 | `api.options` | Opciones de este plugin, tomadas de la configuracion |
@@ -146,6 +150,71 @@ Un modulo que lanza no tumba la generacion: se registra el fallo en
 `result.warnings` y el pipeline continua. Una auditoria caida no puede dejar a
 un equipo sin su proyecto.
 
+## Escribir una plantilla de producto
+
+```ts
+import type { ProjectTemplate } from '@calecosystem/contracts';
+import { scoreTemplate } from '@calecosystem/generator';
+
+export const marketplaceTemplate: ProjectTemplate = {
+  id: 'acme.template.marketplace',
+  name: 'Marketplace multivendedor',
+  description: 'Vendedores, comisiones y liquidaciones.',
+  kind: 'marketplace',
+  tier: 'enterprise',
+  frameworks: ['react'],
+
+  detect: (requirements) =>
+    scoreTemplate(requirements, {
+      signals: ['marketplace', 'multivendedor', 'comision', 'liquidacion'],
+      entities: ['Seller', 'Payout'],
+      // Sin contra-senales, "vendedor" en una tienda normal te activa esto.
+      antiSignals: ['tienda propia'],
+    }),
+
+  refine: (blueprint) => blueprint,   // anade entidades, vistas, endpoints, riesgos
+  scaffold: ({ blueprint }) => [],    // aporta sus pantallas
+};
+```
+
+Tres reglas aprendidas escribiendo las tres incluidas:
+
+- **`refine` tiene que ser idempotente.** Aplicarla dos veces no puede
+  duplicar entidades. Hay una prueba que lo comprueba.
+- **El analizador manda sobre la plantilla.** Si `Product` salio del enunciado,
+  sus campos son mas fieles que los de la plantilla: usa `ensureEntity`, que
+  solo anade lo que falta.
+- **Declara contra-senales.** Son lo que evita generar un carrito de la compra
+  en una landing que menciona "producto".
+
+## Escribir un middleware
+
+Para lo que envuelve la ejecucion entera: cuotas, autorizacion, medicion.
+
+```ts
+api.registerMiddleware({
+  name: 'acme:auditoria',
+  priority: 20,          // menor = mas externo
+  handler: async (context, next) => {
+    const started = Date.now();
+    try {
+      const result = await next();
+      await auditLog.write({ requestId: context.requestId, ok: true });
+      return result;
+    } catch (error) {
+      await auditLog.write({ requestId: context.requestId, ok: false });
+      throw error;
+    } finally {
+      metrics.timing('generation', Date.now() - started);
+    }
+  },
+});
+```
+
+No llamar a `next` corta la ejecucion: asi se implementa "cuota agotada".
+Llamarlo dos veces es un error explicito, porque duplicaria la generacion y el
+contador de consumo.
+
 ## Buenas practicas
 
 - **Un plugin, una responsabilidad.** Es mas facil de versionar y de facturar.
@@ -156,3 +225,6 @@ un equipo sin su proyecto.
 - **Implementa `dispose`** si abres conexiones, ficheros o procesos.
 - **No dependas de otro modulo por su id.** Usa `hasModule(kind)` o el
   contenedor de servicios.
+- **Declara dependencias, no escribas `package.json`.** Usa
+  `context.dependencies.require(...)` con una `reason` util: acaba en la
+  documentacion del proyecto generado.

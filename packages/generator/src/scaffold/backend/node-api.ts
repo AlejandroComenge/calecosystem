@@ -2,15 +2,52 @@ import type {
   ApiEndpoint,
   BackendAdapter,
   Blueprint,
+  DependencySpec,
   DomainEntity,
   ScaffoldContext,
   VirtualFile,
 } from '@calecosystem/contracts';
-import { banner, entityInterface, fileFactory, jsonFile, tsTypeOf } from '../shared.ts';
+import { banner, entityInterface, fileFactory, tsTypeOf } from '../shared.ts';
 import { camelCase } from '../../analysis/text.ts';
 
 const TOOL = '@calecosystem/generator (node-api)';
 const file = fileFactory(TOOL);
+
+const dep = (name: string, version: string, reason: string, dev = false): DependencySpec => ({
+  name,
+  version,
+  workspace: 'api',
+  dev,
+  reason,
+  requestedBy: TOOL,
+});
+
+/** Paquetes que hacen falta segun las capacidades activas del blueprint. */
+function capabilityDependencies(blueprint: Blueprint): DependencySpec[] {
+  const specs: DependencySpec[] = [];
+  const { features } = blueprint.requirements;
+
+  if (features.auth) {
+    specs.push(
+      dep('@fastify/jwt', '^9.0.0', 'Emision y verificacion de tokens de sesion.'),
+      dep('argon2', '^0.41.0', 'Hash de contrasenas; el algoritmo recomendado hoy.'),
+      dep('@fastify/rate-limit', '^10.0.0', 'Limita intentos de login por IP.'),
+    );
+  }
+  if (features.payments) {
+    specs.push(dep('stripe', '^17.0.0', 'Pasarela de pago detectada en los requisitos.'));
+  }
+  if (features.fileUploads) {
+    specs.push(dep('@fastify/multipart', '^9.0.0', 'Recepcion de ficheros subidos.'));
+  }
+  if (features.realtime) {
+    specs.push(dep('@fastify/websocket', '^11.0.0', 'Conexiones persistentes en tiempo real.'));
+  }
+  if (features.i18n) {
+    specs.push(dep('accept-language-parser', '^1.5.0', 'Negociacion de idioma por peticion.'));
+  }
+  return specs;
+}
 
 /**
  * Adaptador de backend Node + Fastify sobre una estructura hexagonal.
@@ -26,29 +63,31 @@ export const nodeApiAdapter: BackendAdapter = {
   runtime: 'node-fastify',
   tier: 'community',
 
-  scaffold({ blueprint }: ScaffoldContext): VirtualFile[] {
+  scaffold({ blueprint, dependencies }: ScaffoldContext): VirtualFile[] {
     const root = 'apps/api';
     const files: VirtualFile[] = [];
     const { entities } = blueprint;
 
-    files.push(
-      file(
-        `${root}/package.json`,
-        jsonFile({
-          name: `${blueprint.slug}-api`,
-          private: true,
-          type: 'module',
-          scripts: {
-            dev: 'node --watch src/server.ts',
-            start: 'node src/server.ts',
-            test: 'node --test "src/**/*.test.ts"',
-            typecheck: 'tsc --noEmit',
-          },
-          dependencies: { fastify: '^5.1.0' },
-          devDependencies: { '@types/node': '^22.0.0', typescript: '^5.9.0' },
-        }),
-      ),
-    );
+    // Deteccion de dependencias: el backend pide lo suyo y, ademas, lo que
+    // exigen las capacidades detectadas en los requisitos. Un proyecto con
+    // autenticacion no deberia arrancar sin libreria de hash.
+    dependencies.require(dep('fastify', '^5.1.0', 'Servidor HTTP elegido en el blueprint.'));
+    dependencies.requireAll(capabilityDependencies(blueprint));
+    dependencies.requireAll([
+      dep('@types/node', '^22.0.0', 'Tipos de la plataforma Node.', true),
+      dep('typescript', '^5.9.0', 'Tipado del backend.', true),
+    ]);
+    dependencies.contribute({
+      workspace: 'api',
+      requestedBy: TOOL,
+      fields: { type: 'module' },
+      scripts: {
+        dev: 'node --watch src/server.ts',
+        start: 'node src/server.ts',
+        test: 'node --test "src/**/*.test.ts"',
+        typecheck: 'tsc --noEmit',
+      },
+    });
 
     files.push(file(`${root}/src/config/env.ts`, envConfig(blueprint)));
     files.push(file(`${root}/src/server.ts`, server(blueprint)));

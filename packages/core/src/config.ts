@@ -15,11 +15,35 @@ export interface PluginSpecifier {
   readonly enabled?: boolean;
 }
 
+export interface TelemetryConfig {
+  /**
+   * Desactivada por defecto.
+   *
+   * Una herramienta de desarrollo que empieza a escribir telemetria sin
+   * preguntar pierde la confianza del equipo que la instala. Se activa
+   * explicitamente y se documenta que se registra.
+   */
+  readonly enabled: boolean;
+  /** Fichero JSONL de destino. */
+  readonly file: string;
+  /** Con `true` se registra tambien el texto de los requisitos. */
+  readonly includeRequirementText: boolean;
+}
+
+export interface UsageConfig {
+  /** Fichero donde se lleva el contador local de consumo. */
+  readonly file: string;
+  /** Con `true`, generar exige identificar al usuario. */
+  readonly requireUser: boolean;
+}
+
 export interface EcosystemConfig {
   readonly tier: Tier;
   readonly plugins: readonly PluginSpecifier[];
   readonly generator: Readonly<Record<string, unknown>>;
   readonly output: string;
+  readonly telemetry: TelemetryConfig;
+  readonly usage: UsageConfig;
 }
 
 export const DEFAULT_CONFIG: EcosystemConfig = {
@@ -27,6 +51,15 @@ export const DEFAULT_CONFIG: EcosystemConfig = {
   plugins: [],
   generator: {},
   output: './generated',
+  telemetry: {
+    enabled: false,
+    file: './.calec/telemetry.jsonl',
+    includeRequirementText: false,
+  },
+  usage: {
+    file: './.calec/usage.jsonl',
+    requireUser: false,
+  },
 };
 
 /** Normaliza JSON arbitrario en una configuracion valida (sin lanzar por campos extra). */
@@ -45,6 +78,27 @@ export function normalizeConfig(raw: unknown): EcosystemConfig {
         ? (source['generator'] as Record<string, unknown>)
         : {},
     output: typeof source['output'] === 'string' ? source['output'] : DEFAULT_CONFIG.output,
+    telemetry: normalizeTelemetry(source['telemetry']),
+    usage: normalizeUsage(source['usage']),
+  };
+}
+
+function normalizeTelemetry(raw: unknown): TelemetryConfig {
+  if (typeof raw !== 'object' || raw === null) return DEFAULT_CONFIG.telemetry;
+  const source = raw as Record<string, unknown>;
+  return {
+    enabled: source['enabled'] === true,
+    file: typeof source['file'] === 'string' ? source['file'] : DEFAULT_CONFIG.telemetry.file,
+    includeRequirementText: source['includeRequirementText'] === true,
+  };
+}
+
+function normalizeUsage(raw: unknown): UsageConfig {
+  if (typeof raw !== 'object' || raw === null) return DEFAULT_CONFIG.usage;
+  const source = raw as Record<string, unknown>;
+  return {
+    file: typeof source['file'] === 'string' ? source['file'] : DEFAULT_CONFIG.usage.file,
+    requireUser: source['requireUser'] === true,
   };
 }
 

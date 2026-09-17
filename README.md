@@ -28,13 +28,17 @@ no se enteran de lo que pasa despues.
 Cinco modulos que comparten un mismo modelo de datos y se comunican por un
 bus de extension, en lugar de cinco herramientas que no se hablan.
 
-| # | Modulo | Que hace | Estado v0.1 |
+| # | Modulo | Que hace | Estado v0.2 |
 |---|--------|----------|-------------|
-| 1 | **Generador de codigo base** | Analiza requisitos, decide la arquitectura y genera el proyecto | **Completo** |
+| 1 | **Generador de codigo base** | Analiza requisitos, decide la arquitectura, aplica plantillas de producto y genera el proyecto | **Completo** |
 | 2 | **Optimizador de rendimiento** | Detecta decisiones que no escalan, antes de escribirlas | Vista previa |
 | 3 | **Auditor de seguridad** | Audita el codigo generado y el plan frente a fallos conocidos | Vista previa |
 | 4 | **Testeador automatico** | Genera la bateria inicial y senala lo que queda sin cubrir | Vista previa |
 | 5 | **Documentador inteligente** | Documenta decisiones, API e incorporacion al proyecto | Vista previa |
+
+Ademas, dos piezas de producto: **cuotas por plan** (`@calecosystem/billing`,
+con integracion basica de Stripe) y **telemetria de uso**
+(`@calecosystem/telemetry`).
 
 El valor no esta en cada modulo por separado: esta en que **el auditor sabe
 que el generador eligio Stripe**, el testeador sabe que riesgos declaro el
@@ -44,29 +48,33 @@ herramientas sueltas puede replicar.
 
 ## Lo que hace hoy, sin adornos
 
-Una ejecucion real sobre un enunciado de tres lineas:
+Una ejecucion real sobre un enunciado de cinco lineas (`npm run demo:ecommerce`):
 
 ```
-$ calec generate "Plataforma de reservas para clinicas: los pacientes piden citas
-  con los medicos, con login, roles, pagos online y panel de administracion"
+Plantilla detectada: E-commerce (encaje 90%)
 
-Proyecto: Reservas Clinicas
-Stack: react + node-fastify + postgres
-Confianza del analisis: 92%
-Ficheros generados: 71 (68.4 KB)
-Tiempo: 41 ms
+--- Metricas de generacion ---
+  Tiempo total            32 ms
+  Ficheros                117
+  Lineas de codigo        3996
+  Componentes de interfaz 26
 
-Informes de los modulos:
-  [optimizer]  58/100  4 oportunidades de optimizacion detectadas
-  [security]   36/100  4 hallazgos (2 bloqueantes para produccion)
-  [tester]     11/100  8 ficheros de prueba generados; 1 zona de riesgo sin cubrir
-  [documenter] 100/100 3 documentos generados
+--- Informes de los modulos ---
+  [optimizer  ]  58/100  4 oportunidades de optimizacion detectadas
+  [security   ]  36/100  4 hallazgos (2 bloqueantes para produccion)
+  [tester     ]   7/100  9 ficheros de prueba generados
+  [documenter ] 100/100  3 documentos generados
 ```
 
 Las puntuaciones bajas **son el producto funcionando**: el proyecto recien
 generado tiene autenticacion sin verificar y listados sin paginar, y el
 ecosistema lo dice en voz alta en lugar de entregar un esqueleto con
 apariencia de estar terminado.
+
+El caso completo, con reparto por fases y por areas, esta en
+[`docs/case-study-ecommerce.md`](docs/case-study-ecommerce.md). Sus cifras
+estan verificadas por pruebas: si el producto cambia y dejan de ser ciertas,
+la suite falla.
 
 ### Lo que **no** hace todavia
 
@@ -78,6 +86,12 @@ Conviene decirlo antes de que lo descubra un cliente:
   implementar.
 - Los modulos 2-5 hacen **analisis estatico**: no ejecutan el proyecto, no
   miden tiempos reales ni escanean dependencias.
+- Las plantillas de producto solo generan para **React**. El eje esta separado
+  para que portarlas sea escribir el `scaffold`, pero hoy la limitacion es real.
+- La integracion con Stripe cubre **sesion de pago y webhooks**, no prorrateos,
+  impuestos ni portal del cliente.
+- El contador de uso local es **manipulable por diseno** y esta documentado
+  como tal; la verdad de facturacion vivira en el servidor.
 - El codigo generado es un **punto de partida correcto y sintacticamente
   valido**, no una aplicacion terminada. La autenticacion y la persistencia
   son esqueletos marcados como tales.
@@ -90,7 +104,7 @@ hace falta compilar nada).
 ```bash
 git clone <este-repositorio> && cd calecosystem
 npm install
-npm run verify        # typecheck + 105 pruebas
+npm run verify        # typecheck + 199 pruebas
 
 npm run calec -- plan "Panel interno para gestionar pedidos y clientes"
 npm run calec -- generate --file requisitos.md --framework vue --out ./mi-proyecto
@@ -101,10 +115,28 @@ npm run calec -- modules
 |---------|----------------|
 | `calec plan <texto>` | Muestra la arquitectura propuesta sin escribir nada |
 | `calec generate <texto>` | Genera el proyecto completo |
-| `calec modules` | Que plugins, modulos y adaptadores hay activos |
+| `calec templates [texto]` | Plantillas disponibles y su encaje con un enunciado |
+| `calec modules` | Plugins, modulos, adaptadores y middlewares activos |
+| `calec usage --user <id>` | Consumo del periodo y limites del plan |
+| `calec upgrade --tier pro` | Que incluye el plan y como cambiarse |
 
 Opciones utiles: `--framework react\|vue\|angular`, `--database`,
-`--deployment`, `--dry-run`, `--json`, `--out`.
+`--deployment docker-compose\|vercel\|netlify`, `--user`, `--dry-run`,
+`--json`, `--out`.
+
+### Plantillas de producto
+
+El generador detecta que tipo de producto describe el enunciado y completa lo
+que ese tipo **siempre** necesita y nadie menciona:
+
+| Plantilla | Se activa con | Anade |
+|-----------|---------------|-------|
+| **E-commerce** | tienda, carrito, checkout, catalogo | Carrito con persistencia, proceso de compra con precios recalculados en servidor, panel de pedidos |
+| **SaaS** | suscripcion, multiempresa, organizaciones, planes | Organizaciones, planes, aislamiento por inquilino, panel y facturacion |
+| **Landing** | captacion, leads, formulario de contacto | Secciones de venta, formulario con campo trampa, metadatos para buscadores |
+
+La deteccion es puntuada y tiene contra-senales: una landing no dispara la
+plantilla de tienda porque mencione "producto".
 
 ## Como se usa desde codigo
 
@@ -121,6 +153,17 @@ const result = await new CodeGenerator({ kernel }).generate({
 console.log(result.blueprint.stack);   // decisiones de arquitectura
 console.log(result.files.length);      // arbol de ficheros en memoria
 console.log(result.reports);           // informes de cada modulo
+console.log(result.template);          // plantilla aplicada y su encaje
+console.log(result.metrics.lineCount); // lineas generadas
+```
+
+Con cuotas por plan, basta anadir el plugin de facturacion y un `principal`:
+
+```ts
+const result = await generator.generate(
+  { text: '...' },
+  { principal: { userId: 'ana', tier: 'community' } },
+);
 ```
 
 Nada se escribe en disco hasta que se llama a `writeFileTree`. Esa separacion
@@ -130,16 +173,21 @@ proyecto **antes** de que exista.
 ## Arquitectura en una pagina
 
 ```
-                       EcosystemKernel
-         (plugins, hooks, entitlements, VFS)
+                        EcosystemKernel
+     (plugins, hooks, middlewares, entitlements, VFS)
                              |
-   +--------+--------+-------+-------+--------+
-   |        |        |       |       |        |
-generador optimizador seguridad testeador documentador
+   +--------+--------+-------+-------+--------+--------+
+   |        |        |       |       |        |        |
+generador optimizador seguridad testeador documentador billing
+   |
+   [middlewares]  -> cuotas por plan, telemetria  (envuelven todo)
    |
    +-- analyze  -> requirements:analyzed   (transformable)
    +-- plan     -> blueprint:planned       (transformable)
-   +-- scaffold -> adaptadores react/vue/angular + node + docker
+   |              + plantilla de producto (e-commerce / SaaS / landing)
+   +-- scaffold -> adaptadores react/vue/angular + node
+   |              + catalogo de componentes + docker/vercel/netlify
+   |              + package.json deducido de las capacidades detectadas
    +-- augment  -> los otros cuatro modulos aportan informes y ficheros
    +-- finalize -> files:finalized         (transformable)
 ```
@@ -176,15 +224,17 @@ partida razonado, no un precio validado con clientes.
 ```
 packages/
   contracts/   Tipos e interfaces compartidos. Nadie depende de nadie mas.
-  core/        Kernel: plugins, hooks, entitlements, ficheros virtuales.
-  generator/   Modulo 1. Analisis, planificacion y scaffolding.
+  core/        Kernel: plugins, hooks, middlewares, entitlements, VFS.
+  generator/   Modulo 1. Analisis, planificacion, componentes y plantillas.
   optimizer/   Modulo 2.
   security/    Modulo 3.
   tester/      Modulo 4.
   documenter/  Modulo 5.
+  billing/     Cuotas por plan, contador de uso y Stripe.
+  telemetry/   Registro estructurado de uso.
   cli/         Interfaz de linea de comandos.
-docs/          Arquitectura, precios, extension y decisiones (ADR).
-examples/      Demo ejecutable de extremo a extremo.
+docs/          Arquitectura, precios, limites, extension y decisiones (ADR).
+examples/      Demos ejecutables, incluido el caso de uso e-commerce.
 tests/         Pruebas de integracion del ecosistema completo.
 ```
 
@@ -198,7 +248,7 @@ ninguna licencia de codigo abierto mientras tanto.
 
 ## Estado del proyecto
 
-v0.1.0 — primer commit. 105 pruebas, sin dependencias de ejecucion.
+v0.2.0 — 199 pruebas, sin dependencias de ejecucion.
 Lo previsto para las siguientes versiones esta en
 [`docs/roadmap.md`](docs/roadmap.md), separando lo comprometido de lo que
 todavia es una hipotesis.

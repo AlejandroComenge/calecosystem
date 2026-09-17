@@ -2,6 +2,10 @@
 
 Todo lo que el pipeline hace es interceptable. Esta es la referencia completa.
 
+> Los hooks intervienen **dentro** del pipeline. Para envolver la ejecucion
+> entera (cuotas, autorizacion, medicion de extremo a extremo) el mecanismo es
+> el middleware; ver [`plugins.md`](plugins.md#escribir-un-middleware).
+
 ## Dos familias
 
 | | Eventos (`onEvent`) | Transformaciones (`onTransform`) |

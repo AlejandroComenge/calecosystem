@@ -31,11 +31,16 @@ pruebas escrita a mano.
 | Generador de codigo base | ✅ | ✅ | ✅ |
 | Documentador inteligente | ✅ | ✅ | ✅ |
 | React / Vue / Angular | ✅ | ✅ | ✅ |
-| Proyectos generados | ilimitados | ilimitados | ilimitados |
+| Plantillas de producto (e-commerce, SaaS, landing) | ✅ | ✅ | ✅ |
+| Catalogo de componentes | ✅ | ✅ | ✅ |
+| Generaciones al mes | 10 | 200 | ilimitadas |
+| Proyectos | 3 | ilimitados | ilimitados |
+| Asientos | 1 | 25 | ilimitados |
 | Optimizador de rendimiento | — | ✅ | ✅ |
 | Auditor de seguridad | — | ✅ | ✅ |
 | Testeador automatico | — | ✅ | ✅ |
 | Integracion en CI | — | ✅ | ✅ |
+| Plantillas de producto a medida | — | — | ✅ |
 | Plugins privados de la organizacion | — | — | ✅ |
 | Adaptadores a medida (design system propio) | — | — | ✅ |
 | Instalacion on-premise / air-gapped | — | — | ✅ |
@@ -44,6 +49,11 @@ pruebas escrita a mano.
 
 **Uso comercial permitido en los tres planes.** Un plan gratuito que prohibe
 ganar dinero con lo generado no lo usa nadie.
+
+Las cuotas estan elegidas para que el plan gratuito permita **evaluar el
+producto de verdad**, no probarlo una vez: diez generaciones al mes son tres o
+cuatro proyectos con sus iteraciones. Como se aplican en el codigo, en
+[`usage-limits.md`](usage-limits.md).
 
 ## 3. Precio por componente
 
@@ -65,13 +75,16 @@ debe reflejarlo.
 | Complemento | Precio orientativo | Modelo |
 |-------------|--------------------|--------|
 | Adaptador de frontend a medida | 6.000-15.000 € | Proyecto cerrado |
+| Plantilla de producto a medida (vertical del cliente) | 9.000-20.000 € | Proyecto cerrado |
 | Plantilla corporativa (design system + arquitectura propia) | 12.000-30.000 € | Proyecto cerrado |
 | Formacion e implantacion | 3.500 €/sesion | Por sesion |
 | Soporte con SLA de 4 horas | +30% sobre la licencia | Recurrente |
 
-Los adaptadores a medida son el complemento con mejor margen: se apoyan en el
-sistema de plugins, no requieren tocar el producto y su coste marginal cae en
-cada nuevo cliente porque el patron se reutiliza.
+Los adaptadores y plantillas a medida son los complementos con mejor margen:
+se apoyan en el sistema de plugins, no requieren tocar el producto y su coste
+marginal cae en cada nuevo cliente porque el patron se reutiliza. Las tres
+plantillas incluidas son la prueba de que el mecanismo funciona: entre las tres
+suman menos de 1.500 lineas.
 
 ## 4. Marketplace de plugins
 
@@ -105,16 +118,19 @@ de ser una variable del presupuesto"**.
 Lo que estos numeros **no** dicen: cuanto del tiempo ahorrado se recupera de
 verdad y cuanto se reinvierte en revisar lo generado. Es la primera metrica
 que habria que medir con clientes reales, y la que decide si el precio esta
-bien puesto.
+bien puesto. La telemetria (`@calecosystem/telemetry`) esta puesta para poder
+responderla con datos en vez de con intuiciones; el caso medido esta en
+[`case-study-ecommerce.md`](case-study-ecommerce.md).
 
 ## 6. Riesgos del modelo
 
 Enumerados porque afectan a la decision, no como formalismo:
 
 1. **El plan gratuito puede canibalizar al de pago.** Si el proyecto generado
-   parece suficiente, nadie sube a Pro. Mitigacion: el generador dice en voz
-   alta lo que no ha comprobado, y esa lista es exactamente el ambito de los
-   modulos de pago.
+   parece suficiente, nadie sube a Pro. Mitigacion doble: el generador dice en
+   voz alta lo que no ha comprobado (y esa lista es exactamente el ambito de
+   los modulos de pago), y la cuota de 10 generaciones al mes marca el momento
+   en que un equipo que ya obtuvo valor tiene que decidir.
 2. **Precio por desarrollador en equipos pequenos.** Cinco personas que
    arrancan dos proyectos al ano pagan 2.940 € por un ahorro puntual.
    Mitigacion: tarifa por proyecto para equipos de menos de cinco.

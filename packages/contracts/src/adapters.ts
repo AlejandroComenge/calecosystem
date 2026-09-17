@@ -7,10 +7,22 @@ import type { Blueprint, DeploymentTarget, FrontendFramework, BackendRuntime } f
 import type { VirtualFile } from './artifacts.ts';
 import type { Logger } from './logger.ts';
 import type { Tier } from './tiers.ts';
+import type { DependencyCollector } from './dependencies.ts';
+import type { ComponentSpec } from './components.ts';
 
 export interface ScaffoldContext {
   readonly blueprint: Blueprint;
   readonly logger: Logger;
+  /**
+   * Donde se declaran las dependencias en lugar de escribir `package.json`
+   * a mano. Ver `dependencies.ts`.
+   */
+  readonly dependencies: DependencyCollector;
+  /**
+   * Componentes que otros productores ya han registrado. Permite que una
+   * plantilla reutilice el catalogo de UI del adaptador en vez de duplicarlo.
+   */
+  readonly components: readonly ComponentSpec[];
 }
 
 export interface ScaffoldAdapter {
