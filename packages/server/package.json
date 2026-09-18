@@ -1,0 +1,20 @@
+{
+  "name": "@calecosystem/server",
+  "version": "0.3.0",
+  "description": "Aplicacion web: genera proyectos desde el navegador, sin instalar nada.",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@calecosystem/billing": "0.2.0",
+    "@calecosystem/contracts": "0.1.0",
+    "@calecosystem/core": "0.1.0",
+    "@calecosystem/documenter": "0.1.0",
+    "@calecosystem/generator": "0.1.0",
+    "@calecosystem/optimizer": "0.1.0",
+    "@calecosystem/security": "0.1.0",
+    "@calecosystem/telemetry": "0.2.0",
+    "@calecosystem/tester": "0.1.0"
+  },
+  "license": "UNLICENSED"
+}

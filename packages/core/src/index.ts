@@ -16,4 +16,5 @@ export * from './middleware-chain.ts';
 export * from './kernel.ts';
 export * from './config.ts';
 export * from './write-tree.ts';
+export * from './zip.ts';
 export { definePlugin, createServiceToken } from '@calecosystem/contracts';

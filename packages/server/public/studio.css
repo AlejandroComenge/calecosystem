@@ -1,0 +1,410 @@
+/* CalEcosystem Studio
+ *
+ * Mismo lenguaje visual que la pagina comercial: registro de plano tecnico,
+ * azul sobre papel calido, tipografia IBM Plex. El producto tiene que
+ * parecer una sola cosa en todos los sitios donde aparece.
+ */
+
+:root {
+  --paper: #fbfaf7;
+  --surface: #ffffff;
+  --surface-sunk: #f3f1ec;
+  --ink: #16233a;
+  --ink-soft: #55617a;
+  --ink-faint: #8a93a6;
+  --rule: #ddd8cd;
+  --rule-strong: #c3bcae;
+  --blue: #2d5a8e;
+  --blue-soft: #e9f0f8;
+  --ok: #2f6b4f;
+  --ok-soft: #e7f1eb;
+  --warn: #8a5a0d;
+  --warn-soft: #f7efdd;
+  --crit: #a3372f;
+  --crit-soft: #fbeae8;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.625rem;
+  --step-3: 2.25rem;
+
+  --sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --serif: "IBM Plex Serif", Georgia, serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e1521;
+    --surface: #151f2e;
+    --surface-sunk: #101a27;
+    --ink: #e7ecf4;
+    --ink-soft: #a2aec2;
+    --ink-faint: #6f7c92;
+    --rule: #29344a;
+    --rule-strong: #3b4863;
+    --blue: #7fb2e5;
+    --blue-soft: #1a2940;
+    --ok: #6fc096;
+    --ok-soft: #14261d;
+    --warn: #d9a43f;
+    --warn-soft: #2a2213;
+    --crit: #e58a80;
+    --crit-soft: #2c1917;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 940px;
+  margin: 0 auto;
+  padding-inline: 20px;
+}
+
+h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
+h3 { font-size: var(--step-0); font-weight: 600; margin-block: 28px 12px; }
+h3:first-child { margin-top: 0; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  background: var(--surface-sunk);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* ---------- Cabecera ---------- */
+
+.masthead {
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  padding-block: 44px 36px;
+  margin-bottom: 32px;
+}
+
+.wordmark {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 22px;
+}
+.wordmark b { color: var(--ink); font-weight: 600; letter-spacing: 0.16em; }
+.wordmark span::before { content: "·"; margin-right: 10px; }
+
+h1 { font-size: var(--step-3); font-weight: 600; letter-spacing: -0.02em; max-width: 20ch; }
+
+.lede {
+  font-family: var(--serif);
+  color: var(--ink-soft);
+  max-width: 62ch;
+  margin: 16px 0 0;
+}
+
+/* ---------- Paneles ---------- */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-sunk);
+}
+.panel-head h2 {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.panel-body { padding: 22px; }
+
+/* ---------- Formulario ---------- */
+
+.campo { display: block; margin-bottom: 16px; }
+.campo > span {
+  display: block;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+.campo i { font-style: normal; color: var(--ink-faint); }
+
+textarea, input[type="text"], select {
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--step-0);
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  padding: 10px 12px;
+  line-height: 1.5;
+}
+textarea { resize: vertical; min-height: 120px; }
+
+textarea:focus-visible,
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.pista {
+  font-size: var(--step--1);
+  color: var(--ink-faint);
+  max-width: 68ch;
+  margin: -6px 0 18px;
+}
+.pista b { color: var(--ink-soft); }
+
+.opciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.campo.compacto { margin-bottom: 0; }
+
+.acciones { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.btn {
+  font-family: inherit;
+  font-size: var(--step-0);
+  font-weight: 500;
+  padding: 10px 18px;
+  border-radius: 3px;
+  border: 1px solid var(--rule-strong);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.btn:hover:not(:disabled) { background: var(--surface-sunk); }
+.btn.primario { background: var(--blue); border-color: var(--blue); color: #fff; }
+.btn.primario:hover:not(:disabled) { filter: brightness(1.12); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.link {
+  background: none;
+  border: 0;
+  color: var(--blue);
+  font: inherit;
+  font-size: var(--step--1);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.estado { font-size: var(--step--1); color: var(--ink-soft); font-family: var(--mono); }
+
+.alerta {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border: 1px solid var(--crit);
+  background: var(--crit-soft);
+  color: var(--crit);
+  border-radius: 3px;
+  font-size: var(--step--1);
+}
+
+/* ---------- Ejemplos ---------- */
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip {
+  font-family: inherit;
+  font-size: var(--step--1);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.chip:hover { border-color: var(--blue); color: var(--blue); }
+
+/* ---------- Cifras ---------- */
+
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  margin-bottom: 4px;
+}
+.cifra { background: var(--surface); padding: 14px 16px; }
+.cifra b {
+  display: block;
+  font-family: var(--mono);
+  font-size: var(--step-2);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+/* Un valor largo ("docker-compose") a tamano de cifra no cabe en la columna. */
+.cifra b.texto { font-size: var(--step-1); }
+.cifra small { display: block; margin-top: 4px; font-size: var(--step--1); color: var(--ink-faint); }
+
+.badge {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  padding: 3px 10px;
+  border-radius: 3px;
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+.badge.ok { background: var(--ok-soft); color: var(--ok); }
+
+/* ---------- Tablas ---------- */
+
+.tabla-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 460px; font-size: var(--step--1); }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--rule); }
+th {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+td.mono { font-family: var(--mono); }
+td b { font-weight: 600; }
+
+.marca {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: var(--warn-soft);
+  color: var(--warn);
+  white-space: nowrap;
+}
+
+/* ---------- Decisiones ---------- */
+
+.decisiones { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 3px; }
+.decision { background: var(--surface); padding: 14px 18px; }
+.decision header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+.decision code { background: none; color: var(--ink-faint); padding: 0; font-size: var(--step--1); }
+.decision b { color: var(--blue); }
+.decision p { margin: 0; font-family: var(--serif); font-size: var(--step--1); color: var(--ink-soft); }
+.decision .alt { margin-top: 5px; font-family: var(--sans); color: var(--ink-faint); }
+
+/* ---------- Listas ---------- */
+
+.lista-riesgos, .lista-preguntas, .lista-hallazgos {
+  margin: 0 0 4px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+.lista-riesgos li, .lista-hallazgos li {
+  border-left: 3px solid var(--rule-strong);
+  padding: 8px 0 8px 14px;
+  font-size: var(--step--1);
+}
+.lista-riesgos li.high, .lista-hallazgos li.critical { border-left-color: var(--crit); }
+.lista-hallazgos li.high { border-left-color: var(--warn); }
+.lista-riesgos li.medium, .lista-hallazgos li.medium { border-left-color: var(--warn); }
+.lista-riesgos li b, .lista-hallazgos li b { display: block; }
+.lista-riesgos li span, .lista-hallazgos li span { color: var(--ink-soft); }
+
+.lista-preguntas li {
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+  padding-left: 20px;
+  position: relative;
+}
+.lista-preguntas li::before { content: "?"; position: absolute; left: 0; color: var(--blue); font-weight: 600; }
+
+/* ---------- Informes ---------- */
+
+.informes { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 3px; }
+.informe {
+  background: var(--surface);
+  padding: 12px 18px;
+  display: grid;
+  grid-template-columns: 130px 64px minmax(0, 1fr);
+  gap: 14px;
+  align-items: baseline;
+  font-size: var(--step--1);
+}
+.informe b { font-weight: 600; }
+.informe .nota { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.informe .nota.baja { color: var(--crit); }
+.informe .nota.media { color: var(--warn); }
+.informe .nota.alta { color: var(--ok); }
+.informe span { color: var(--ink-soft); }
+
+.aviso-plan {
+  margin-top: 28px;
+  padding: 16px 18px;
+  border: 1px solid var(--warn);
+  background: var(--warn-soft);
+  border-radius: 3px;
+}
+.aviso-plan h3 { margin-top: 0; color: var(--warn); }
+.aviso-plan ul { margin: 0 0 10px; padding-left: 20px; font-size: var(--step--1); }
+.aviso-plan p { margin: 0; font-size: var(--step--1); color: var(--ink-soft); }
+
+.pasos { margin: 0; padding-left: 20px; font-size: var(--step--1); color: var(--ink-soft); display: grid; gap: 8px; }
+
+.pie {
+  padding-block: 28px 44px;
+  font-size: var(--step--1);
+  color: var(--ink-faint);
+  max-width: 72ch;
+}
+.pie p { margin: 0; }
+
+@media (max-width: 620px) {
+  .informe { grid-template-columns: 1fr; gap: 4px; }
+  h1 { font-size: var(--step-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

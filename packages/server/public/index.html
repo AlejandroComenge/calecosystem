@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>CalEcosystem Studio</title>
+    <meta
+      name="description"
+      content="Describe tu proyecto en español y recibe la arquitectura completa, con las decisiones justificadas."
+    />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600&display=swap" />
+    <link rel="stylesheet" href="/studio.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="wrap">
+        <div class="wordmark"><b>CalEcosystem</b> <span>Studio</span></div>
+        <h1>Describe tu proyecto. Recibe la arquitectura.</h1>
+        <p class="lede">
+          Escribe en español qué hace tu producto y quién lo usa. El sistema decide la
+          arquitectura, te explica por qué eligió cada cosa y te entrega el proyecto listo
+          para descargar.
+        </p>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <!-- Paso 1: el enunciado -->
+      <section class="panel" aria-labelledby="titulo-enunciado">
+        <div class="panel-head">
+          <h2 id="titulo-enunciado">1 · Tu proyecto</h2>
+          <button type="button" id="boton-ejemplos" class="link">Usar un ejemplo</button>
+        </div>
+
+        <div class="panel-body">
+          <div id="ejemplos" class="chips" hidden></div>
+
+          <label class="campo">
+            <span>Describe qué gestiona la aplicación y quién la usa</span>
+            <textarea
+              id="enunciado"
+              rows="7"
+              spellcheck="true"
+              placeholder="Ejemplo: Marketplace donde los vendedores publican cartas de colección con su precio y estado. Los compradores hacen pedidos y pagan con Stripe. Hay valoraciones, login de usuarios con roles y un panel de administración."
+            ></textarea>
+          </label>
+          <p class="pista">
+            Cuenta <b>qué gestiona</b> la aplicación, no qué quieres montar. "Quiero hacer una
+            web" no dice nada; "los vendedores publican cartas y los compradores hacen pedidos"
+            lo dice todo.
+          </p>
+
+          <div class="opciones">
+            <label class="campo compacto">
+              <span>Nombre del producto <i>(opcional)</i></span>
+              <input id="nombre" type="text" placeholder="Cartas Seguras" autocomplete="off" />
+            </label>
+            <label class="campo compacto">
+              <span>Framework</span>
+              <select id="framework">
+                <option value="">Que lo decida el sistema</option>
+                <option value="react">React</option>
+                <option value="vue">Vue</option>
+                <option value="angular">Angular</option>
+              </select>
+            </label>
+            <label class="campo compacto">
+              <span>Despliegue</span>
+              <select id="deployment">
+                <option value="">Que lo decida el sistema</option>
+                <option value="docker-compose">Docker Compose</option>
+                <option value="vercel">Vercel</option>
+                <option value="netlify">Netlify</option>
+                <option value="kubernetes">Kubernetes</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="acciones">
+            <button type="button" id="boton-analizar" class="btn primario">Analizar</button>
+            <button type="button" id="boton-generar" class="btn" disabled>
+              Generar y descargar
+            </button>
+            <span id="estado" class="estado" role="status" aria-live="polite"></span>
+          </div>
+
+          <p id="error" class="alerta" role="alert" hidden></p>
+        </div>
+      </section>
+
+      <!-- Paso 2: el plan -->
+      <section class="panel" id="seccion-plan" aria-labelledby="titulo-plan" hidden>
+        <div class="panel-head">
+          <h2 id="titulo-plan">2 · Lo que ha decidido</h2>
+          <span id="confianza" class="badge"></span>
+        </div>
+        <div class="panel-body">
+          <div class="cifras" id="cifras"></div>
+
+          <h3>Modelo de dominio</h3>
+          <div class="tabla-scroll">
+            <table id="tabla-entidades">
+              <thead>
+                <tr><th>Entidad</th><th>Ruta de la API</th><th>Campos</th><th></th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <h3>Decisiones y por qué</h3>
+          <div id="decisiones" class="decisiones"></div>
+
+          <div id="bloque-riesgos" hidden>
+            <h3>Riesgos que ha identificado</h3>
+            <ul id="riesgos" class="lista-riesgos"></ul>
+          </div>
+
+          <div id="bloque-preguntas" hidden>
+            <h3>Lo que no ha podido deducir</h3>
+            <p class="pista">
+              Responde esto en el enunciado y vuelve a analizar: el modelo mejora mucho.
+            </p>
+            <ul id="preguntas" class="lista-preguntas"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Paso 3: el resultado -->
+      <section class="panel" id="seccion-resultado" aria-labelledby="titulo-resultado" hidden>
+        <div class="panel-head">
+          <h2 id="titulo-resultado">3 · Tu proyecto</h2>
+          <span id="descarga-hecha" class="badge ok"></span>
+        </div>
+        <div class="panel-body">
+          <div class="cifras" id="cifras-resultado"></div>
+
+          <h3>Lo que ha revisado</h3>
+          <div id="informes" class="informes"></div>
+
+          <div id="bloque-pendiente" hidden>
+            <h3>Pendiente antes de producción</h3>
+            <p class="pista">
+              Esto no es un fallo de la generación: son las partes que el sistema deja a medias
+              a propósito y te señala por escrito.
+            </p>
+            <ul id="pendiente" class="lista-hallazgos"></ul>
+          </div>
+
+          <div id="bloque-omitidos" class="aviso-plan" hidden>
+            <h3>Módulos que tu plan no incluye</h3>
+            <ul id="omitidos"></ul>
+            <p>
+              Tu proyecto se ha generado, pero nadie ha revisado su seguridad, su rendimiento
+              ni su cobertura de pruebas.
+            </p>
+          </div>
+
+          <h3>Qué hacer con el ZIP</h3>
+          <ol class="pasos">
+            <li>Descomprímelo donde quieras trabajar.</li>
+            <li>Lee <code>README.md</code>: el stack, las decisiones y los riesgos.</li>
+            <li>Lee <code>SECURITY.md</code>: lo que falta antes de ponerlo en producción.</li>
+            <li>
+              Comprueba que las pruebas pasan:
+              <code>node --test "apps/api/src/domain/*.test.ts"</code>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <footer class="pie">
+        <p>
+          El proyecto generado es un punto de partida correcto y sintácticamente válido, no una
+          aplicación terminada: la autenticación y la persistencia son esqueletos marcados como
+          tales. Tu enunciado no sale de este servidor.
+        </p>
+      </footer>
+    </main>
+
+    <script src="/studio.js"></script>
+  </body>
+</html>

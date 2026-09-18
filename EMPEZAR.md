@@ -65,7 +65,34 @@ tampoco funcionará.
 
 ---
 
-## Paso 4 — Ver la demostración
+## Paso 4 — Abrir la aplicación web
+
+Esta es la forma más cómoda de usarlo: sin comandos, en el navegador.
+
+```bash
+npm run studio
+```
+
+Verás algo así:
+
+```
+  CalEcosystem Studio
+  http://127.0.0.1:3000
+
+  Plan activo: enterprise. Ctrl+C para parar.
+```
+
+Abre esa dirección en el navegador. Ahí puedes:
+
+1. Escribir tu proyecto en español (o pulsar **Usar un ejemplo**).
+2. Pulsar **Analizar** para ver qué decide y por qué, sin generar nada.
+3. Pulsar **Generar y descargar** para recibir el proyecto en un ZIP.
+
+Para pararlo, `Ctrl+C` en la terminal.
+
+> Todo ocurre en tu ordenador: tu descripción no sale de esa ventana.
+
+## Paso 5 — Ver la demostración comercial
 
 ```bash
 npm run demo:comercial
@@ -83,7 +110,7 @@ npm run demo:comercial -- --rapido
 
 ---
 
-## Paso 5 — Probar con ejemplos preparados
+## Paso 6 — Probar con ejemplos preparados
 
 No tienes que inventarte nada. Hay 8 ejemplos listos:
 
@@ -121,7 +148,7 @@ Te da el comando completo. **Cópialo y pégalo.** Genera la tienda en la carpet
 
 ---
 
-## Paso 6 — Mirar lo que ha creado
+## Paso 7 — Mirar lo que ha creado
 
 ```bash
 cd pruebas/tienda
@@ -149,7 +176,7 @@ tiene el proyecto y que preguntas quedaron sin responder.
 
 ---
 
-## Paso 7 — Comprobar que el código generado funciona de verdad
+## Paso 8 — Comprobar que el código generado funciona de verdad
 
 Esto es lo que separa una demo de un producto. El sistema entrega pruebas
 automáticas y **se pueden ejecutar sin instalar nada**:
@@ -164,7 +191,7 @@ funcionan correctamente.
 
 ---
 
-## Paso 8 — Probar con TU idea
+## Paso 9 — Probar con TU idea
 
 Ahora lo importante. Describe tu proyecto en español, en 3 o 4 frases:
 
@@ -204,6 +231,7 @@ CALEC_LICENSE_TIER=enterprise npm run calec -- generate "tu descripcion" --dry-r
 
 | Quiero... | Comando |
 |---|---|
+| **Abrir la aplicación web** | `npm run studio` |
 | Ver los ejemplos | `npm run calec -- examples` |
 | Ver un ejemplo concreto | `npm run calec -- examples tienda` |
 | Ver que haría, sin crear nada | `npm run calec -- plan "mi idea"` |

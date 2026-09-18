@@ -1,6 +1,6 @@
 {
   "name": "calecosystem",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "description": "Ecosistema interconectado de desarrollo web automatizado: generacion, optimizacion, seguridad, testing, documentacion, cuotas y telemetria.",
@@ -19,7 +19,8 @@
     "verify": "npm run typecheck && npm test",
     "demo:ecommerce": "node examples/ecommerce-demo.ts",
     "validate": "node scripts/validate.ts",
-    "demo:comercial": "node examples/demo-comercial.ts"
+    "demo:comercial": "node examples/demo-comercial.ts",
+    "studio": "node packages/server/src/bin.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.3",

@@ -31,14 +31,27 @@ ambas cosas es como se construyen las hojas de ruta que nadie cumple.
 - [x] Guía de inicio para quien no programa, guía de pruebas y material de venta.
 - [x] 247 pruebas.
 
-## v0.3 — publicable
+## v0.3.0 — este commit
+
+- [x] Aplicación web (`@calecosystem/server`): API HTTP e interfaz de navegador,
+      sin dependencias de ejecución ni paso de compilación.
+- [x] Escritor de ZIP propio para poder descargar el proyecto generado.
+- [x] Aviso explícito de los módulos que el plan no ejecuta.
+- [x] 289 pruebas.
+
+## v0.4 — publicable
 
 Objetivo: que `npm install @calecosystem/cli` funcione fuera de este repositorio.
 
 - [ ] **Build de publicación.** Los paquetes apuntan a `src/*.ts`; hay que
       emitir `dist/` con tipos y `exports` condicionales. Es el bloqueo real
       para publicar.
-- [ ] Versionado y publicación coordinada de los diez paquetes.
+- [ ] Versionado y publicación coordinada de los once paquetes.
+- [ ] Cuentas de usuario reales en la aplicación web: hoy el identificador va
+      en una cabecera y cualquiera puede falsearlo, así que el consumo medido
+      no sirve para facturar.
+- [ ] Persistencia del consumo en la aplicación web: hoy vive en memoria.
+- [ ] Límite de peticiones por IP antes de exponer el servidor a internet.
 - [ ] `calec init` para generar `calecosystem.config.json` de forma interactiva.
 - [ ] `--template` para forzar plantilla, y `--no-templates` documentado.
 - [ ] Renderizadores de componentes para Vue y Angular: hoy el catálogo solo

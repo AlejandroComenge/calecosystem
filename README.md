@@ -96,6 +96,35 @@ Conviene decirlo antes de que lo descubra un cliente:
   valido**, no una aplicación terminada. La autenticación y la persistencia
   son esqueletos marcados como tales.
 
+## La aplicación web
+
+```bash
+npm run studio
+```
+
+Abre `http://localhost:3000` y ya está: escribes tu proyecto en español,
+pulsas **Analizar** para ver las decisiones antes de generar nada, y
+**Generar y descargar** para recibir el proyecto en un ZIP.
+
+Es la forma de usar el ecosistema sin terminal, y por tanto la única que
+puede ofrecerse a quien no programa. El servidor no tiene dependencias de
+ejecución y la interfaz no tiene paso de compilación: son HTML, CSS y
+JavaScript que el navegador carga tal cual.
+
+| Ruta | Para qué |
+|------|----------|
+| `POST /api/plan` | Devuelve el blueprint: stack, entidades, decisiones y riesgos |
+| `POST /api/generate` | Genera el proyecto y lo devuelve como ZIP (o JSON con `format`) |
+| `GET /api/examples` | Catálogo de ejemplos |
+| `GET /api/usage` | Consumo y límites del plan |
+| `GET /api/health` | Sonda de salud |
+
+Lo que **no** incluye todavía, y está declarado: no hay cuentas de usuario
+reales (el identificador viaja en una cabecera y cualquiera puede falsearlo),
+el consumo se guarda en memoria y se pierde al reiniciar, y no hay límite de
+peticiones por IP. Sirve para una demo y para uso local; no para exponerlo a
+internet y cobrar.
+
 ## Instalación y uso
 
 Requiere Node.js 22.18 o superior (usa el soporte nativo de TypeScript; no
@@ -271,7 +300,7 @@ al evaluar un generador de código:
 | | `npm test` | `npm run validate` |
 |---|---|---|
 | Verifica | Qué el **generador** funciona | Qué el **código generado** es válido |
-| Alcance | 247 pruebas | 8 ejemplos completos |
+| Alcance | 289 pruebas | 8 ejemplos completos |
 | Incluye | Analisis, planificacion, plantillas, cuotas, Stripe, integracion | Sintaxis de todo el TS, JSON, YAML, y **ejecuta las pruebas que el generador entrega** |
 
 Ultima ejecucion de `npm run validate`:
@@ -303,7 +332,7 @@ enseña lo bueno gana la reunión y pierde al cliente tres semanas después.
 
 ## Estado del proyecto
 
-v0.2.0 — 247 pruebas + validación de salida, sin dependencias de ejecución.
+v0.3.0 — 289 pruebas + validación de salida, sin dependencias de ejecución.
 Lo previsto para las siguientes versiones está en
 [`docs/roadmap.md`](docs/roadmap.md), separando lo comprometido de lo que
 todavía es una hipotesis.
