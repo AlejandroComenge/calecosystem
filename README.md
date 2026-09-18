@@ -102,7 +102,7 @@ Conviene decirlo antes de que lo descubra un cliente:
 npm run studio
 ```
 
-Abre `http://localhost:3000` y ya está: escribes tu proyecto en español,
+Abre `http://localhost:4173` y ya está: escribes tu proyecto en español,
 pulsas **Analizar** para ver las decisiones antes de generar nada, y
 **Generar y descargar** para recibir el proyecto en un ZIP.
 

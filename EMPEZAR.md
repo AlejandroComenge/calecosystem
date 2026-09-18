@@ -77,12 +77,19 @@ Verás algo así:
 
 ```
   CalEcosystem Studio
-  http://127.0.0.1:3000
+  Abre esta dirección en el navegador: http://127.0.0.1:4173
 
   Plan activo: enterprise. Ctrl+C para parar.
 ```
 
-Abre esa dirección en el navegador. Ahí puedes:
+Abre esa dirección en el navegador. **Fíjate en el puerto que imprime tu
+terminal**: es el que vale. Si ves `NO SE PUEDE ACCEDER A ESTE SITIO WEB`,
+casi siempre es que has abierto una dirección distinta a la que dice ahí.
+
+Deja esa ventana de la terminal abierta: mientras esté abierta, el servidor
+está encendido. Si la cierras, la web deja de responder.
+
+Ahí puedes:
 
 1. Escribir tu proyecto en español (o pulsar **Usar un ejemplo**).
 2. Pulsar **Analizar** para ver qué decide y por qué, sin generar nada.

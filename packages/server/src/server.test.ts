@@ -1,11 +1,11 @@
 import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createSilentLogger } from '@calecosystem/core';
-import { startServer, type ServerHandle } from './start.ts';
+import { PUERTO_POR_DEFECTO, startServer, type ServerHandle } from './start.ts';
 
 let servidor: ServerHandle;
 
@@ -257,4 +257,38 @@ test('una ruta de API inexistente devuelve 404 con código', async () => {
 
   assert.equal(respuesta.status, 404);
   assert.equal(error.error.code, 'NOT_FOUND');
+});
+
+/* --- El puerto por defecto ---------------------------------------------- */
+
+test('el puerto por defecto no choca con el de los proyectos generados', () => {
+  // Los backends que genera el ecosistema escuchan en el 3000. Si Studio
+  // usase ese mismo puerto, arrancar un proyecto recién generado fallaría
+  // sin explicación. Esta prueba existe para que nadie lo "simplifique".
+  assert.notEqual(PUERTO_POR_DEFECTO, 3000);
+  assert.equal(PUERTO_POR_DEFECTO, 4173);
+});
+
+test('la documentación anuncia el mismo puerto que usa el código', async () => {
+  // Un puerto mal documentado deja al usuario mirando una pantalla de error
+  // mientras el servidor funciona perfectamente en otra puerta. Ya pasó.
+  const raiz = path.resolve(import.meta.dirname, '../../..');
+
+  for (const fichero of ['README.md', 'EMPEZAR.md']) {
+    const texto = await readFile(path.join(raiz, fichero), 'utf8');
+    const anunciados = new Set(
+      [...texto.matchAll(/(?:localhost|127\.0\.0\.1):(\d{4,5})/g)].map((m) => Number(m[1])),
+    );
+    // El 3000 aparece legítimamente al hablar del backend generado; lo que no
+    // puede aparecer es un puerto de Studio que no sea el real.
+    anunciados.delete(3000);
+
+    for (const puerto of anunciados) {
+      assert.equal(
+        puerto,
+        PUERTO_POR_DEFECTO,
+        `${fichero} anuncia el puerto ${puerto}, pero Studio escucha en el ${PUERTO_POR_DEFECTO}`,
+      );
+    }
+  }
 });
