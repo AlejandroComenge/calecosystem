@@ -239,3 +239,105 @@ test('ninguna señal de las plantillas lleva tildes', () => {
   }
   assert.ok(comprobados > 40, `solo se comprobaron ${comprobados} señales`);
 });
+
+/* --- Entidades fuera del léxico ---------------------------------------- */
+
+test('propone entidades que no están en el léxico en vez de descartarlas', async () => {
+  const model = await analyzer.analyze({
+    text:
+      'Quiero preparar un proyecto para ser un intermediario para la gente que ' +
+      'vende o intercambia cartas pokemon',
+  });
+
+  const carta = model.entities.find((entity) => entity.name === 'Carta');
+  assert.ok(carta, `no se dedujo Carta; se obtuvo ${model.entities.map((e) => e.name).join(', ')}`);
+  assert.equal(carta.inferred, true, 'debe quedar marcada como deducida');
+});
+
+test('no confunde el andamiaje del encargo con el dominio', async () => {
+  const model = await analyzer.analyze({
+    text: 'Quiero preparar un proyecto para vender cartas de coleccion entre usuarios',
+  });
+
+  // "proyecto" solo aparece enmarcando la petición: no es una entidad.
+  assert.equal(
+    model.entities.some((entity) => entity.name === 'Project'),
+    false,
+    'el proyecto del que habla el usuario es el encargo, no el dominio',
+  );
+});
+
+test('pero sí modela Project cuando el dominio va de proyectos', async () => {
+  const model = await analyzer.analyze({
+    text:
+      'Herramienta para gestionar proyectos y tareas de un equipo. Cada proyecto ' +
+      'tiene tareas asignadas y los proyectos se archivan al terminar.',
+  });
+
+  assert.ok(
+    model.entities.some((entity) => entity.name === 'Project'),
+    'aquí "proyecto" sí es dominio y aparece fuera del marco',
+  );
+});
+
+test('descarta el ruido: atributos, interfaz y palabras abstractas', async () => {
+  const model = await analyzer.analyze({
+    text:
+      'Tienda donde se venden cartas. Cada carta tiene su precio, su estado y su ' +
+      'nombre. Hay paginas de resultados, filtros, botones y varias opciones. La ' +
+      'gente puede ver los datos en distintas pantallas durante varios meses.',
+  });
+
+  const nombres = model.entities.map((entity) => entity.name);
+  for (const ruido of ['Precio', 'Estado', 'Nombre', 'Pagina', 'Filtro', 'Boton', 'Opcion', 'Dato', 'Gente', 'Pantalla', 'Mes']) {
+    assert.equal(nombres.includes(ruido), false, `"${ruido}" no es una entidad de negocio`);
+  }
+  assert.ok(nombres.includes('Carta'), 'pero la entidad real sí debe estar');
+});
+
+test('los roles se modelan como actores, no como entidades', async () => {
+  const model = await analyzer.analyze({
+    text: 'Marketplace donde los vendedores publican cartas y los compradores hacen pedidos con login',
+  });
+
+  assert.equal(
+    model.entities.some((entity) => entity.name === 'Vendedore' || entity.name === 'Vendedor'),
+    false,
+    'un vendedor es un rol, no una tabla',
+  );
+  assert.ok(model.actors.some((actor) => actor.label === 'Vendedor'));
+});
+
+test('avisa de que el nombre del producto es una suposición', async () => {
+  const model = await analyzer.analyze({
+    text: 'Quiero montar algo para que la gente intercambie cartas de coleccion entre si',
+  });
+
+  assert.ok(
+    model.openQuestions.some((pregunta) => pregunta.includes('Cómo se llama el producto')),
+    'si el nombre se dedujo, hay que preguntarlo',
+  );
+});
+
+test('no pregunta por el nombre cuando el enunciado lo da', async () => {
+  const model = await analyzer.analyze({
+    text: 'Plataforma de reservas para clinicas dentales con citas, pacientes y pagos online',
+  });
+
+  assert.equal(
+    model.openQuestions.some((pregunta) => pregunta.includes('Cómo se llama el producto')),
+    false,
+  );
+});
+
+test('las entidades deducidas se limitan para no inundar el modelo', async () => {
+  const model = await analyzer.analyze({
+    text:
+      'Aplicacion donde se gestionan cartas, cromos, figuras, pegatinas, chapas, ' +
+      'llaveros, posters, comics, revistas y fanzines de coleccionismo',
+  });
+
+  const deducidas = model.entities.filter((entity) => entity.inferred);
+  assert.ok(deducidas.length > 0, 'debe deducir algunas');
+  assert.ok(deducidas.length <= 4, `dedujo ${deducidas.length}: demasiadas para revisar`);
+});

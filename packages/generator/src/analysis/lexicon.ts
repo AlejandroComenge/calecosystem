@@ -132,6 +132,81 @@ export const ENTITY_LEXICON: Readonly<Record<string, string>> = {
   task: 'Task', tasks: 'Task', event: 'Event', events: 'Event',
 };
 
+/**
+ * Palabras que nunca son entidades de negocio.
+ *
+ * Sin esta lista, la extracción genérica convierte en tabla de base de datos
+ * cualquier sustantivo plural del enunciado: "opciones", "datos", "meses".
+ * Es la diferencia entre proponer un modelo y proponer ruido.
+ */
+export const NON_ENTITY_WORDS: ReadonlySet<string> = new Set([
+  // Meta-lenguaje del propio encargo
+  'proyecto', 'proyectos', 'aplicacion', 'aplicaciones', 'app', 'apps', 'web',
+  'webs', 'sistema', 'sistemas', 'plataforma', 'plataformas', 'herramienta',
+  'herramientas', 'portal', 'portales', 'sitio', 'sitios', 'software',
+  'programa', 'programas', 'solucion', 'soluciones', 'idea', 'ideas',
+  'negocio', 'negocios', 'servicio', 'servicios', 'modulo', 'modulos',
+  // Abstractos y muletillas
+  'gente', 'personas', 'persona', 'cosas', 'cosa', 'temas', 'tema', 'formas',
+  'forma', 'maneras', 'manera', 'tipos', 'tipo', 'partes', 'parte', 'veces',
+  'vez', 'casos', 'caso', 'ejemplos', 'ejemplo', 'detalles', 'detalle',
+  'aspectos', 'puntos', 'punto', 'niveles', 'nivel', 'grupos', 'grupo',
+  // Atributos, no entidades
+  'datos', 'dato', 'precios', 'precio', 'estados', 'estado', 'nombres',
+  'nombre', 'fechas', 'fecha', 'cantidades', 'cantidad', 'importes',
+  'importe', 'totales', 'total', 'descripciones', 'descripcion', 'titulos',
+  'titulo', 'campos', 'campo', 'valores', 'valor', 'codigos', 'codigo',
+  'numeros', 'numero', 'euros', 'euro', 'colores', 'color', 'tallas', 'talla',
+  // Interfaz
+  'paginas', 'pagina', 'pantallas', 'pantalla', 'vistas', 'vista', 'botones',
+  'boton', 'menus', 'menu', 'formularios', 'formulario', 'listados',
+  'listado', 'tablas', 'tabla', 'filtros', 'filtro', 'buscador', 'panel',
+  'paneles', 'secciones', 'seccion', 'apartados', 'apartado', 'opciones',
+  'opcion', 'funciones', 'funcion', 'funcionalidades', 'funcionalidad',
+  // Tiempo y medida
+  'meses', 'mes', 'anos', 'ano', 'dias', 'dia', 'horas', 'hora', 'minutos',
+  'semanas', 'semana', 'momentos', 'momento', 'plazos', 'plazo',
+  // Roles: se detectan como actores, no como entidades
+  'roles', 'rol', 'permisos', 'permiso', 'perfiles', 'perfil',
+]);
+
+/**
+ * Verbos que introducen el objeto que la aplicación gestiona.
+ *
+ * "los vendedores **publican** cartas" -> `cartas` es candidata a entidad.
+ * Es la señal sintáctica más fiable sin un analizador morfológico completo.
+ */
+export const OBJECT_VERBS: readonly string[] = [
+  'gestionar', 'gestiona', 'gestionan', 'administrar', 'administra',
+  'administran', 'publicar', 'publica', 'publican', 'vender', 'vende',
+  'venden', 'comprar', 'compra', 'compran', 'intercambiar', 'intercambia',
+  'intercambian', 'alquilar', 'alquila', 'alquilan', 'ofrecer', 'ofrece',
+  'ofrecen', 'registrar', 'registra', 'registran', 'listar', 'lista',
+  'listan', 'subir', 'sube', 'suben', 'anadir', 'anade', 'anaden',
+  'crear', 'crea', 'crean', 'catalogo de', 'inventario de', 'coleccion de',
+];
+
+/** Terminaciones que delatan un verbo o un adverbio, nunca un sustantivo. */
+export const NON_NOUN_ENDINGS: readonly string[] = [
+  'ar', 'er', 'ir', 'ando', 'iendo', 'mente', 'aba', 'aban', 'ria', 'rian',
+];
+
+/**
+ * Verbos que enmarcan el encargo: lo que va detrás describe el entregable,
+ * no el dominio. Van en dos listas porque se encadenan ("quiero preparar una
+ * web") y una sola expresión regular capturaría el segundo verbo como si
+ * fuera el sustantivo.
+ */
+export const FRAMING_MODALS: readonly string[] = [
+  'quiero', 'queremos', 'necesito', 'necesitamos', 'busco', 'buscamos',
+  'deseo', 'pretendo', 'me gustaria', 'estoy buscando', 'voy a', 'vamos a',
+];
+
+export const FRAMING_BUILD: readonly string[] = [
+  'preparar', 'hacer', 'montar', 'crear', 'desarrollar', 'construir',
+  'lanzar', 'disenar', 'programar', 'tener', 'poner en marcha',
+];
+
 /** Verbos que suelen introducir una enumeración de entidades. */
 export const ENTITY_TRIGGERS: readonly string[] = [
   'gestionar', 'administrar', 'gestion de', 'administracion de', 'crear', 'registrar',

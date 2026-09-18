@@ -238,6 +238,15 @@ Cuando el texto no da para decidir, el analizador **no inventa**: baja
 `confidence` y deja las dudas en `openQuestions`, que acaban en el README del
 proyecto generado. Es lo que haría un consultor antes de dibujar nada.
 
+Con los sustantivos que no están en el léxico hace algo intermedio: los
+propone marcados como `inferred` y pide confirmación. La alternativa, que era
+descartarlos en silencio, resultó peor: un enunciado sobre "cartas de
+colección" producía un modelo vacío sin que nadie se enterara de por qué. La
+señal que exige para proponerlos es sintáctica —objeto de un verbo de gestión,
+o plural tras determinante— y hay una lista explícita de lo que nunca es una
+entidad (atributos, elementos de interfaz, abstracciones), porque un modelo con
+tablas inventadas es peor que uno incompleto.
+
 ## 9. Decisiones técnicas del repositorio
 
 | Decisión | Motivo | Coste asumido |

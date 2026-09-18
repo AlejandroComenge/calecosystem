@@ -17,7 +17,12 @@ import {
   ENTITY_LEXICON,
   ENTITY_TRIGGERS,
   FEATURE_LEXICON,
+  FRAMING_BUILD,
+  FRAMING_MODALS,
   INTEGRATION_LEXICON,
+  NON_ENTITY_WORDS,
+  NON_NOUN_ENDINGS,
+  OBJECT_VERBS,
   fieldsFor,
 } from './lexicon.ts';
 import {
@@ -35,6 +40,8 @@ import {
 
 const ALL_OPERATIONS: readonly CrudOperation[] = ['list', 'read', 'create', 'update', 'delete'];
 const MAX_ENTITIES = 12;
+/** Tope de entidades deducidas: a partir de ahí, el ruido supera al valor. */
+const MAX_INFERRED_ENTITIES = 4;
 
 export interface AnalyzerOptions {
   readonly logger: Logger;
@@ -70,8 +77,15 @@ export class RequirementsAnalyzer {
     const nonFunctional = this.#detectNonFunctional(text);
     const integrations = INTEGRATION_LEXICON.filter((name) => containsTerm(text, name));
     const projectName = input.projectName?.trim() || inferProjectName(raw, text);
+    const nombreDeducido = !input.projectName?.trim() && !namedInBrief(text);
 
-    const openQuestions = buildOpenQuestions({ entities, actors, features, nonFunctional });
+    const openQuestions = buildOpenQuestions({
+      entities,
+      actors,
+      features,
+      nonFunctional,
+      nombreDeducido,
+    });
 
     let model: RequirementsModel = {
       projectName,
@@ -129,37 +143,121 @@ export class RequirementsAnalyzer {
   }
 
   #detectEntities(text: string, features: FeatureSet): DomainEntity[] {
-    const found = new Map<string, string>(); // nombre canonico -> término original
+    const found = new Map<string, string>(); // nombre canónico -> término original
+    const meta = framedTerms(text);
 
     // 1) Enumeraciones tras verbos de gestión: "gestionar productos, pedidos y clientes".
     for (const trigger of ENTITY_TRIGGERS) {
       const pattern = new RegExp(`${trigger}\\s+((?:[a-z0-9]+(?:[,\\s]+(?:y|e|and)?\\s*)?){1,8})`, 'g');
       for (const match of text.matchAll(pattern)) {
         for (const token of (match[1] ?? '').split(/[,\s]+|\s+y\s+|\s+and\s+/)) {
-          register(found, token);
+          register(found, token, meta);
         }
       }
     }
 
-    // 2) Barrido general del lexico de dominio sobre todo el texto.
+    // 2) Barrido general del léxico de dominio sobre todo el texto.
     for (const term of Object.keys(ENTITY_LEXICON)) {
-      if (containsTerm(text, term)) register(found, term);
+      if (containsTerm(text, term)) register(found, term, meta);
     }
 
-    // 3) Entidades implicitas por capacidad activa.
-    if (features.auth) register(found, 'usuario');
-    if (features.payments) register(found, 'pago');
+    // 3) Entidades implícitas por capacidad activa.
+    if (features.auth) register(found, 'usuario', meta);
+    if (features.payments) register(found, 'pago', meta);
 
-    const entities = [...found.entries()]
-      .slice(0, MAX_ENTITIES)
-      .map(([name, sourceTerm]) => buildEntity(name, sourceTerm));
+    const conocidas = [...found.entries()].map(([name, sourceTerm]) =>
+      buildEntity(name, sourceTerm),
+    );
 
-    // 4) Red de seguridad: sin dominio no hay nada que generar.
+    // 4) Lo que el léxico no conoce.
+    //
+    //    Antes se descartaba, y por eso "cartas de colección" desaparecía del
+    //    modelo sin dejar rastro. Ahora se propone: es mejor un nombre que
+    //    alguien tiene que revisar que un silencio que nadie detecta. Van
+    //    marcadas como `inferred` para que la documentación lo advierta.
+    const deducidas = this.#inferUnknownEntities(text, meta, conocidas, features);
+
+    const entities = [...conocidas, ...deducidas].slice(0, MAX_ENTITIES);
+
+    // 5) Red de seguridad: sin dominio no hay nada que generar.
     if (entities.length === 0) {
       this.#logger.warn('No se detectaron entidades de dominio; se genera un modelo `Item` base.');
       return [buildEntity('Item', 'item')];
     }
+    if (deducidas.length > 0) {
+      this.#logger.info(
+        `Entidades deducidas del texto (revísalas): ${deducidas.map((e) => e.name).join(', ')}.`,
+      );
+    }
     return entities;
+  }
+
+  /**
+   * Extrae sustantivos que no están en el léxico.
+   *
+   * Sin analizador morfológico, la fiabilidad viene de exigir una señal
+   * sintáctica clara: o el sustantivo va detrás de un verbo que introduce el
+   * objeto gestionado ("publican cartas"), o es un plural detrás de
+   * determinante ("las cartas"). Todo lo demás se descarta, porque un modelo
+   * con entidades inventadas es peor que uno incompleto.
+   */
+  #inferUnknownEntities(
+    text: string,
+    meta: ReadonlySet<string>,
+    conocidas: readonly DomainEntity[],
+    features: FeatureSet,
+  ): DomainEntity[] {
+    const yaCubiertos = new Set<string>();
+    for (const entity of conocidas) {
+      yaCubiertos.add(entity.sourceTerm);
+      yaCubiertos.add(singularize(entity.sourceTerm));
+    }
+
+    const candidatos = new Map<string, number>(); // término -> fuerza de la señal
+
+    // (a) Objeto de un verbo de gestión: la señal más fiable.
+    for (const verbo of OBJECT_VERBS) {
+      const pattern = new RegExp(
+        `${verbo}\\s+(?:de\\s+)?(?:los|las|un|una|unos|unas|sus)?\\s*([a-z]{4,})`,
+        'g',
+      );
+      for (const match of text.matchAll(pattern)) {
+        if (match[1]) candidatos.set(match[1], Math.max(candidatos.get(match[1]) ?? 0, 2));
+      }
+    }
+
+    // (b) Plural detrás de determinante: señal más débil, pero útil.
+    for (const match of text.matchAll(
+      /\b(?:los|las|unos|unas|sus|nuestros|nuestras)\s+([a-z]{4,}(?:es|s))\b/g,
+    )) {
+      if (match[1]) candidatos.set(match[1], Math.max(candidatos.get(match[1]) ?? 0, 1));
+    }
+
+    const deducidas: DomainEntity[] = [];
+    const vistos = new Set<string>();
+
+    for (const [termino] of [...candidatos.entries()].sort((a, b) => b[1] - a[1])) {
+      if (deducidas.length >= MAX_INFERRED_ENTITIES) break;
+      const singular = singularize(termino);
+
+      if (NON_ENTITY_WORDS.has(termino) || NON_ENTITY_WORDS.has(singular)) continue;
+      if (meta.has(termino) || meta.has(singular)) continue;
+      if (yaCubiertos.has(termino) || yaCubiertos.has(singular)) continue;
+      if (ENTITY_LEXICON[termino] ?? ENTITY_LEXICON[singular]) continue;
+      // Los roles se modelan como actores, no como tablas.
+      if (ACTOR_LEXICON[termino] ?? ACTOR_LEXICON[singular]) continue;
+      if (NON_NOUN_ENDINGS.some((fin) => singular.endsWith(fin))) continue;
+      if (singular.length < 4) continue;
+
+      const nombre = pascalCase(singular);
+      if (vistos.has(nombre)) continue;
+      vistos.add(nombre);
+
+      deducidas.push({ ...buildEntity(nombre, termino), inferred: true });
+    }
+
+    void features;
+    return deducidas;
   }
 
   #detectActors(text: string, features: FeatureSet): Actor[] {
@@ -208,12 +306,63 @@ export class RequirementsAnalyzer {
 
 /* --- Auxiliares puros ------------------------------------------------- */
 
-function register(found: Map<string, string>, rawToken: string): void {
+function register(
+  found: Map<string, string>,
+  rawToken: string,
+  meta: ReadonlySet<string> = new Set(),
+): void {
   const token = normalize(rawToken).trim();
   if (token.length < 3) return;
+  // "quiero preparar un proyecto para..." habla del encargo, no del dominio.
+  if (meta.has(token) || meta.has(singularize(token))) return;
   const canonical = ENTITY_LEXICON[token] ?? ENTITY_LEXICON[singularize(token)];
   if (!canonical) return;
   if (!found.has(canonical)) found.set(canonical, token);
+}
+
+/**
+ * Términos que solo aparecen enmarcando el encargo ("quiero montar una
+ * plataforma"), nunca como algo que la aplicación gestione.
+ *
+ * Si la palabra aparece también fuera de ese marco, no se filtra: una
+ * herramienta de gestión de proyectos sí tiene una entidad `Project`.
+ */
+function framedTerms(text: string): Set<string> {
+  const modales = FRAMING_MODALS.join('|');
+  const construir = FRAMING_BUILD.join('|');
+  const determinante = '(?:un|una|el|la|mi|nuestro|nuestra|unos|unas)?\\s*';
+
+  // "quiero preparar una web", "montar un marketplace", "necesito una app".
+  const patrones = [
+    new RegExp(`\\b(?:${modales})\\s+(?:${construir})\\s+${determinante}([a-z]{3,})`, 'g'),
+    new RegExp(`\\b(?:${construir})\\s+${determinante}([a-z]{3,})`, 'g'),
+    new RegExp(`\\b(?:${modales})\\s+${determinante}([a-z]{3,})`, 'g'),
+  ];
+
+  const enmarcados = new Set<string>();
+  const vecesEnmarcado = new Map<string, number>();
+
+  for (const patron of patrones) {
+    for (const match of text.matchAll(patron)) {
+      const termino = match[1];
+      // Un verbo capturado como si fuera sustantivo no cuenta.
+      if (!termino || esVerboDeMarco(termino)) continue;
+      enmarcados.add(termino);
+      vecesEnmarcado.set(termino, (vecesEnmarcado.get(termino) ?? 0) + 1);
+    }
+  }
+
+  // Si el término aparece más veces de las que va enmarcado, también se usa
+  // como dominio y no debe filtrarse.
+  for (const termino of [...enmarcados]) {
+    const total = [...text.matchAll(new RegExp(`\\b${termino}\\b`, 'g'))].length;
+    if (total > (vecesEnmarcado.get(termino) ?? 0)) enmarcados.delete(termino);
+  }
+  return enmarcados;
+}
+
+function esVerboDeMarco(termino: string): boolean {
+  return FRAMING_MODALS.includes(termino) || FRAMING_BUILD.includes(termino);
 }
 
 function buildEntity(name: string, sourceTerm: string): DomainEntity {
@@ -271,13 +420,27 @@ function inferProjectName(raw: string, text: string): string {
     if (words.length > 0) return titleCase(words.join(' '));
   }
 
+  // Sin patrón reconocible: se toman las primeras palabras con contenido,
+  // descartando el andamiaje de la petición ("quiero preparar un...") y los
+  // términos que solo enmarcan el encargo.
+  const descartables = new Set<string>([
+    ...NAME_STOPWORDS,
+    ...FRAMING_MODALS,
+    ...FRAMING_BUILD,
+    ...framedTerms(text),
+    'ser', 'estar', 'poder', 'hacer',
+  ]);
+
   const firstWords = raw
     .trim()
     .split(/\s+/)
-    .filter((word) => !NAME_STOPWORDS.has(normalize(word)))
+    .filter((word) => {
+      const limpia = normalize(word).replace(/[^a-z0-9]/g, '');
+      return limpia.length > 2 && !descartables.has(limpia);
+    })
     .slice(0, 3)
     .join(' ');
-  return firstWords === '' ? 'Generated App' : titleCase(firstWords);
+  return firstWords === '' ? 'Proyecto Sin Nombre' : titleCase(firstWords);
 }
 
 /** Empareja dos listas del mismo tamano; descarta el sobrante si difieren. */
@@ -340,10 +503,31 @@ interface OpenQuestionsInput {
   readonly actors: readonly Actor[];
   readonly features: FeatureSet;
   readonly nonFunctional: NonFunctionalRequirements;
+  readonly nombreDeducido: boolean;
+}
+
+/** `true` si el enunciado nombra el producto con un patrón reconocible. */
+function namedInBrief(text: string): boolean {
+  return /(?:plataforma|aplicacion|app|sistema|portal|marketplace|tienda|herramienta|web)\s+(?:[a-z0-9]+\s+){0,3}[a-z0-9]+/.test(
+    text,
+  );
 }
 
 function buildOpenQuestions(input: OpenQuestionsInput): string[] {
   const questions: string[] = [];
+
+  if (input.nombreDeducido) {
+    questions.push('Cómo se llama el producto? El nombre se dedujo del texto y puede no ser el bueno.');
+  }
+
+  // Las entidades deducidas son una propuesta, no una certeza.
+  const deducidas = input.entities.filter((entity) => entity.inferred);
+  if (deducidas.length > 0) {
+    questions.push(
+      `Se dedujeron del texto estas entidades: ${deducidas.map((e) => e.name).join(', ')}. ` +
+        'Confirma su nombre y qué campos necesita cada una.',
+    );
+  }
   if (input.entities.length <= 1) {
     questions.push('Que entidades de negocio principales debe gestionar la aplicación?');
   }

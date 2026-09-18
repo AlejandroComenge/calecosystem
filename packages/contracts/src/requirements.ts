@@ -40,6 +40,12 @@ export interface DomainEntity {
   readonly sourceTerm: string;
   readonly fields: readonly EntityField[];
   readonly operations: readonly CrudOperation[];
+  /**
+   * `true` cuando el término no estaba en el léxico de dominio y se dedujo
+   * del texto. El modelo propuesto es una hipótesis razonable, no una
+   * certeza: conviene que alguien confirme el nombre y los campos.
+   */
+  readonly inferred?: boolean;
 }
 
 export interface Actor {
