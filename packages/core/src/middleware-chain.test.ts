@@ -8,7 +8,7 @@ const RESULT = { requestId: 'r-1' } as GenerationResult;
 
 function context(): GenerationContext {
   return {
-    input: { text: 'una descripcion de prueba suficientemente larga' },
+    input: { text: 'una descripción de prueba suficientemente larga' },
     logger: createSilentLogger(),
     requestId: 'r-1',
     state: new Map<string, unknown>(),
@@ -50,7 +50,7 @@ test('el middleware de menor prioridad envuelve a los demas', async () => {
   ]);
 });
 
-test('un middleware que no llama a next corta la ejecucion', async () => {
+test('un middleware que no llama a next corta la ejecución', async () => {
   const chain = new MiddlewareChain();
   let coreRan = false;
 
@@ -82,7 +82,7 @@ test('un middleware que lanza propaga el error', async () => {
   await assert.rejects(() => chain.run(context(), async () => RESULT), /cuota agotada/);
 });
 
-test('llamar dos veces a next es un error, no una generacion duplicada', async () => {
+test('llamar dos veces a next es un error, no una generación duplicada', async () => {
   const chain = new MiddlewareChain();
   chain.register(
     defineMiddleware('defectuoso', async (_ctx, next) => {
@@ -93,7 +93,7 @@ test('llamar dos veces a next es un error, no una generacion duplicada', async (
 
   await assert.rejects(
     () => chain.run(context(), async () => RESULT),
-    /mas de una vez/,
+    /más de una vez/,
   );
 });
 

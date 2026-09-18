@@ -1,9 +1,9 @@
 /**
- * Pruebas de integracion del ecosistema.
+ * Pruebas de integración del ecosistema.
  *
- * Verifican lo que ninguna prueba unitaria puede: que los cinco modulos se
+ * Verifican lo que ninguna prueba unitaria puede: que los cinco módulos se
  * conectan de verdad por los hooks, y que un plugin de terceros puede
- * intervenir en el resultado sin tocar el codigo del generador.
+ * intervenir en el resultado sin tocar el código del generador.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -25,9 +25,9 @@ const logger = createSilentLogger();
 const enterprise = new Entitlements({ tier: 'enterprise' });
 
 const BRIEF =
-  'Plataforma de reservas para clinicas: los pacientes piden citas con los medicos, ' +
-  'hay login de usuarios con roles, pagos online y un panel de administracion. ' +
-  'Esperamos 30.000 usuarios y trabajamos con datos medicos.';
+  'Plataforma de reservas para clínicas: los pacientes piden citas con los médicos, ' +
+  'hay login de usuarios con roles, pagos online y un panel de administración. ' +
+  'Esperamos 30.000 usuarios y trabajamos con datos médicos.';
 
 async function fullKernel() {
   return createKernel({
@@ -43,7 +43,7 @@ async function fullKernel() {
   });
 }
 
-test('el ecosistema completo genera proyecto, informes y metricas', async () => {
+test('el ecosistema completo genera proyecto, informes y métricas', async () => {
   const kernel = await fullKernel();
   const result = await new CodeGenerator({ kernel }).generate({ text: BRIEF });
 
@@ -63,7 +63,7 @@ test('el ecosistema completo genera proyecto, informes y metricas', async () => 
   await kernel.dispose();
 });
 
-test('los cuatro modulos de ampliacion emiten informe en el orden canonico', async () => {
+test('los cuatro módulos de ampliación emiten informe en el orden canonico', async () => {
   const kernel = await fullKernel();
   const result = await new CodeGenerator({ kernel }).generate({ text: BRIEF });
 
@@ -78,7 +78,7 @@ test('los cuatro modulos de ampliacion emiten informe en el orden canonico', asy
   await kernel.dispose();
 });
 
-test('los ficheros que aportan los modulos llegan al proyecto final', async () => {
+test('los ficheros que aportan los módulos llegan al proyecto final', async () => {
   const kernel = await fullKernel();
   const result = await new CodeGenerator({ kernel }).generate({ text: BRIEF });
   const paths = result.files.map((file) => file.path);
@@ -103,7 +103,7 @@ test('cada fichero declara quien lo produjo', async () => {
   await kernel.dispose();
 });
 
-test('el auditor detecta la autenticacion sin verificar como hallazgo critico', async () => {
+test('el auditor detecta la autenticación sin verificar como hallazgo crítico', async () => {
   const kernel = await fullKernel();
   const result = await new CodeGenerator({ kernel }).generate({ text: BRIEF });
   const report = result.reports.find((candidate) => candidate.kind === 'security');
@@ -114,7 +114,7 @@ test('el auditor detecta la autenticacion sin verificar como hallazgo critico', 
   await kernel.dispose();
 });
 
-test('un plugin de terceros modifica el blueprint por el hook de transformacion', async () => {
+test('un plugin de terceros modifica el blueprint por el hook de transformación', async () => {
   const kernel = await createKernel({
     logger,
     entitlements: enterprise,
@@ -144,7 +144,7 @@ test('un plugin de terceros modifica el blueprint por el hook de transformacion'
   await kernel.dispose();
 });
 
-test('un plugin de terceros puede anadir ficheros al resultado final', async () => {
+test('un plugin de terceros puede añadir ficheros al resultado final', async () => {
   const extra: VirtualFile = {
     path: 'COMPLIANCE.md',
     contents: '# Cumplimiento corporativo\n',
@@ -202,7 +202,7 @@ test('el pipeline emite los eventos del ciclo de vida en orden', async () => {
   await kernel.dispose();
 });
 
-test('un modulo que falla no tumba la generacion y deja constancia', async () => {
+test('un módulo que falla no tumba la generación y deja constancia', async () => {
   const roto: EcosystemModule = {
     descriptor: {
       id: 'test/roto',
@@ -214,7 +214,7 @@ test('un modulo que falla no tumba la generacion y deja constancia', async () =>
       status: 'preview',
     },
     run: async (_context: ModuleRunContext) => {
-      throw new Error('el analizador se quedo sin memoria');
+      throw new Error('el analizador se quedó sin memoria');
     },
   };
 
@@ -285,7 +285,7 @@ test('sin licencia de pago se genera el proyecto, pero sin las fases premium', a
   await kernel.dispose();
 });
 
-test('la generacion completa es reproducible salvo en las metricas de tiempo', async () => {
+test('la generación completa es reproducible salvo en las métricas de tiempo', async () => {
   const kernelA = await fullKernel();
   const kernelB = await fullKernel();
 
@@ -302,7 +302,7 @@ test('la generacion completa es reproducible salvo en las metricas de tiempo', a
 
 test('el blueprint se ajusta a los adaptadores realmente instalados', async () => {
   // Dominio amplio: el planificador pide `node-nest`, para el que no hay
-  // adaptador en esta instalacion.
+  // adaptador en esta instalación.
   const kernel = await createKernel({
     logger,
     entitlements: enterprise,
@@ -315,11 +315,11 @@ test('el blueprint se ajusta a los adaptadores realmente instalados', async () =
       'facturas, pagos, suscripciones, planes y documentos, con login y roles.',
   });
 
-  // El stack declarado debe coincidir con el codigo que se ha generado.
+  // El stack declarado debe coincidir con el código que se ha generado.
   assert.equal(result.blueprint.stack.backend, 'node-fastify');
   assert.ok(result.warnings.some((warning) => warning.includes('node-nest')));
 
-  // Y la sustitucion queda documentada, no escondida.
+  // Y la sustitución queda documentada, no escondida.
   const substitution = result.blueprint.decisions.find(
     (decision) => decision.id === 'ADR-BACKEND-SUSTITUIDO',
   );

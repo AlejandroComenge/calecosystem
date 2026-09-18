@@ -13,12 +13,12 @@ export interface License {
 export const COMMUNITY_LICENSE: License = { tier: 'community' };
 
 /**
- * Comprobacion de derechos de uso por tier.
+ * Comprobación de derechos de uso por tier.
  *
  * Es control de empaquetado de producto, no un control de seguridad: quien
- * tiene el codigo puede editarlo. Su valor esta en que las combinaciones de
- * modulos activos sean explicitas, verificables y faciles de auditar en una
- * instalacion. Ver `docs/pricing.md` y `docs/adr/0003-entitlements-por-tier.md`.
+ * tiene el código puede editarlo. Su valor está en que las combinaciones de
+ * módulos activos sean explicitas, verificables y fáciles de auditar en una
+ * instalación. Ver `docs/pricing.md` y `docs/adr/0003-entitlements-por-tier.md`.
  */
 export class Entitlements {
   readonly license: License;

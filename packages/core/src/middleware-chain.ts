@@ -10,15 +10,15 @@ import { toError } from './errors.ts';
 export const DEFAULT_MIDDLEWARE_PRIORITY = 100;
 
 /**
- * Cadena de middlewares alrededor de una generacion completa.
+ * Cadena de middlewares alrededor de una generación completa.
  *
- * El middleware con menor `priority` es el mas externo: ve la peticion antes
- * que nadie y el resultado despues que todos. Es el orden que quiere una
- * comprobacion de cuota (rechazar cuanto antes) y tambien una medicion de
+ * El middleware con menor `priority` es el más externo: ve la petición antes
+ * que nadie y el resultado después que todos. Es el orden que quiere una
+ * comprobación de cuota (rechazar cuánto antes) y también una medición de
  * extremo a extremo (abarcar todo lo demas).
  *
- * Un middleware que no llama a `next` corta la ejecucion. Eso es una
- * caracteristica, no un accidente: asi se implementa "cuota agotada".
+ * Un middleware que no llama a `next` corta la ejecución. Eso es una
+ * caracteristica, no un accidente: así se implementa "cuota agotada".
  */
 export class MiddlewareChain {
   readonly #registrations: (MiddlewareRegistration & { seq: number })[] = [];
@@ -33,7 +33,7 @@ export class MiddlewareChain {
     };
   }
 
-  /** Nombres en orden de ejecucion. Util para `calec modules` y diagnostico. */
+  /** Nombres en orden de ejecución. Útil para `calec modules` y diagnostico. */
   names(): string[] {
     return this.#ordered().map((entry) => entry.name);
   }
@@ -64,8 +64,8 @@ export class MiddlewareChain {
       const next: GenerationNext = async () => {
         if (advanced) {
           // Llamar dos veces a `next` produce generaciones duplicadas y
-          // contadores de uso inflados. Mejor fallar que facturar de mas.
-          throw new Error(`El middleware "${entry.name}" llamo a next() mas de una vez.`);
+          // contadores de uso inflados. Mejor fallar que facturar de más.
+          throw new Error(`El middleware "${entry.name}" llamó a next() más de una vez.`);
         }
         advanced = true;
         return dispatch(index + 1);
@@ -75,7 +75,7 @@ export class MiddlewareChain {
         return await entry.handler(context, next);
       } catch (error) {
         const failure = toError(error);
-        context.logger.debug(`Middleware "${entry.name}" interrumpio la generacion: ${failure.message}`);
+        context.logger.debug(`Middleware "${entry.name}" interrumpio la generación: ${failure.message}`);
         throw failure;
       }
     };

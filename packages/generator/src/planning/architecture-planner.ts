@@ -28,11 +28,11 @@ export interface PlannerOptions {
 }
 
 /**
- * Decide la arquitectura y, sobre todo, deja constancia de por que.
+ * Decide la arquitectura y, sobre todo, deja constancia de por qué.
  *
- * Cada eleccion se registra como `ArchitectureDecision` con alternativas
- * descartadas. Un generador que no explica sus decisiones produce codigo que
- * nadie se atreve a cambiar seis meses despues.
+ * Cada elección se registra como `ArchitectureDecision` con alternativas
+ * descartadas. Un generador que no explica sus decisiones produce código que
+ * nadie se atreve a cambiar seis meses después.
  */
 export class ArchitecturePlanner {
   readonly #logger: Logger;
@@ -95,10 +95,10 @@ export class ArchitecturePlanner {
 
     const choice = explicit ?? this.#options.defaultFrontend ?? 'react';
     const rationale = explicit
-      ? 'Solicitado explicitamente en los requisitos o por configuracion.'
+      ? 'Solicitado explicitamente en los requisitos o por configuración.'
       : requirements.features.seo
-        ? 'Sin preferencia expresa. Se elige el ecosistema con mas opciones de renderizado en servidor, que es lo que pide el requisito de SEO.'
-        : 'Sin preferencia expresa. Se elige la opcion con mayor disponibilidad de perfiles en el mercado, que reduce el riesgo de mantenimiento.';
+        ? 'Sin preferencia expresa. Se elige el ecosistema con más opciones de renderizado en servidor, que es lo que pide el requisito de SEO.'
+        : 'Sin preferencia expresa. Se elige la opción con mayor disponibilidad de perfiles en el mercado, que reduce el riesgo de mantenimiento.';
 
     decisions.push({
       id: 'ADR-FRONTEND',
@@ -130,10 +130,10 @@ export class ArchitecturePlanner {
       title: 'Runtime de backend',
       choice,
       rationale: explicit
-        ? 'Solicitado explicitamente en los requisitos o por configuracion.'
+        ? 'Solicitado explicitamente en los requisitos o por configuración.'
         : complex
-          ? 'Dominio amplio o exigencias de disponibilidad altas: se prioriza una estructura opinionada con inyeccion de dependencias y limites de modulo explicitos.'
-          : 'Dominio acotado: se prioriza arranque rapido, superficie minima y menos capas que mantener.',
+          ? 'Dominio amplio o exigencias de disponibilidad altas: se prioriza una estructura opinionada con inyección de dependencias y límites de módulo explicitos.'
+          : 'Dominio acotado: se prioriza arranque rápido, superficie mínima y menos capas que mantener.',
       alternatives: ['node-fastify', 'node-express', 'node-nest'].filter((runtime) => runtime !== choice),
     });
     return choice;
@@ -160,9 +160,9 @@ export class ArchitecturePlanner {
       title: 'Motor de datos',
       choice,
       rationale: explicit
-        ? 'Solicitado explicitamente en los requisitos o por configuracion.'
+        ? 'Solicitado explicitamente en los requisitos o por configuración.'
         : relational
-          ? 'El modelo detectado tiene relaciones entre entidades y operaciones que deben ser transaccionales (pagos, pedidos, facturacion).'
+          ? 'El modelo detectado tiene relaciones entre entidades y operaciones que deben ser transaccionales (pagos, pedidos, facturación).'
           : 'El modelo detectado es mayoritariamente documental y sin relaciones fuertes.',
       alternatives: ['postgres', 'mysql', 'mongodb', 'sqlite'].filter((engine) => engine !== choice),
     });
@@ -187,10 +187,10 @@ export class ArchitecturePlanner {
       title: 'Destino de despliegue',
       choice: target,
       rationale: explicit
-        ? 'Solicitado explicitamente en los requisitos o por configuracion.'
+        ? 'Solicitado explicitamente en los requisitos o por configuración.'
         : highScale
           ? 'El volumen estimado exige escalado horizontal y despliegues sin corte.'
-          : 'Volumen inicial moderado: se prioriza que un equipo pequeno pueda levantar todo el entorno con un solo comando.',
+          : 'Volumen inicial moderado: se prioriza que un equipo pequeño pueda levantar todo el entorno con un solo comando.',
       alternatives: ['docker-compose', 'vercel', 'aws-ecs', 'kubernetes'].filter((option) => option !== target),
     });
 
@@ -212,7 +212,7 @@ export class ArchitecturePlanner {
   }
 }
 
-/* --- Planificacion estructural --------------------------------------- */
+/* --- Planificación estructural --------------------------------------- */
 
 function planLayers(stack: StackDecision): LayerPlan[] {
   return [
@@ -238,12 +238,12 @@ function planLayers(stack: StackDecision): LayerPlan[] {
     },
     {
       name: 'infrastructure',
-      description: `Adaptadores hacia el exterior: ${stack.database}, correo, pasarelas de pago.`,
+      description: `Adaptadores hacía el exterior: ${stack.database}, correo, pasarelas de pago.`,
       directories: ['apps/api/src/infrastructure'],
     },
     {
       name: 'interfaces',
-      description: 'Entrada HTTP: rutas, validacion y serializacion.',
+      description: 'Entrada HTTP: rutas, validación y serialización.',
       directories: ['apps/api/src/routes'],
     },
   ];
@@ -276,8 +276,8 @@ function planEndpoints(requirements: RequirementsModel): ApiEndpoint[] {
   if (requirements.features.auth) {
     endpoints.push(
       { method: 'POST', path: '/api/auth/register', summary: 'Alta de usuario', entity: 'User', requiresAuth: false },
-      { method: 'POST', path: '/api/auth/login', summary: 'Inicio de sesion', entity: 'User', requiresAuth: false },
-      { method: 'POST', path: '/api/auth/refresh', summary: 'Renovacion de token', entity: 'User', requiresAuth: false },
+      { method: 'POST', path: '/api/auth/login', summary: 'Inicio de sesión', entity: 'User', requiresAuth: false },
+      { method: 'POST', path: '/api/auth/refresh', summary: 'Renovación de token', entity: 'User', requiresAuth: false },
       { method: 'GET', path: '/api/auth/me', summary: 'Perfil autenticado', entity: 'User', requiresAuth: true },
     );
   }
@@ -285,7 +285,7 @@ function planEndpoints(requirements: RequirementsModel): ApiEndpoint[] {
     endpoints.push({
       method: 'POST',
       path: '/api/payments/checkout',
-      summary: 'Crea una sesion de pago',
+      summary: 'Crea una sesión de pago',
       entity: 'Payment',
       requiresAuth: true,
     });
@@ -353,8 +353,8 @@ function planPages(requirements: RequirementsModel): PagePlan[] {
 }
 
 /**
- * Riesgos con dueno asignado. Cada riesgo apunta al modulo del ecosistema que
- * deberia cerrarlo: es el mecanismo por el que el generador crea trabajo
+ * Riesgos con dueño asignado. Cada riesgo apunta al módulo del ecosistema que
+ * debería cerrarlo: es el mecanismo por el que el generador crea trabajo
  * explicito para el optimizador, el auditor, el testeador y el documentador.
  */
 function assessRisks(requirements: RequirementsModel): Risk[] {
@@ -373,9 +373,9 @@ function assessRisks(requirements: RequirementsModel): Risk[] {
   if (features.auth) {
     risks.push({
       id: 'RISK-AUTH',
-      title: 'La autenticacion es la superficie de ataque mas expuesta',
+      title: 'La autenticación es la superficie de ataque más expuesta',
       impact: 'high',
-      mitigation: 'Hash con argon2/bcrypt, rotacion de refresh tokens y limitacion de intentos por IP.',
+      mitigation: 'Hash con argon2/bcrypt, rotación de refresh tokens y limitación de intentos por IP.',
       owner: 'security',
     });
   }
@@ -384,7 +384,7 @@ function assessRisks(requirements: RequirementsModel): Risk[] {
       id: 'RISK-TENANT-ISOLATION',
       title: 'Fuga de datos entre inquilinos',
       impact: 'high',
-      mitigation: 'Filtro de tenant obligatorio en el repositorio y tests que intenten cruzar el limite.',
+      mitigation: 'Filtro de tenant obligatorio en el repositorio y tests que intenten cruzar el límite.',
       owner: 'tester',
     });
   }
@@ -400,18 +400,18 @@ function assessRisks(requirements: RequirementsModel): Risk[] {
   if (entities.length >= 8) {
     risks.push({
       id: 'RISK-DOMAIN-SIZE',
-      title: 'Dominio amplio: el coste de incorporacion crece rapido',
+      title: 'Dominio amplio: el coste de incorporación crece rápido',
       impact: 'medium',
-      mitigation: 'Documentacion viva del modelo y de los limites de modulo, generada en cada cambio.',
+      mitigation: 'Documentación viva del modelo y de los límites de módulo, generada en cada cambio.',
       owner: 'documenter',
     });
   }
   if (nonFunctional.availabilityTarget === 'critical') {
     risks.push({
       id: 'RISK-AVAILABILITY',
-      title: 'Objetivo de disponibilidad critico sin redundancia definida',
+      title: 'Objetivo de disponibilidad crítico sin redundancia definida',
       impact: 'high',
-      mitigation: 'Replicas activas, health checks y presupuesto de error acordado antes de produccion.',
+      mitigation: 'Replicas activas, health checks y presupuesto de error acordado antes de producción.',
       owner: 'optimizer',
     });
   }

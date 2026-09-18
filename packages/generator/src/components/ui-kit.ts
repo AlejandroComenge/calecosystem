@@ -1,15 +1,15 @@
 import type { ComponentSpec } from '@calecosystem/contracts';
 
 /**
- * Catalogo base de componentes de interfaz.
+ * Catálogo base de componentes de interfaz.
  *
- * Criterio de inclusion: solo entra lo que **toda** aplicacion de gestion
- * necesita el primer dia. Un kit de cuarenta componentes se borra entero;
- * uno de diez se usa. Los que faltan se anaden desde un plugin.
+ * Criterio de inclusion: solo entra lo que **toda** aplicación de gestión
+ * necesita el primer día. Un kit de cuarenta componentes se borra entero;
+ * uno de diez se usa. Los que faltan se añaden desde un plugin.
  *
  * Todos son accesibles por defecto (roles ARIA, estados `disabled`,
- * `aria-live` en los avisos). Corregir accesibilidad despues cuesta mucho
- * mas que generarla bien.
+ * `aria-live` en los avisos). Corregir accesibilidad después cuesta mucho
+ * más que generarla bien.
  */
 export function uiKit(): ComponentSpec[] {
   return [button(), card(), input(), select(), badge(), spinner(), emptyState(), alert(), dataTable(), pagination()];
@@ -67,11 +67,11 @@ function card(): ComponentSpec {
   return {
     name: 'Card',
     category: 'ui',
-    description: 'Contenedor con titulo opcional y zona de acciones.',
+    description: 'Contenedor con título opcional y zona de acciones.',
     props: [
       { name: 'children', kind: 'node', required: true },
       { name: 'title', kind: 'string', required: false },
-      { name: 'actions', kind: 'node', required: false, description: 'Botones alineados a la derecha del titulo.' },
+      { name: 'actions', kind: 'node', required: false, description: 'Botones alineados a la derecha del título.' },
     ],
     body: [
       '    <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">',
@@ -218,7 +218,7 @@ function emptyState(): ComponentSpec {
   return {
     name: 'EmptyState',
     category: 'ui',
-    description: 'Mensaje para listados vacios, con accion sugerida opcional.',
+    description: 'Mensaje para listados vacíos, con acción sugerida opcional.',
     props: [
       { name: 'title', kind: 'string', required: true },
       { name: 'description', kind: 'string', required: false },
@@ -273,7 +273,7 @@ function dataTable(): ComponentSpec {
   return {
     name: 'DataTable',
     category: 'ui',
-    description: 'Tabla generica tipada, con estados de carga y vacio incluidos.',
+    description: 'Tabla genérica tipada, con estados de carga y vacío incluidos.',
     props: [
       {
         name: 'columns',
@@ -331,7 +331,7 @@ function pagination(): ComponentSpec {
   return {
     name: 'Pagination',
     category: 'ui',
-    description: 'Paginacion por pagina con limites respetados.',
+    description: 'Paginación por página con límites respetados.',
     props: [
       { name: 'page', kind: 'number', required: true },
       { name: 'pageCount', kind: 'number', required: true },
@@ -339,12 +339,12 @@ function pagination(): ComponentSpec {
     ],
     imports: ["import { Button } from './Button.tsx';"],
     body: [
-      '    <nav aria-label="Paginacion" className="flex items-center justify-between gap-4 py-3">',
+      '    <nav aria-label="Paginación" className="flex items-center justify-between gap-4 py-3">',
       '      <Button variant="secondary" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>',
       '        Anterior',
       '      </Button>',
       '      <span className="text-sm text-slate-600">',
-      '        Pagina {page} de {Math.max(1, pageCount)}',
+      '        Página {page} de {Math.max(1, pageCount)}',
       '      </span>',
       '      <Button variant="secondary" disabled={page >= pageCount} onClick={() => onPageChange(page + 1)}>',
       '        Siguiente',

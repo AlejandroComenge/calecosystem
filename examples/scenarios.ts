@@ -1,25 +1,25 @@
 /**
- * Catalogo de ejemplos: un enunciado realista por tipo de web.
+ * Catálogo de ejemplos: un enunciado realista por tipo de web.
  *
- * Fuente unica de verdad. Lo usan el validador (`npm run validate`), la guia
+ * Fuente única de verdad. Lo usan el validador (`npm run validate`), la guía
  * de pruebas, el comando `calec examples` y la demo comercial. Si un ejemplo
  * deja de funcionar, el validador lo detecta antes que un cliente.
  *
- * Los enunciados estan escritos como los escribiria un responsable de
- * producto, no como una especificacion tecnica: es el caso de uso real.
+ * Los enunciados están escritos como los escribiría un responsable de
+ * producto, no como una especificación técnica: es el caso de uso real.
  */
 import type { FrontendFramework, TemplateKind } from '@calecosystem/contracts';
 
 export interface Scenario {
-  /** Identificador corto para la linea de comandos. */
+  /** Identificador corto para la línea de comandos. */
   readonly id: string;
   readonly title: string;
   /** Para quien es este tipo de web. */
   readonly audience: string;
   readonly brief: string;
-  /** Plantilla que deberia detectarse. `null` = ninguna (CRUD deducido). */
+  /** Plantilla que debería detectarse. `null` = ninguna (CRUD deducido). */
   readonly expectTemplate: TemplateKind | null;
-  /** Capacidades que el analizador deberia detectar. */
+  /** Capacidades que el analizador debería detectar. */
   readonly expectFeatures: readonly string[];
   /** Ficheros que deben existir en el resultado. Son el contrato del ejemplo. */
   readonly expectFiles: readonly string[];
@@ -32,9 +32,9 @@ export const SCENARIOS: readonly Scenario[] = [
     title: 'Tienda online (e-commerce)',
     audience: 'Comercios que venden productos por internet',
     brief:
-      'Tienda online de ceramica artesanal. Los clientes navegan el catalogo, anaden ' +
+      'Tienda online de cerámica artesanal. Los clientes navegan el catálogo, añaden ' +
       'productos al carrito y pagan con Stripe en el checkout. Hay valoraciones de ' +
-      'productos, login de usuarios con roles y un panel de administracion para ' +
+      'productos, login de usuarios con roles y un panel de administración para ' +
       'gestionar pedidos, productos y clientes. Esperamos 20.000 usuarios y cumplimos el RGPD.',
     expectTemplate: 'ecommerce',
     expectFeatures: ['auth', 'payments', 'adminPanel'],
@@ -48,12 +48,12 @@ export const SCENARIOS: readonly Scenario[] = [
   },
   {
     id: 'saas',
-    title: 'Aplicacion SaaS por suscripcion',
+    title: 'Aplicación SaaS por suscripción',
     audience: 'Productos que se venden como servicio mensual',
     brief:
-      'Plataforma SaaS multiempresa para gestion de proyectos. Cada organizacion tiene ' +
+      'Plataforma SaaS multiempresa para gestión de proyectos. Cada organización tiene ' +
       'su espacio de trabajo con usuarios y roles, proyectos y tareas. Hay suscripciones ' +
-      'mensuales con planes de distinta cuota, facturacion y un panel con metricas de uso.',
+      'mensuales con planes de distinta cuota, facturación y un panel con métricas de uso.',
     expectTemplate: 'saas',
     expectFeatures: ['auth', 'multiTenant', 'payments'],
     expectFiles: [
@@ -65,12 +65,12 @@ export const SCENARIOS: readonly Scenario[] = [
   },
   {
     id: 'landing',
-    title: 'Landing de captacion',
-    audience: 'Lanzamientos de producto y campanas de marketing',
+    title: 'Landing de captación',
+    audience: 'Lanzamientos de producto y campañas de marketing',
     brief:
-      'Landing de captacion para el lanzamiento de una app de fitness. Pagina unica con ' +
+      'Landing de captación para el lanzamiento de una app de fitness. Página única con ' +
       'secciones de venta, formulario de contacto para recoger leads y buen posicionamiento ' +
-      'SEO. Queremos medir la conversion de la campana.',
+      'SEO. Queremos medir la conversión de la campaña.',
     expectTemplate: 'landing',
     expectFeatures: ['seo'],
     expectFiles: [
@@ -81,12 +81,12 @@ export const SCENARIOS: readonly Scenario[] = [
   },
   {
     id: 'panel',
-    title: 'Panel interno de gestion',
+    title: 'Panel interno de gestión',
     audience: 'Equipos que gestionan datos de negocio a diario',
     brief:
       'Panel interno para gestionar pedidos, productos, clientes y facturas. Los empleados ' +
-      'entran con usuario y contrasena, hay roles de administrador y operador, busqueda con ' +
-      'filtros y exportacion de informes.',
+      'entran con usuario y contraseña, hay roles de administrador y operador, busqueda con ' +
+      'filtros y exportación de informes.',
     expectTemplate: null,
     expectFeatures: ['auth', 'roles', 'search'],
     expectFiles: [
@@ -99,11 +99,11 @@ export const SCENARIOS: readonly Scenario[] = [
   {
     id: 'reservas',
     title: 'Sistema de reservas',
-    audience: 'Clinicas, restaurantes, hoteles y centros deportivos',
+    audience: 'Clínicas, restaurantes, hoteles y centros deportivos',
     brief:
-      'Plataforma de reservas para clinicas dentales. Los pacientes piden citas con los ' +
-      'medicos desde la web, con login de usuarios y roles. Hay pagos online, recordatorios ' +
-      'por email y un panel de administracion para gestionar citas y pacientes.',
+      'Plataforma de reservas para clínicas dentales. Los pacientes piden citas con los ' +
+      'médicos desde la web, con login de usuarios y roles. Hay pagos online, recordatorios ' +
+      'por email y un panel de administración para gestionar citas y pacientes.',
     expectTemplate: null,
     expectFeatures: ['auth', 'payments', 'notifications'],
     expectFiles: [
@@ -117,8 +117,8 @@ export const SCENARIOS: readonly Scenario[] = [
     title: 'Blog o portal de contenidos',
     audience: 'Medios, marcas con estrategia de contenidos',
     brief:
-      'Portal de contenidos con publicaciones, categorias y comentarios. Hay autores con ' +
-      'roles, buscador de articulos, panel de administracion para publicar y buen SEO para ' +
+      'Portal de contenidos con publicaciones, categorías y comentarios. Hay autores con ' +
+      'roles, buscador de artículos, panel de administración para publicar y buen SEO para ' +
       'posicionar en Google.',
     expectTemplate: null,
     expectFeatures: ['auth', 'search', 'seo', 'adminPanel'],
@@ -133,10 +133,10 @@ export const SCENARIOS: readonly Scenario[] = [
     title: 'Tienda online generada en Vue',
     audience: 'Equipos que ya trabajan con Vue',
     brief:
-      'Tienda online de productos artesanales con catalogo, pedidos, clientes, login de ' +
+      'Tienda online de productos artesanales con catálogo, pedidos, clientes, login de ' +
       'usuarios y pagos. El frontend debe hacerse en vue.',
     // Las plantillas solo generan React hoy: con Vue se obtiene el CRUD
-    // deducido. Esta limitacion esta declarada, no escondida.
+    // deducido. Esta limitación está declarada, no escondida.
     expectTemplate: null,
     expectFeatures: ['auth', 'payments'],
     expectFiles: ['apps/web/src/App.vue', 'apps/web/src/router/index.ts'],
@@ -144,7 +144,7 @@ export const SCENARIOS: readonly Scenario[] = [
   },
   {
     id: 'panel-angular',
-    title: 'Panel de gestion generado en Angular',
+    title: 'Panel de gestión generado en Angular',
     audience: 'Equipos corporativos que estandarizan en Angular',
     brief:
       'Panel interno para gestionar pedidos, productos y clientes con login de usuarios y ' +

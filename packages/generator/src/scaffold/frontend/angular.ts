@@ -42,9 +42,9 @@ export const angularAdapter: FrontendAdapter = {
     }
     dependencies.requireAll([
       dep('rxjs', '^7.8.0', 'Flujos asincronos que usa el cliente HTTP de Angular.'),
-      dep('zone.js', '^0.15.0', 'Deteccion de cambios de Angular.'),
+      dep('zone.js', '^0.15.0', 'Detección de cambios de Angular.'),
       dep('@angular/cli', '^19.0.0', 'Herramientas de desarrollo y build.', true),
-      dep('@angular/compiler-cli', '^19.0.0', 'Compilacion anticipada de plantillas.', true),
+      dep('@angular/compiler-cli', '^19.0.0', 'Compilación anticipada de plantillas.', true),
       dep('typescript', '^5.6.0', 'Version soportada por Angular 19.', true),
     ]);
     dependencies.contribute({

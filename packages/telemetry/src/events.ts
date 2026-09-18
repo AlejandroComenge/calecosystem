@@ -4,7 +4,7 @@ export interface AnalyticsEvent {
   readonly name: string;
   /** ISO-8601. */
   readonly at: string;
-  /** Correlaciona todos los eventos de una misma generacion. */
+  /** Correlaciona todos los eventos de una misma generación. */
   readonly requestId: string;
   readonly properties: Readonly<Record<string, unknown>>;
 }
@@ -18,10 +18,10 @@ export interface AnalyticsSink {
 /**
  * Huella del enunciado de requisitos.
  *
- * Permite saber si dos generaciones vienen del mismo texto (util para medir
- * cuantas veces se regenera algo) sin guardar el texto, que es informacion de
+ * Permite saber si dos generaciones vienen del mismo texto (útil para medir
+ * cuántas veces se regenera algo) sin guardar el texto, que es información de
  * negocio del cliente. Se trunca a 16 caracteres: suficiente para agrupar,
- * inutil para reconstruir nada.
+ * inútil para reconstruir nada.
  */
 export function fingerprint(text: string): string {
   return createHash('sha256').update(text, 'utf8').digest('hex').slice(0, 16);

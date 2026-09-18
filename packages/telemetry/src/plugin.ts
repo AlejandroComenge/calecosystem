@@ -7,27 +7,27 @@ export interface TelemetryPluginOptions {
   /**
    * Con `true` se registra el texto completo de los requisitos.
    *
-   * Por defecto NO. Ese texto es la descripcion del negocio del cliente, y
-   * un fichero de telemetria no es sitio para guardarla. Se registra solo su
+   * Por defecto NO. Ese texto es la descripción del negocio del cliente, y
+   * un fichero de telemetría no es sitio para guardarla. Se registra solo su
    * huella, que sirve para agrupar sin revelar nada.
    */
   readonly includeRequirementText?: boolean;
-  /** Etiquetas fijas anadidas a cada evento (entorno, version, instalacion). */
+  /** Etiquetas fijas añadidas a cada evento (entorno, version, instalación). */
   readonly tags?: Readonly<Record<string, string>>;
 }
 
 /**
- * Plugin de telemetria.
+ * Plugin de telemetría.
  *
- * Se apoya por completo en los hooks que ya publica el pipeline: no toca el
+ * Se apoya por completo en los hooks que ya pública el pipeline: no toca el
  * generador ni conoce su interior. Es la prueba de que el sistema de
  * extension sirve para algo real, y a la vez la fuente de datos para decidir
  * que mejorar del producto.
  *
- * Lo que se mide y por que:
- *  - duracion por fase -> donde invertir en rendimiento;
- *  - plantilla elegida y encaje -> si la deteccion acierta;
- *  - hallazgos por modulo -> que problemas genera el propio generador;
+ * Lo que se mide y por qué:
+ *  - duración por fase -> donde invertir en rendimiento;
+ *  - plantilla elegida y encaje -> si la detección acierta;
+ *  - hallazgos por módulo -> que problemas genera el propio generador;
  *  - fallos y su fase -> donde se rompe en manos de clientes.
  */
 export function telemetryPlugin(options: TelemetryPluginOptions = {}): Plugin {
@@ -72,7 +72,7 @@ export function telemetryPlugin(options: TelemetryPluginOptions = {}): Plugin {
         });
       });
 
-      // La transformacion se usa solo para observar; devuelve el valor intacto.
+      // La transformación se usa solo para observar; devuelve el valor intacto.
       api.onTransform(
         'requirements:analyzed',
         (requirements) => {
@@ -120,7 +120,7 @@ export function telemetryPlugin(options: TelemetryPluginOptions = {}): Plugin {
         });
       });
 
-      api.logger.debug(`Telemetria activa hacia el destino "${sink.id}".`);
+      api.logger.debug(`Telemetría activa hacía el destino "${sink.id}".`);
     },
 
     async dispose() {

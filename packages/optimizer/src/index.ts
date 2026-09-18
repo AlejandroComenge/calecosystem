@@ -14,7 +14,7 @@ const DESCRIPTOR = {
   version: '0.1.0',
   displayName: 'Optimizador de rendimiento',
   description:
-    'Analiza el blueprint y el codigo generado en busca de decisiones que degradan el rendimiento a escala.',
+    'Analiza el blueprint y el código generado en busca de decisiones que degradan el rendimiento a escala.',
   tier: 'pro',
   status: 'preview',
 } as const satisfies ModuleDescriptor;
@@ -23,7 +23,7 @@ const DESCRIPTOR = {
 const THRESHOLDS = {
   /** Rutas por encima de las cuales conviene dividir el bundle. */
   routesBeforeCodeSplitting: 6,
-  /** Endpoints de listado sin paginacion que se toleran. */
+  /** Endpoints de listado sin paginación que se toleran. */
   unpaginatedListEndpoints: 0,
   /** Usuarios a partir de los cuales hace falta cache. */
   usersBeforeCache: 5_000,
@@ -32,10 +32,10 @@ const THRESHOLDS = {
 /**
  * Optimizador de rendimiento (v0.1).
  *
- * Alcance actual: analisis estatico del blueprint. Detecta los problemas que
- * son baratos de corregir ahora y caros en produccion, y nada mas: no mide
- * tiempos reales ni perfila bundles todavia. El alcance completo esta en
- * `docs/roadmap.md`; lo que hay aqui ya es accionable y no promete de mas.
+ * Alcance actual: análisis estático del blueprint. Detecta los problemas que
+ * son baratos de corregir ahora y caros en producción, y nada más: no mide
+ * tiempos reales ni perfila bundles todavía. El alcance completo está en
+ * `docs/roadmap.md`; lo que hay aquí ya es accionable y no promete de más.
  */
 export class PerformanceOptimizer implements OptimizerModule {
   readonly descriptor = DESCRIPTOR;
@@ -50,10 +50,10 @@ export class PerformanceOptimizer implements OptimizerModule {
       findings.push({
         id: 'PERF-NO-CODE-SPLITTING',
         severity: 'medium',
-        title: `${routeCount} rutas cargan en un unico bundle`,
+        title: `${routeCount} rutas cargan en un único bundle`,
         detail:
-          'Todas las vistas se importan de forma estatica, asi que el primer render descarga ' +
-          'codigo de pantallas que el usuario puede no visitar nunca.',
+          'Todas las vistas se importan de forma estática, así que el primer render descarga ' +
+          'código de pantallas que el usuario puede no visitar nunca.',
         remediation:
           'Cargar las rutas de forma diferida (import dinamico por ruta) y medir el peso del bundle inicial en CI.',
         tags: ['frontend', 'bundle'],
@@ -67,12 +67,12 @@ export class PerformanceOptimizer implements OptimizerModule {
       findings.push({
         id: 'PERF-UNBOUNDED-LIST',
         severity: 'high',
-        title: `${listEndpoints.length} endpoints de listado devuelven la coleccion completa`,
+        title: `${listEndpoints.length} endpoints de listado devuelven la colección completa`,
         detail:
           'Los repositorios generados hacen `list()` sin limite. Con datos reales, la respuesta crece ' +
           'sin cota y arrastra memoria del proceso, ancho de banda y tiempo de render.',
         remediation:
-          'Anadir paginacion por cursor (`limit` + `after`) al puerto `Repository` antes de conectar datos reales.',
+          'Añadir paginación por cursor (`limit` + `after`) al puerto `Repository` antes de conectar datos reales.',
         tags: ['backend', 'scalability'],
       });
     }
@@ -86,9 +86,9 @@ export class PerformanceOptimizer implements OptimizerModule {
       findings.push({
         id: 'PERF-MISSING-INDEXES',
         severity: 'medium',
-        title: `${referenceFields.length} claves foraneas sin indice declarado`,
-        detail: `Campos afectados: ${referenceFields.join(', ')}. Las consultas por relacion haran recorrido completo de tabla.`,
-        remediation: 'Declarar un indice por cada columna de relacion en la primera migracion.',
+        title: `${referenceFields.length} claves foraneas sin índice declarado`,
+        detail: `Campos afectados: ${referenceFields.join(', ')}. Las consultas por relación harán recorrido completo de tabla.`,
+        remediation: 'Declarar un índice por cada columna de relación en la primera migración.',
         tags: ['database'],
       });
     }
@@ -100,12 +100,12 @@ export class PerformanceOptimizer implements OptimizerModule {
         severity: 'medium',
         title: `Volumen previsto de ${expectedUsers.toLocaleString('es-ES')} usuarios sin capa de cache`,
         detail: 'Cada peticion llega a la base de datos; las lecturas repetidas dominaran la carga.',
-        remediation: 'Introducir cache de lectura (Redis o cache HTTP) en los listados mas consultados.',
+        remediation: 'Introducir cache de lectura (Redis o cache HTTP) en los listados más consultados.',
         tags: ['infrastructure'],
       });
     }
 
-    // Aporte tangible: presupuesto de rendimiento versionado junto al codigo.
+    // Aporte tangible: presupuesto de rendimiento versionado junto al código.
     context.emit({
       path: 'performance-budget.json',
       producedBy: DESCRIPTOR.id,
@@ -118,7 +118,7 @@ export class PerformanceOptimizer implements OptimizerModule {
             apiP95Ms: requirements.nonFunctional.availabilityTarget === 'critical' ? 200 : 400,
             largestContentfulPaintMs: 2_500,
           },
-          notes: 'Umbrales iniciales. Ajustalos con datos reales tras la primera semana en produccion.',
+          notes: 'Umbrales iniciales. Ajustalos con datos reales tras la primera semana en producción.',
         },
         null,
         2,
@@ -131,7 +131,7 @@ export class PerformanceOptimizer implements OptimizerModule {
       summary:
         findings.length === 0
           ? 'Sin cuellos de botella estructurales detectados.'
-          : `${findings.length} oportunidades de optimizacion detectadas antes de escribir datos reales.`,
+          : `${findings.length} oportunidades de optimización detectadas antes de escribir datos reales.`,
       findings,
       score: scoreFrom(findings),
       emittedFiles: [],
@@ -140,7 +140,7 @@ export class PerformanceOptimizer implements OptimizerModule {
   }
 }
 
-/** 100 = sin hallazgos. Cada hallazgo resta segun su gravedad. */
+/** 100 = sin hallazgos. Cada hallazgo resta según su gravedad. */
 function scoreFrom(findings: readonly Finding[]): number {
   const penalties: Record<Finding['severity'], number> = {
     info: 0,

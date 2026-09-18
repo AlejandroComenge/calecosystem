@@ -17,7 +17,7 @@ const RESULT = {
 
 function context(principal?: Principal): GenerationContext {
   return {
-    input: { text: 'una descripcion suficientemente larga para el analizador' },
+    input: { text: 'una descripción suficientemente larga para el analizador' },
     ...(principal ? { principal } : {}),
     logger: createSilentLogger(),
     requestId: 'req-1',
@@ -31,26 +31,26 @@ function setup() {
   return { store, guard, middleware: quotaMiddleware({ guard }) };
 }
 
-test('deja pasar cuando queda cuota y registra el consumo despues', async () => {
+test('deja pasar cuando queda cuota y registra el consumo después', async () => {
   const { guard, middleware } = setup();
 
   const result = await middleware.handler(context(community), async () => RESULT);
 
   assert.equal(result, RESULT);
   const decision = await guard.check(community, 'generation');
-  assert.equal(decision.used, 1, 'una generacion con exito consume cuota');
+  assert.equal(decision.used, 1, 'una generación con exito consume cuota');
 });
 
-test('registra tambien el consumo de los modulos de ampliacion', async () => {
+test('registra también el consumo de los módulos de ampliación', async () => {
   const { guard, middleware } = setup();
 
   await middleware.handler(context(community), async () => RESULT);
 
   const modules = await guard.check(community, 'module-run');
-  assert.equal(modules.used, 2, 'un informe por modulo ejecutado');
+  assert.equal(modules.used, 2, 'un informe por módulo ejecutado');
 });
 
-test('rechaza antes de generar cuando la cuota esta agotada', async () => {
+test('rechaza antes de generar cuando la cuota está agotada', async () => {
   const { guard, middleware } = setup();
   for (let index = 0; index < 10; index += 1) {
     await guard.record(community, 'generation');
@@ -71,10 +71,10 @@ test('rechaza antes de generar cuando la cuota esta agotada', async () => {
     },
   );
 
-  assert.equal(coreRan, false, 'no se debe gastar trabajo en una peticion rechazada');
+  assert.equal(coreRan, false, 'no se debe gastar trabajo en una petición rechazada');
 });
 
-test('una generacion fallida no consume cuota', async () => {
+test('una generación fallida no consume cuota', async () => {
   const { guard, middleware } = setup();
 
   await assert.rejects(() =>
@@ -118,7 +118,7 @@ test('la decision de cuota queda en el estado compartido', async () => {
   assert.equal(decision.limit, 10);
 });
 
-test('el middleware es el mas externo de la cadena', () => {
+test('el middleware es el más externo de la cadena', () => {
   const { middleware } = setup();
   assert.equal(middleware.name, 'billing:quota');
   assert.ok((middleware.priority ?? 100) < 100, 'debe rechazar antes que nada');

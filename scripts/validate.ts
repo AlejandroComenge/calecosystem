@@ -2,19 +2,19 @@
  * Validador de salida: `npm run validate`
  *
  * Las 199 pruebas del repositorio comprueban que **el generador** funciona.
- * Esto comprueba algo distinto y mas importante para un cliente: que el
- * **codigo generado** es valido.
+ * Esto comprueba algo distinto y más importante para un cliente: que el
+ * **código generado** es válido.
  *
- * Por cada ejemplo del catalogo:
+ * Por cada ejemplo del catálogo:
  *   1. genera el proyecto en memoria;
  *   2. comprueba que aparecen los ficheros que ese tipo de web promete;
  *   3. analiza cada .ts/.tsx con el parser de TypeScript (errores de sintaxis);
  *   4. valida que todo .json se puede leer;
- *   5. hace una comprobacion estructural de los .yml;
+ *   5. hace una comprobación estructural de los .yml;
  *   6. escribe el proyecto en un directorio temporal y **ejecuta las pruebas
  *      que el propio generador entrega**.
  *
- * El paso 6 es el que de verdad cierra el circulo: si las pruebas generadas
+ * El paso 6 es el que de verdad cierra el círculo: si las pruebas generadas
  * no pasan, lo que entregamos no vale, por muy bonita que sea la salida.
  */
 import { spawnSync } from 'node:child_process';
@@ -105,13 +105,13 @@ async function validateScenario(scenario: Scenario): Promise<ScenarioReport> {
   // 1. La plantilla esperada.
   const detected = result.template?.kind ?? null;
   if (detected !== scenario.expectTemplate) {
-    fail('plantilla', `se esperaba ${scenario.expectTemplate ?? 'ninguna'} y se detecto ${detected ?? 'ninguna'}`);
+    fail('plantilla', `se esperaba ${scenario.expectTemplate ?? 'ninguna'} y se detectó ${detected ?? 'ninguna'}`);
   }
 
-  // 2. Las capacidades que el analizador debia deducir del enunciado.
+  // 2. Las capacidades que el analizador debía deducir del enunciado.
   for (const feature of scenario.expectFeatures) {
     const features = result.requirements.features as unknown as Record<string, boolean>;
-    if (features[feature] !== true) fail('capacidad', `no se detecto "${feature}"`);
+    if (features[feature] !== true) fail('capacidad', `no se detectó "${feature}"`);
   }
 
   // 3. Los ficheros que este tipo de web promete.
@@ -140,7 +140,7 @@ async function validateScenario(scenario: Scenario): Promise<ScenarioReport> {
     }
   }
 
-  // 6. Comprobacion estructural de YAML. No es un analisis completo: sin
+  // 6. Comprobación estructural de YAML. No es un análisis completo: sin
   //    dependencias no hay parser de YAML, y se declara en lugar de fingirlo.
   for (const file of result.files) {
     if (!file.path.endsWith('.yml') && !file.path.endsWith('.yaml')) continue;
@@ -161,7 +161,7 @@ async function validateScenario(scenario: Scenario): Promise<ScenarioReport> {
   const status = local.length === 0 ? 'OK ' : 'FALLA';
   process.stdout.write(
     `                 ${status}  ${result.metrics.fileCount} ficheros, ` +
-      `${result.metrics.lineCount} lineas, ${tsFiles} TS analizados, ` +
+      `${result.metrics.lineCount} líneas, ${tsFiles} TS analizados, ` +
       `${generatedTests.passed}/${generatedTests.total} pruebas generadas\n`,
   );
   for (const problem of local) {
@@ -172,7 +172,7 @@ async function validateScenario(scenario: Scenario): Promise<ScenarioReport> {
   return { scenario, result, tsFiles, generatedTests, problems: local, durationMs };
 }
 
-/** Errores de sintaxis segun el parser de TypeScript. */
+/** Errores de sintaxis según el parser de TypeScript. */
 function syntaxErrors(filePath: string, contents: string): string[] {
   const source = ts.createSourceFile(
     filePath,
@@ -181,21 +181,21 @@ function syntaxErrors(filePath: string, contents: string): string[] {
     true,
     filePath.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
   );
-  // `parseDiagnostics` no esta en los tipos publicos pero es estable y es la
-  // unica via de obtener errores de sintaxis sin montar un programa completo.
+  // `parseDiagnostics` no está en los tipos públicos pero es estable y es la
+  // única via de obtener errores de sintaxis sin montar un programa completo.
   const diagnostics = (source as unknown as { parseDiagnostics?: ts.Diagnostic[] }).parseDiagnostics ?? [];
 
   return diagnostics.slice(0, 3).map((diagnostic) => {
     const position = diagnostic.start ?? 0;
     const { line } = source.getLineAndCharacterOfPosition(position);
-    return `linea ${line + 1}: ${ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ')}`;
+    return `línea ${line + 1}: ${ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ')}`;
   });
 }
 
 /**
  * Comprobaciones de humo sobre YAML: no es un parser, detecta los errores que
- * de verdad produce un generador (tabuladores, claves duplicadas en la raiz,
- * fichero vacio).
+ * de verdad produce un generador (tabuladores, claves duplicadas en la raíz,
+ * fichero vacío).
  */
 function yamlSmokeErrors(contents: string): string[] {
   const errors: string[] = [];
@@ -206,7 +206,7 @@ function yamlSmokeErrors(contents: string): string[] {
 
   for (const [index, line] of lines.entries()) {
     if (line.includes('\t')) {
-      errors.push(`linea ${index + 1}: tabulador (YAML solo admite espacios)`);
+      errors.push(`línea ${index + 1}: tabulador (YAML solo admite espacios)`);
     }
     const match = /^([A-Za-z_][\w-]*):/.exec(line);
     if (match?.[1]) {
@@ -221,7 +221,7 @@ function yamlSmokeErrors(contents: string): string[] {
 
 /**
  * Escribe el proyecto en un directorio temporal y ejecuta sus pruebas de
- * dominio, que son las unicas autonomas (sin `npm install`).
+ * dominio, que son las únicas autonomas (sin `npm install`).
  */
 async function runGeneratedTests(
   scenario: Scenario,
@@ -237,7 +237,7 @@ async function runGeneratedTests(
   try {
     await writeFileTree(result.files, directory, { force: true });
 
-    // Se pasa la lista explicita de ficheros: `spawnSync` no usa shell, asi
+    // Se pasa la lista explicita de ficheros: `spawnSync` no usa shell, así
     // que un patron con comodin llegaria sin expandir.
     const run = spawnSync(
       process.execPath,
@@ -273,13 +273,13 @@ function printSummary(): void {
 
   process.stdout.write('='.repeat(78) + '\n');
   process.stdout.write(
-    `${reports.length} ejemplos | ${totals.files} ficheros | ${totals.lines} lineas | ` +
+    `${reports.length} ejemplos | ${totals.files} ficheros | ${totals.lines} líneas | ` +
       `${totals.tsFiles} TS sin errores de sintaxis | ${totals.tests} pruebas generadas en verde\n`,
   );
-  process.stdout.write(`Tiempo de generacion acumulado: ${totals.durationMs.toFixed(0)} ms\n\n`);
+  process.stdout.write(`Tiempo de generación acumulado: ${totals.durationMs.toFixed(0)} ms\n\n`);
 
   if (problems.length === 0) {
-    process.stdout.write('TODO CORRECTO: la salida del generador es valida en todos los ejemplos.\n\n');
+    process.stdout.write('TODO CORRECTO: la salida del generador es válida en todos los ejemplos.\n\n');
     return;
   }
 

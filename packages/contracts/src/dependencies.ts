@@ -1,14 +1,14 @@
 /**
- * Declaracion de dependencias.
+ * Declaración de dependencias.
  *
  * Antes, cada adaptador escribia su propio `package.json` a mano. Eso
- * funcionaba con un adaptador por proyecto y se rompe en cuanto una plantilla
- * o un componente necesitan anadir un paquete: acabas con dos productores
+ * funcionaba con un adaptador por proyecto y se rompe en cuánto una plantilla
+ * o un componente necesitan añadir un paquete: acabas con dos productores
  * peleando por el mismo fichero.
  *
  * Ahora cada productor **declara** lo que necesita y el generador construye
- * un unico manifiesto por workspace. El efecto secundario util es que el
- * `package.json` resultante puede explicar por que esta cada dependencia.
+ * un único manifiesto por workspace. El efecto secundario útil es que el
+ * `package.json` resultante puede explicar por qué está cada dependencia.
  */
 
 /** Workspace del proyecto generado al que pertenece una dependencia. */
@@ -21,7 +21,7 @@ export interface DependencySpec {
   readonly workspace: WorkspaceId;
   /** `true` para `devDependencies`. */
   readonly dev?: boolean;
-  /** Por que hace falta. Acaba en la documentacion del proyecto generado. */
+  /** Por qué hace falta. Acaba en la documentación del proyecto generado. */
   readonly reason: string;
   /** Quien la pidio: adaptador, plantilla o componente. */
   readonly requestedBy: string;
@@ -39,7 +39,7 @@ export interface DependencyConflict {
   readonly requests: readonly { version: string; requestedBy: string; reason: string }[];
 }
 
-/** Aportacion a un `package.json`: scripts y campos sueltos. */
+/** Aportación a un `package.json`: scripts y campos sueltos. */
 export interface ManifestContribution {
   readonly workspace: WorkspaceId;
   readonly scripts?: Readonly<Record<string, string>>;
@@ -48,13 +48,13 @@ export interface ManifestContribution {
 }
 
 /**
- * Lo que ve un adaptador o una plantilla. Solo escribe; la construccion del
+ * Lo que ve un adaptador o una plantilla. Solo escribe; la construcción del
  * manifiesto es responsabilidad del generador.
  */
 export interface DependencyCollector {
   require(spec: DependencySpec): void;
   requireAll(specs: readonly DependencySpec[]): void;
   contribute(contribution: ManifestContribution): void;
-  /** Consulta: util para que una plantilla no repita lo que ya pidio el adaptador. */
+  /** Consulta: útil para que una plantilla no repita lo que ya pidio el adaptador. */
   has(name: string, workspace: WorkspaceId): boolean;
 }

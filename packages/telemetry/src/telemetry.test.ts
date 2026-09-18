@@ -9,7 +9,7 @@ import { fingerprint } from './events.ts';
 import { telemetryPlugin } from './plugin.ts';
 
 const BRIEF =
-  'Tienda online con catalogo de productos, carrito, checkout con pagos y panel de pedidos.';
+  'Tienda online con catálogo de productos, carrito, checkout con pagos y panel de pedidos.';
 
 async function generateWith(sink: MemorySink, includeRequirementText = false) {
   const kernel = await createKernel({
@@ -26,7 +26,7 @@ async function generateWith(sink: MemorySink, includeRequirementText = false) {
   return result;
 }
 
-test('registra el ciclo de vida completo de una generacion', async () => {
+test('registra el ciclo de vida completo de una generación', async () => {
   const sink = new MemorySink();
   await generateWith(sink);
 
@@ -39,7 +39,7 @@ test('registra el ciclo de vida completo de una generacion', async () => {
   assert.ok(names.has('generation.completed'));
 });
 
-test('mide la duracion de las cinco fases', async () => {
+test('mide la duración de las cinco fases', async () => {
   const sink = new MemorySink();
   await generateWith(sink);
 
@@ -51,7 +51,7 @@ test('mide la duracion de las cinco fases', async () => {
   }
 });
 
-test('el evento final lleva las metricas que interesan al producto', async () => {
+test('el evento final lleva las métricas que interesan al producto', async () => {
   const sink = new MemorySink();
   const result = await generateWith(sink);
 
@@ -72,7 +72,7 @@ test('por defecto NO se registra el texto de los requisitos', async () => {
   const [event] = sink.byName('requirements.analyzed');
 
   assert.ok(event);
-  assert.equal(event.properties['text'], undefined, 'el negocio del cliente no va a telemetria');
+  assert.equal(event.properties['text'], undefined, 'el negocio del cliente no va a telemetría');
   assert.equal(typeof event.properties['fingerprint'], 'string');
   assert.equal(String(event.properties['fingerprint']).length, 16);
 });
@@ -86,7 +86,7 @@ test('el texto solo se registra si se activa explicitamente', async () => {
   assert.equal(typeof event?.properties['text'], 'string');
 });
 
-test('las etiquetas fijas acompanan a cada evento', async () => {
+test('las etiquetas fijas acompañan a cada evento', async () => {
   const sink = new MemorySink();
   await generateWith(sink);
 
@@ -99,7 +99,7 @@ test('la huella agrupa textos iguales y separa los distintos', () => {
   assert.equal(fingerprint('x').length, 16);
 });
 
-test('la telemetria no altera el resultado de la generacion', async () => {
+test('la telemetría no altera el resultado de la generación', async () => {
   const conTelemetria = await generateWith(new MemorySink());
 
   const kernel = await createKernel({

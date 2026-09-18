@@ -5,12 +5,12 @@
 
 ## Contexto
 
-Un generador puede ir directo del texto a los ficheros. Es lo mas simple y lo
-que hacen casi todos. El problema aparece cuando otro modulo quiere intervenir:
-solo puede hacerlo sobre codigo ya escrito, que es el momento mas caro para
-cambiar una decision.
+Un generador puede ir directo del texto a los ficheros. Es lo más simple y lo
+que hacen casi todos. El problema aparece cuando otro módulo quiere intervenir:
+solo puede hacerlo sobre código ya escrito, que es el momento más caro para
+cambiar una decisión.
 
-## Decision
+## Decisión
 
 Cinco fases con dos representaciones intermedias explicitas:
 
@@ -19,15 +19,15 @@ texto -> RequirementsModel -> Blueprint -> FileTree -> GenerationResult
        [analyze]          [plan]        [scaffold]  [augment + finalize]
 ```
 
-Nada se escribe en disco hasta que el arbol completo existe en memoria y los
-cinco modulos han opinado sobre el.
+Nada se escribe en disco hasta que el árbol completo existe en memoria y los
+cinco módulos han opinado sobre el.
 
 ## Consecuencias
 
 **A favor**
 
-- Cambiar una decision en el blueprint cuesta una linea; cambiarla en 70
-  ficheros generados, una regeneracion completa.
+- Cambiar una decisión en el blueprint cuesta una línea; cambiarla en 70
+  ficheros generados, una regeneración completa.
 - El auditor revisa el proyecto **antes** de que exista.
 - Las pruebas verifican arquitectura y scaffolding por separado, y ninguna
   escribe en disco.
@@ -37,14 +37,14 @@ cinco modulos han opinado sobre el.
 
 **En contra**
 
-- Dos modelos de datos que mantener sincronizados con el codigo generado.
-- Todo el arbol vive en memoria. Irrelevante a 70 ficheros y 68 KB; habria que
+- Dos modelos de datos que mantener sincronizados con el código generado.
+- Todo el árbol vive en memoria. Irrelevante a 70 ficheros y 68 KB; habría que
   revisarlo con proyectos de otro orden de magnitud.
 
 ## Alternativas descartadas
 
-- **Generacion directa por plantillas:** mas simple, pero deja a los otros
-  cuatro modulos sin punto de intervencion util. Habria convertido el
+- **Generación directa por plantillas:** más simple, pero deja a los otros
+  cuatro módulos sin punto de intervención útil. Habría convertido el
   ecosistema en un generador con cuatro herramientas de postproceso.
 - **Escritura en disco por fases:** permitiria proyectos enormes, a costa de
   perder atomicidad y de complicar las pruebas. Se reconsiderara si aparece el

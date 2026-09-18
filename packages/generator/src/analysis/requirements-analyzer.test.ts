@@ -2,13 +2,29 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createSilentLogger } from '@calecosystem/core';
 import { RequirementsAnalyzer } from './requirements-analyzer.ts';
+import {
+  ACTOR_LEXICON,
+  COMPLIANCE_LEXICON,
+  ENTITY_LEXICON,
+  ENTITY_TRIGGERS,
+  FEATURE_LEXICON,
+  INTEGRATION_LEXICON,
+} from './lexicon.ts';
+import { ECOMMERCE_RULES } from '../templates/ecommerce.ts';
+import { SAAS_RULES } from '../templates/saas.ts';
+import { LANDING_RULES } from '../templates/landing.ts';
+
+/** Un término de léxico debe ser idéntico a su forma normalizada. */
+function sinTilde(valor: string): string {
+  return valor.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
 
 const analyzer = new RequirementsAnalyzer({ logger: createSilentLogger() });
 
 const MARKETPLACE =
   'Quiero un marketplace donde los vendedores publican productos y los clientes hacen pedidos. ' +
-  'Necesita login de usuarios, pagos con Stripe, valoraciones de productos y un panel de administracion. ' +
-  'Esperamos 20.000 usuarios el primer ano y debemos cumplir el RGPD.';
+  'Necesita login de usuarios, pagos con Stripe, valoraciones de productos y un panel de administración. ' +
+  'Esperamos 20.000 usuarios el primer año y debemos cumplir el RGPD.';
 
 test('extrae las entidades de negocio del texto', async () => {
   const model = await analyzer.analyze({ text: MARKETPLACE });
@@ -42,7 +58,7 @@ test('detecta las capacidades transversales mencionadas', async () => {
   assert.equal(model.features.realtime, false);
 });
 
-test('los pagos implican autenticacion aunque no se mencione el login', async () => {
+test('los pagos implican autenticación aunque no se mencione el login', async () => {
   const model = await analyzer.analyze({
     text: 'Una tienda sencilla de productos con cobro por tarjeta mediante Stripe al finalizar la compra.',
   });
@@ -76,7 +92,7 @@ test('identifica integraciones de terceros por nombre', async () => {
   assert.ok(model.integrations.includes('stripe'));
 });
 
-test('una descripcion pobre baja la confianza y genera preguntas abiertas', async () => {
+test('una descripción pobre baja la confianza y genera preguntas abiertas', async () => {
   const model = await analyzer.analyze({ text: 'Una web para mi negocio.' });
 
   assert.ok(model.confidence < 0.5, `confianza inesperadamente alta: ${model.confidence}`);
@@ -84,14 +100,14 @@ test('una descripcion pobre baja la confianza y genera preguntas abiertas', asyn
   assert.ok(model.openQuestions.some((question) => question.includes('entidades')));
 });
 
-test('una descripcion rica sube la confianza', async () => {
+test('una descripción rica sube la confianza', async () => {
   const model = await analyzer.analyze({ text: MARKETPLACE });
 
   assert.ok(model.confidence > 0.7, `confianza inesperadamente baja: ${model.confidence}`);
 });
 
-test('nunca devuelve un dominio vacio: cae a una entidad generica', async () => {
-  const model = await analyzer.analyze({ text: 'Algo muy abstracto sin nombres concretos aqui.' });
+test('nunca devuelve un dominio vacío: cae a una entidad genérica', async () => {
+  const model = await analyzer.analyze({ text: 'Algo muy abstracto sin nombres concretos aquí.' });
 
   assert.equal(model.entities.length, 1);
   assert.equal(model.entities[0]?.name, 'Item');
@@ -104,23 +120,23 @@ test('el nombre explicito del proyecto gana a la inferencia', async () => {
   assert.equal(model.slug, 'artesania-viva');
 });
 
-test('las pistas de capacidades ganan a la deteccion automatica', async () => {
+test('las pistas de capacidades ganan a la detección automática', async () => {
   const model = await analyzer.analyze({
-    text: 'Catalogo publico de productos, sin cuentas de usuario.',
+    text: 'Catálogo público de productos, sin cuentas de usuario.',
     hints: { features: { realtime: true } },
   });
 
   assert.equal(model.features.realtime, true);
 });
 
-test('el analisis es reproducible: mismo texto, mismo resultado', async () => {
+test('el análisis es reproducible: mismo texto, mismo resultado', async () => {
   const first = await analyzer.analyze({ text: MARKETPLACE });
   const second = await analyzer.analyze({ text: MARKETPLACE });
 
   assert.deepEqual(first, second);
 });
 
-test('un enriquecedor externo puede refinar el analisis deterministico', async () => {
+test('un enriquecedor externo puede refinar el análisis deterministico', async () => {
   const enriched = new RequirementsAnalyzer({
     logger: createSilentLogger(),
     enrichers: [
@@ -136,7 +152,7 @@ test('un enriquecedor externo puede refinar el analisis deterministico', async (
   assert.equal(model.projectName, 'Refinado por IA');
 });
 
-test('si el enriquecedor falla se conserva el analisis deterministico', async () => {
+test('si el enriquecedor falla se conserva el análisis deterministico', async () => {
   const fragile = new RequirementsAnalyzer({
     logger: createSilentLogger(),
     enrichers: [
@@ -152,4 +168,74 @@ test('si el enriquecedor falla se conserva el analisis deterministico', async ()
   const model = await fragile.analyze({ text: MARKETPLACE });
 
   assert.ok(model.entities.length > 0);
+});
+
+test('el nombre del proyecto conserva las tildes del enunciado', async () => {
+  const model = await analyzer.analyze({
+    text: 'Tienda online de cerámica artesanal con catálogo, carrito y pagos por Stripe.',
+  });
+
+  assert.equal(model.projectName, 'Cerámica Artesanal');
+  // El identificador si va sin tildes: es lo que acaba en rutas y en npm.
+  assert.equal(model.slug, 'ceramica-artesanal');
+});
+
+test('el nombre tambien conserva la enie', async () => {
+  const model = await analyzer.analyze({
+    text: 'Plataforma de diseño gráfico para equipos, con proyectos y usuarios.',
+  });
+
+  assert.match(model.projectName, /Diseño/);
+  assert.equal(model.slug.includes('ñ'), false, 'el slug debe ser ASCII');
+});
+
+/**
+ * Invariante del analizador: los términos de los léxicos se comparan contra
+ * texto NORMALIZADO (sin tildes). Un término acentuado nunca casaría con
+ * nada, y el fallo sería silencioso: la capacidad simplemente dejaría de
+ * detectarse. Esta prueba lo convierte en un fallo ruidoso.
+ */
+test('ningún término de los léxicos lleva tildes', () => {
+  const sinTilde = (valor: string) =>
+    valor.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+  const grupos: [string, readonly string[]][] = [
+    ['FEATURE_LEXICON', Object.values(FEATURE_LEXICON).flat()],
+    ['ACTOR_LEXICON', Object.keys(ACTOR_LEXICON)],
+    ['ENTITY_LEXICON', Object.keys(ENTITY_LEXICON)],
+    ['ENTITY_TRIGGERS', ENTITY_TRIGGERS],
+    ['COMPLIANCE_LEXICON', Object.values(COMPLIANCE_LEXICON).flat()],
+    ['INTEGRATION_LEXICON', INTEGRATION_LEXICON],
+  ];
+
+  for (const [nombre, terminos] of grupos) {
+    for (const termino of terminos) {
+      assert.equal(
+        termino,
+        sinTilde(termino),
+        `${nombre}: "${termino}" lleva tildes y nunca casaría con el texto normalizado`,
+      );
+    }
+  }
+});
+
+test('ninguna señal de las plantillas lleva tildes', () => {
+  const plantillas: [string, typeof ECOMMERCE_RULES][] = [
+    ['ecommerce', ECOMMERCE_RULES],
+    ['saas', SAAS_RULES],
+    ['landing', LANDING_RULES],
+  ];
+
+  let comprobados = 0;
+  for (const [nombre, reglas] of plantillas) {
+    for (const senal of [...reglas.signals, ...(reglas.antiSignals ?? [])]) {
+      comprobados += 1;
+      assert.equal(
+        senal,
+        sinTilde(senal),
+        `${nombre}: "${senal}" lleva tildes y nunca activaría la plantilla`,
+      );
+    }
+  }
+  assert.ok(comprobados > 40, `solo se comprobaron ${comprobados} señales`);
 });

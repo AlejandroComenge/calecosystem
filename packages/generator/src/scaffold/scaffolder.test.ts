@@ -29,14 +29,14 @@ for (const framework of ['react', 'vue', 'angular'] as const) {
     assert.equal(blueprint.stack.frontend, framework);
     assert.ok(tree.size > 20, `solo ${tree.size} ficheros generados`);
 
-    // Frontend, backend, despliegue y raiz: las cuatro partes deben existir.
+    // Frontend, backend, despliegue y raíz: las cuatro partes deben existir.
     assert.ok(tree.has('apps/web/package.json'));
     assert.ok(tree.has('apps/api/src/server.ts'));
     assert.ok(tree.has('docker-compose.yml'));
     assert.ok(tree.has('README.md'));
   });
 
-  test(`el package.json del frontend ${framework} es JSON valido y declara el framework`, async () => {
+  test(`el package.json del frontend ${framework} es JSON válido y declara el framework`, async () => {
     const { tree } = await scaffoldWith(framework);
     const contents = tree.get('apps/web/package.json')?.contents ?? '';
     const parsed = JSON.parse(contents) as { dependencies: Record<string, string> };
@@ -46,7 +46,7 @@ for (const framework of ['react', 'vue', 'angular'] as const) {
   });
 }
 
-test('el backend sigue la separacion en capas del blueprint', async () => {
+test('el backend sigue la separación en capas del blueprint', async () => {
   const { tree, blueprint } = await scaffoldWith('react');
 
   for (const entity of blueprint.entities) {
@@ -88,7 +88,7 @@ test('la plantilla de entorno no lleva valores de secretos rellenos', async () =
   const { tree } = await scaffoldWith('react');
   const env = tree.get('.env.example')?.contents ?? '';
 
-  assert.match(env, /^JWT_SECRET=$/m, 'los secretos deben quedar vacios en el ejemplo');
+  assert.match(env, /^JWT_SECRET=$/m, 'los secretos deben quedar vacíos en el ejemplo');
 });
 
 test('el .gitignore del proyecto generado excluye el fichero de entorno real', async () => {

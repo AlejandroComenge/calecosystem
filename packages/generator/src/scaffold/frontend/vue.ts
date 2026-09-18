@@ -33,9 +33,9 @@ export const vueAdapter: FrontendAdapter = {
     dependencies.requireAll([
       dep('vue', '^3.5.0', 'Framework de interfaz elegido en el blueprint.'),
       dep('vue-router', '^4.4.0', `Enrutado de las ${blueprint.pages.length} vistas planificadas.`),
-      dep('@vitejs/plugin-vue', '^5.2.0', 'Compilacion de componentes de un solo fichero.', true),
+      dep('@vitejs/plugin-vue', '^5.2.0', 'Compilación de componentes de un solo fichero.', true),
       dep('typescript', '^5.9.0', 'Tipado del frontend.', true),
-      dep('vue-tsc', '^2.1.0', 'Comprobacion de tipos dentro de los ficheros .vue.', true),
+      dep('vue-tsc', '^2.1.0', 'Comprobación de tipos dentro de los ficheros .vue.', true),
       dep('vite', '^6.0.0', 'Servidor de desarrollo y empaquetado.', true),
     ]);
     dependencies.contribute({
@@ -100,7 +100,7 @@ export const vueAdapter: FrontendAdapter = {
 
 function apiClient(slug: string): string {
   return [
-    '/** Cliente HTTP compartido. Un unico punto donde cambiar auth o base URL. */',
+    '/** Cliente HTTP compartido. Un único punto donde cambiar auth o base URL. */',
     "const BASE_URL = import.meta.env['VITE_API_URL'] ?? '/api';",
     '',
     'export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {',
@@ -113,7 +113,7 @@ function apiClient(slug: string): string {
     '      ...(init.headers ?? {}),',
     '    },',
     '  });',
-    "  if (!response.ok) throw new Error('La peticion a ' + path + ' fallo con ' + response.status);",
+    "  if (!response.ok) throw new Error('La petición a ' + path + ' falló con ' + response.status);",
     '  if (response.status === 204) return undefined as T;',
     '  return (await response.json()) as T;',
     '}',

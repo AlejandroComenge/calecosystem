@@ -1,7 +1,7 @@
 /**
  * @calecosystem/generator
  *
- * Modulo principal del ecosistema: convierte una descripcion de negocio en
+ * Módulo principal del ecosistema: convierte una descripción de negocio en
  * lenguaje natural en un proyecto completo (frontend, backend y despliegue),
  * dejando por escrito cada decision de arquitectura.
  */

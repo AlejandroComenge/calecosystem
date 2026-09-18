@@ -19,16 +19,16 @@ export interface GeneratorPluginOptions {
   readonly frameworks?: readonly SupportedFramework[];
   /** Plantillas de producto a registrar. Por defecto, las tres incluidas. */
   readonly templates?: readonly SupportedTemplate[];
-  /** Con `false` no se registra el catalogo base de componentes. */
+  /** Con `false` no se registra el catálogo base de componentes. */
   readonly uiKit?: boolean;
 }
 
 /**
  * Plugin del generador.
  *
- * El propio modulo principal se carga como plugin: si el generador necesitara
- * un trato especial del kernel, el sistema de extension no serviria para
- * nadie mas. Todo lo que hace aqui puede hacerlo un plugin de terceros.
+ * El propio módulo principal se carga como plugin: si el generador necesitara
+ * un trato especial del kernel, el sistema de extension no serviría para
+ * nadie más. Todo lo que hace aquí puede hacerlo un plugin de terceros.
  */
 export function generatorPlugin(options: GeneratorPluginOptions = {}): Plugin {
   const frameworks = options.frameworks ?? ['react', 'vue', 'angular'];
@@ -38,7 +38,7 @@ export function generatorPlugin(options: GeneratorPluginOptions = {}): Plugin {
     name: '@calecosystem/generator',
     version: '0.2.0',
     description:
-      'Adaptadores de scaffolding, catalogo de componentes y plantillas de producto.',
+      'Adaptadores de scaffolding, catálogo de componentes y plantillas de producto.',
     tier: 'community',
     priority: 10,
 

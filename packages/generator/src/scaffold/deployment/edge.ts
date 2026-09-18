@@ -4,7 +4,7 @@ import { fileFactory, hashBanner, jsonFile } from '../shared.ts';
 const TOOL = '@calecosystem/generator (edge)';
 const file = fileFactory(TOOL);
 
-/** Comando de build del frontend segun el framework elegido. */
+/** Comando de build del frontend según el framework elegido. */
 function buildSettings(blueprint: Blueprint): { command: string; output: string } {
   if (blueprint.stack.frontend === 'angular') {
     return { command: 'npm run build', output: `dist/${blueprint.slug}-web/browser` };
@@ -16,9 +16,9 @@ function buildSettings(blueprint: Blueprint): { command: string; output: string 
  * Despliegue en Vercel.
  *
  * Cubre el frontend, que es lo que estas plataformas hacen bien. El API queda
- * fuera a proposito: un backend con estado y base de datos propia no encaja en
+ * fuera a propósito: un backend con estado y base de datos propia no encaja en
  * el modelo de funciones efimeras sin rediseñarlo, y fingir lo contrario
- * genera una configuracion que falla el dia del despliegue.
+ * genera una configuración que falla el día del despliegue.
  */
 export const vercelDeploymentAdapter: DeploymentAdapter = {
   id: 'calec.deployment.vercel',
@@ -109,8 +109,8 @@ export const netlifyDeploymentAdapter: DeploymentAdapter = {
 /**
  * Cabeceras de seguridad por defecto.
  *
- * Son gratis en el momento de generar y carisimas de anadir cuando ya hay
- * trafico: cualquier cambio de politica rompe integraciones que nadie
+ * Son gratis en el momento de generar y carisimas de añadir cuando ya hay
+ * trafico: cualquier cambio de política rompe integraciones que nadie
  * documento.
  */
 function securityHeaders(): { key: string; value: string }[] {
@@ -133,7 +133,7 @@ function vercelGuide(blueprint: Blueprint): string {
     '',
     '1. Importa el repositorio en Vercel.',
     '2. Deja `vercel.json` tal cual: ya trae build, salida y cabeceras.',
-    '3. Define la variable `API_URL` con la URL publica del API.',
+    '3. Define la variable `API_URL` con la URL pública del API.',
     '',
     '## API',
     '',
@@ -143,12 +143,12 @@ function vercelGuide(blueprint: Blueprint): string {
     ...blueprint.deployment.secrets.map((secret) => `${secret}=`),
     '```',
     '',
-    '## Por que el API no va aqui',
+    '## Por qué el API no va aquí',
     '',
     `El backend mantiene conexiones a ${blueprint.stack.database} y estado entre`,
-    'peticiones. Las funciones efimeras agotan el pool de conexiones y anaden',
+    'peticiones. Las funciones efimeras agotan el pool de conexiones y añaden',
     'arranque en frio a cada llamada. Si necesitas todo en Vercel, el cambio no',
-    'es de configuracion: hay que rediseñar el acceso a datos (pooling externo o',
+    'es de configuración: hay que rediseñar el acceso a datos (pooling externo o',
     'driver sobre HTTP).',
   ].join('\n');
 }
@@ -161,7 +161,7 @@ function netlifyGuide(blueprint: Blueprint): string {
     '',
     '## Pasos',
     '',
-    '1. Conecta el repositorio: `netlify.toml` ya trae base, comando y publicacion.',
+    '1. Conecta el repositorio: `netlify.toml` ya trae base, comando y publicación.',
     '2. Sustituye `API_HOST_PLACEHOLDER` en `netlify.toml` por el host real del API.',
     '3. Configura las variables del API en su propio servicio:',
     '',
@@ -169,9 +169,9 @@ function netlifyGuide(blueprint: Blueprint): string {
     ...blueprint.deployment.secrets.map((secret) => `${secret}=`),
     '```',
     '',
-    '## Nota sobre la redireccion',
+    '## Nota sobre la redirección',
     '',
-    'El proxy `/api/*` se resuelve en el borde, asi que el navegador nunca ve una',
-    'peticion entre dominios distintos y no hay CORS que configurar.',
+    'El proxy `/api/*` se resuelve en el borde, así que el navegador nunca ve una',
+    'petición entre dominios distintos y no hay CORS que configurar.',
   ].join('\n');
 }

@@ -5,7 +5,7 @@ import { GenerationError } from './errors.ts';
 import { FileTree } from './file-tree.ts';
 
 export interface WriteOptions {
-  /** No escribe nada; devuelve lo que se habria escrito. */
+  /** No escribe nada; devuelve lo que se habría escrito. */
   readonly dryRun?: boolean;
   /** Permite sobrescribir ficheros existentes en destino. */
   readonly force?: boolean;
@@ -18,11 +18,11 @@ export interface WriteReport {
 }
 
 /**
- * Materializa el arbol virtual en disco.
+ * Materializa el árbol virtual en disco.
  *
- * Es el unico punto del ecosistema que escribe ficheros del proyecto
+ * Es el único punto del ecosistema que escribe ficheros del proyecto
  * generado. Por defecto no pisa nada: sobrescribir el trabajo de alguien es
- * exactamente el tipo de dano que un generador no debe causar por descuido.
+ * exactamente el tipo de daño que un generador no debe causar por descuido.
  */
 export async function writeFileTree(
   files: readonly VirtualFile[] | FileTree,

@@ -35,12 +35,12 @@ export interface ScaffoldOutcome {
 }
 
 /**
- * Materializa un blueprint en un arbol de ficheros.
+ * Materializa un blueprint en un árbol de ficheros.
  *
  * No sabe escribir React, Fastify ni Docker: delega en los adaptadores que el
- * kernel tenga registrados. Lo que si hace, y ningun adaptador puede hacer por
+ * kernel tenga registrados. Lo que si hace, y ningún adaptador puede hacer por
  * su cuenta, es **consolidar**: reune las dependencias que todos declaran en un
- * unico `package.json` por workspace y renderiza el catalogo de componentes
+ * único `package.json` por workspace y renderiza el catálogo de componentes
  * una sola vez.
  */
 export class Scaffolder {
@@ -99,7 +99,7 @@ export class Scaffolder {
       this.#logger.warn('Sin adaptador de despliegue: el proyecto se genera sin CI ni contenedores.');
     }
 
-    // El catalogo de componentes se renderiza antes que la plantilla para que
+    // El catálogo de componentes se renderiza antes que la plantilla para que
     // esta pueda apoyarse en el en lugar de duplicarlo.
     const componentCount = this.#emitComponents(tree, blueprint, components);
 
@@ -119,7 +119,7 @@ export class Scaffolder {
     return { tree, dependencies, conflicts, componentCount };
   }
 
-  /** Catalogo del kernel mas los componentes derivados de cada entidad. */
+  /** Catálogo del kernel más los componentes derivados de cada entidad. */
   #collectComponents(blueprint: Blueprint): ComponentSpec[] {
     const catalog = new Map<string, ComponentSpec>();
     for (const spec of this.#kernel.components()) catalog.set(spec.name, spec);
@@ -132,10 +132,10 @@ export class Scaffolder {
   #emitComponents(tree: FileTree, blueprint: Blueprint, components: readonly ComponentSpec[]): number {
     const renderer = this.#kernel.componentRenderer(blueprint.stack.frontend);
     if (!renderer) {
-      // Vue y Angular todavia no tienen renderizador; generan sus vistas por
-      // adaptador. Es una limitacion conocida, no un fallo silencioso.
+      // Vue y Angular todavía no tienen renderizador; generan sus vistas por
+      // adaptador. Es una limitación conocida, no un fallo silencioso.
       this.#logger.debug(
-        `Sin renderizador de componentes para "${blueprint.stack.frontend}": se omite el catalogo.`,
+        `Sin renderizador de componentes para "${blueprint.stack.frontend}": se omite el catálogo.`,
       );
       return 0;
     }
@@ -181,7 +181,7 @@ export class Scaffolder {
   }
 }
 
-/** Ficheros de la raiz del proyecto generado, independientes del framework. */
+/** Ficheros de la raíz del proyecto generado, independientes del framework. */
 function rootFiles(
   blueprint: Blueprint,
   dependencies: DependencyRegistry,
@@ -233,7 +233,7 @@ function projectReadme(
   lines.push(
     '## Stack',
     '',
-    `| Capa | Eleccion |`,
+    `| Capa | Elección |`,
     `| --- | --- |`,
     `| Frontend | ${stack.frontend} |`,
     `| Backend | ${stack.backend} |`,
@@ -255,7 +255,7 @@ function projectReadme(
     '```',
     'apps/',
     '  api/   # backend: domain -> application -> infrastructure -> routes',
-    '  web/   # frontend por funcionalidad, con catalogo de componentes en src/components',
+    '  web/   # frontend por funcionalidad, con catálogo de componentes en src/components',
     '```',
     '',
     '## Modelo de dominio',
@@ -267,7 +267,7 @@ function projectReadme(
     lines.push(`- **${entity.name}** (\`/${entity.plural}\`): ${fieldNames}`);
   }
 
-  lines.push('', '## Dependencias y por que estan', '');
+  lines.push('', '## Dependencias y por qué están', '');
   for (const workspace of ['web', 'api'] as const) {
     const explained = dependencies.explain(workspace);
     if (explained.length === 0) continue;
@@ -289,7 +289,7 @@ function projectReadme(
 
   lines.push('## Decisiones de arquitectura', '');
   for (const decision of blueprint.decisions) {
-    lines.push(`### ${decision.id}: ${decision.title}`, '', `**Eleccion:** ${decision.choice}`, '');
+    lines.push(`### ${decision.id}: ${decision.title}`, '', `**Elección:** ${decision.choice}`, '');
     lines.push(decision.rationale, '');
     if (decision.alternatives.length > 0) {
       lines.push(`Alternativas descartadas: ${decision.alternatives.join(', ')}.`, '');
@@ -307,7 +307,7 @@ function projectReadme(
   if (requirements.openQuestions.length > 0) {
     lines.push('## Preguntas abiertas', '');
     lines.push(
-      'El analisis de requisitos no pudo resolver estos puntos. Respondelos antes de llevar el proyecto a produccion:',
+      'El análisis de requisitos no pudo resolver estos puntos. Respóndelos antes de llevar el proyecto a producción:',
       '',
     );
     for (const question of requirements.openQuestions) {
@@ -323,7 +323,7 @@ function projectReadme(
     '',
     '---',
     '',
-    `Generado por CalEcosystem. Confianza del analisis: ${(requirements.confidence * 100).toFixed(0)}%.`,
+    `Generado por CalEcosystem. Confianza del análisis: ${(requirements.confidence * 100).toFixed(0)}%.`,
   );
 
   return lines.join('\n');

@@ -38,17 +38,17 @@ const MAX_ENTITIES = 12;
 
 export interface AnalyzerOptions {
   readonly logger: Logger;
-  /** Puertos opcionales (p.ej. un LLM) que refinan el analisis deterministico. */
+  /** Puertos opcionales (p.ej. un LLM) que refinan el análisis deterministico. */
   readonly enrichers?: readonly RequirementsEnricher[];
 }
 
 /**
- * Traduce una descripcion de negocio a un modelo de requisitos.
+ * Traduce una descripción de negocio a un modelo de requisitos.
  *
  * Es un analizador basado en reglas y lexicos, no un modelo de lenguaje:
  * su salida es reproducible, explicable y gratis. Cuando no llega, no
  * inventa: baja `confidence` y deja la duda en `openQuestions`, que es lo
- * que un consultor haria antes de dibujar una arquitectura.
+ * que un consultor haría antes de dibujar una arquitectura.
  */
 export class RequirementsAnalyzer {
   readonly #logger: Logger;
@@ -92,7 +92,7 @@ export class RequirementsAnalyzer {
       try {
         const patch = await enricher.enrich(raw, model);
         model = { ...model, ...patch };
-        this.#logger.debug(`Analisis enriquecido por "${enricher.id}".`);
+        this.#logger.debug(`Análisis enriquecido por "${enricher.id}".`);
       } catch (error) {
         this.#logger.warn(
           `El enriquecedor "${enricher.id}" fallo; se conserva el analisis deterministico.`,
@@ -119,7 +119,7 @@ export class RequirementsAnalyzer {
     const merged: FeatureSet = { ...detected, ...(input.hints?.features ?? {}) };
 
     // Dependencias implicitas: hay capacidades que arrastran a otras. Pagar
-    // sin saber quien paga no existe, y varios roles implican autenticacion.
+    // sin saber quien paga no existe, y varios roles implican autenticación.
     const withImplied: FeatureSet = {
       ...merged,
       auth: merged.auth || merged.payments || merged.roles || merged.multiTenant,
@@ -129,9 +129,9 @@ export class RequirementsAnalyzer {
   }
 
   #detectEntities(text: string, features: FeatureSet): DomainEntity[] {
-    const found = new Map<string, string>(); // nombre canonico -> termino original
+    const found = new Map<string, string>(); // nombre canonico -> término original
 
-    // 1) Enumeraciones tras verbos de gestion: "gestionar productos, pedidos y clientes".
+    // 1) Enumeraciones tras verbos de gestión: "gestionar productos, pedidos y clientes".
     for (const trigger of ENTITY_TRIGGERS) {
       const pattern = new RegExp(`${trigger}\\s+((?:[a-z0-9]+(?:[,\\s]+(?:y|e|and)?\\s*)?){1,8})`, 'g');
       for (const match of text.matchAll(pattern)) {
@@ -243,7 +243,7 @@ function detectLocale(text: string): Locale {
   return englishMarkers > spanishMarkers ? 'en' : 'es';
 }
 
-/** Palabras vacias que nunca deben acabar en el nombre del proyecto. */
+/** Palabras vacías que nunca deben acabar en el nombre del proyecto. */
 const NAME_STOPWORDS = new Set([
   'de', 'del', 'para', 'por', 'con', 'sin', 'los', 'las', 'el', 'la', 'un',
   'una', 'que', 'en', 'y', 'e', 'o', 'u', 'al', 'donde', 'the', 'for', 'of', 'to',
@@ -252,16 +252,25 @@ const NAME_STOPWORDS = new Set([
 ]);
 
 function inferProjectName(raw: string, text: string): string {
+  // La busqueda se hace sobre el texto normalizado (los lexicos no llevan
+  // tildes), pero el nombre se recorta del texto ORIGINAL. `normalize` no
+  // cambia la longitud de la cadena, asi que los indices de una version
+  // sirven para la otra, y el proyecto conserva su acentuacion real:
+  // "ceramica artesanal" seria un nombre mal escrito para el cliente.
   const pattern =
     /(?:plataforma|aplicacion|app|sistema|portal|marketplace|tienda|herramienta|web)\s+((?:[a-z0-9]+\s+){0,3}[a-z0-9]+)/;
   const match = pattern.exec(text);
-  if (match?.[1]) {
-    const words = match[1]
-      .split(/\s+/)
-      .filter((word) => word.length > 2 && !NAME_STOPWORDS.has(word))
-      .slice(0, 2);
+
+  if (match?.[1] !== undefined && match.index >= 0) {
+    const inicio = match.index + match[0].indexOf(match[1]);
+    const original = raw.slice(inicio, inicio + match[1].length);
+    const words = zip(match[1].split(/\s+/), original.split(/\s+/))
+      .filter(([normalizada]) => normalizada.length > 2 && !NAME_STOPWORDS.has(normalizada))
+      .slice(0, 2)
+      .map(([, acentuada]) => acentuada);
     if (words.length > 0) return titleCase(words.join(' '));
   }
+
   const firstWords = raw
     .trim()
     .split(/\s+/)
@@ -269,6 +278,15 @@ function inferProjectName(raw: string, text: string): string {
     .slice(0, 3)
     .join(' ');
   return firstWords === '' ? 'Generated App' : titleCase(firstWords);
+}
+
+/** Empareja dos listas del mismo tamano; descarta el sobrante si difieren. */
+function zip<A, B>(a: readonly A[], b: readonly B[]): [A, B][] {
+  const pares: [A, B][] = [];
+  for (let index = 0; index < Math.min(a.length, b.length); index += 1) {
+    pares.push([a[index] as A, b[index] as B]);
+  }
+  return pares;
 }
 
 function buildSummary(raw: string): string {
@@ -300,9 +318,9 @@ interface ConfidenceInput {
 }
 
 /**
- * Confianza: cuanta senal real habia en el texto. No mide si la arquitectura
- * es buena, mide si el enunciado daba para decidirla. Es la metrica que evita
- * que un parrafo de dos lineas pase por una especificacion.
+ * Confianza: cuanta señal real había en el texto. No mide si la arquitectura
+ * es buena, mide si el enunciado daba para decidirla. Es la métrica que evita
+ * que un parrafo de dos líneas pase por una especificación.
  */
 function scoreConfidence(input: ConfidenceInput): number {
   const words = input.text.split(/\s+/).filter(Boolean).length;
@@ -327,19 +345,19 @@ interface OpenQuestionsInput {
 function buildOpenQuestions(input: OpenQuestionsInput): string[] {
   const questions: string[] = [];
   if (input.entities.length <= 1) {
-    questions.push('Que entidades de negocio principales debe gestionar la aplicacion?');
+    questions.push('Que entidades de negocio principales debe gestionar la aplicación?');
   }
   if (input.actors.length === 0) {
     questions.push('Que tipos de usuario o roles existen y que puede hacer cada uno?');
   }
   if (input.nonFunctional.expectedUsers === null) {
-    questions.push('Que volumen de usuarios y de datos se espera en el primer ano?');
+    questions.push('Que volumen de usuarios y de datos se espera en el primer año?');
   }
   if (input.features.payments && input.nonFunctional.compliance.length === 0) {
-    questions.push('Hay pagos: que pasarela se usara y quien asume el alcance PCI-DSS?');
+    questions.push('Hay pagos: que pasarela se usará y quien asume el alcance PCI-DSS?');
   }
   if (!input.features.auth) {
-    questions.push('La aplicacion es totalmente publica o requiere cuentas de usuario?');
+    questions.push('La aplicación es totalmente pública o requiere cuentas de usuario?');
   }
   return unique(questions);
 }

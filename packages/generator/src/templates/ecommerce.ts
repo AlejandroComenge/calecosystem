@@ -7,44 +7,53 @@ import type {
   VirtualFile,
 } from '@calecosystem/contracts';
 import { fileFactory } from '../scaffold/shared.ts';
-import { scoreTemplate } from './detect.ts';
+import { scoreTemplate, type DetectionRules } from './detect.ts';
 import { addEndpoints, addPages, ensureEntity, recordTemplateDecision } from './shared.ts';
 
 const TOOL = 'calec.template.ecommerce';
 const file = fileFactory(TOOL);
 
 /**
- * Plantilla de comercio electronico.
+ * Plantilla de comercio electrónico.
  *
- * Aporta lo que ninguna tienda puede no tener y que un CRUD generico nunca
+ * Aporta lo que ninguna tienda puede no tener y que un CRUD genérico nunca
  * deduce: carrito con persistencia local, proceso de compra y panel de
- * pedidos. El catalogo si sale del analisis, porque los productos varian de
+ * pedidos. El catálogo si sale del análisis, porque los productos varian de
  * un negocio a otro y la plantilla no debe imponer su modelo.
  */
+/**
+ * Reglas de deteccion, expuestas para poder inspeccionarlas y probarlas.
+ *
+ * Los terminos se comparan contra el resumen NORMALIZADO, asi que no
+ * pueden llevar tildes: una senal acentuada no casaria nunca y el fallo
+ * seria silencioso. Hay una prueba que lo verifica.
+ */
+export const ECOMMERCE_RULES: DetectionRules = {
+  signals: [
+    'tienda', 'ecommerce', 'e-commerce', 'comercio electronico', 'carrito',
+    'checkout', 'marketplace', 'catalogo', 'vender', 'venta', 'compra',
+    'comprar', 'pedidos', 'envio', 'stock',
+  ],
+  entities: ['Product', 'Order', 'Cart', 'Customer'],
+  features: ['payments'],
+  // Un panel interno gestiona pedidos y productos, pero no es una tienda:
+  // generarle un carrito y un proceso de compra es ruido, no valor.
+  antiSignals: [
+    'landing', 'captacion de leads', 'panel interno', 'uso interno',
+    'empleados', 'backoffice', 'back office', 'herramienta interna',
+  ],
+  };
+
 export const ecommerceTemplate: ProjectTemplate = {
   id: 'calec.template.ecommerce',
   name: 'E-commerce',
-  description: 'Catalogo, carrito, proceso de compra y panel de pedidos.',
+  description: 'Catálogo, carrito, proceso de compra y panel de pedidos.',
   kind: 'ecommerce',
   tier: 'community',
   frameworks: ['react'],
 
   detect(requirements: RequirementsModel): TemplateMatch {
-    return scoreTemplate(requirements, {
-      signals: [
-        'tienda', 'ecommerce', 'e-commerce', 'comercio electronico', 'carrito',
-        'checkout', 'marketplace', 'catalogo', 'vender', 'venta', 'compra',
-        'comprar', 'pedidos', 'envio', 'stock',
-      ],
-      entities: ['Product', 'Order', 'Cart', 'Customer'],
-      features: ['payments'],
-      // Un panel interno gestiona pedidos y productos, pero no es una tienda:
-      // generarle un carrito y un proceso de compra es ruido, no valor.
-      antiSignals: [
-        'landing', 'captacion de leads', 'panel interno', 'uso interno',
-        'empleados', 'backoffice', 'back office', 'herramienta interna',
-      ],
-    });
+    return scoreTemplate(requirements, ECOMMERCE_RULES);
   },
 
   refine(blueprint: Blueprint): Blueprint {
@@ -79,24 +88,24 @@ export const ecommerceTemplate: ProjectTemplate = {
       {
         method: 'GET',
         path: '/api/catalog',
-        summary: 'Catalogo publico con filtros y paginacion',
+        summary: 'Catálogo público con filtros y paginación',
         entity: 'Product',
         requiresAuth: false,
       },
     ]);
 
-    // El inventario es la fuente numero uno de incidencias en una tienda:
-    // dos clientes comprando la ultima unidad a la vez.
+    // El inventario es la fuente número uno de incidencias en una tienda:
+    // dos clientes comprando la última unidad a la vez.
     refined = {
       ...refined,
       risks: [
         ...refined.risks,
         {
           id: 'RISK-STOCK-RACE',
-          title: 'Condicion de carrera al descontar stock',
+          title: 'Condición de carrera al descontar stock',
           impact: 'high',
           mitigation:
-            'Descontar existencias dentro de la misma transaccion que crea el pedido, con bloqueo por fila.',
+            'Descontar existencias dentro de la misma transacción que crea el pedido, con bloqueo por fila.',
           owner: 'tester',
         },
       ],
@@ -111,7 +120,7 @@ export const ecommerceTemplate: ProjectTemplate = {
     dependencies.contribute({
       workspace: 'web',
       requestedBy: TOOL,
-      scripts: { 'test:e2e': 'echo "Anade aqui tu runner de e2e"' },
+      scripts: { 'test:e2e': 'echo "Añade aquí tu runner de e2e"' },
     });
 
     return [
@@ -137,9 +146,9 @@ function cartContext(slug: string): string {
     '/**',
     ' * Estado del carrito.',
     ' *',
-    ' * Se guarda en `localStorage` porque un carrito que se vacia al recargar',
+    ' * Se guarda en `localStorage` porque un carrito que se vacía al recargar',
     ' * pierde ventas. El precio se recalcula SIEMPRE en el servidor al pagar:',
-    ' * lo que hay aqui es una copia de conveniencia para pintar la interfaz.',
+    ' * lo que hay aquí es una copia de conveniencia para pintar la interfaz.',
     ' */',
     "import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';",
     "import type { Product } from '../../types.ts';",
@@ -170,8 +179,8 @@ function cartContext(slug: string): string {
     '    const raw = localStorage.getItem(STORAGE_KEY);',
     '    return raw ? (JSON.parse(raw) as CartLine[]) : [];',
     '  } catch {',
-    '    // Almacenamiento no disponible o corrupto: arrancar vacio es',
-    '    // preferible a romper la aplicacion entera.',
+    '    // Almacenamiento no disponible o corrupto: arrancar vacío es',
+    '    // preferible a romper la aplicación entera.',
     '    return [];',
     '  }',
     '}',
@@ -184,7 +193,7 @@ function cartContext(slug: string): string {
     '      localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));',
     '    } catch {',
     '      // Modo privado o cuota agotada: no es motivo para perder el carrito',
-    '      // de esta sesion.',
+    '      // de esta sesión.',
     '    }',
     '  }, [lines]);',
     '',
@@ -215,7 +224,7 @@ function cartContext(slug: string): string {
     '  }, []);',
     '',
     '  const setQuantity = useCallback((productId: string, quantity: number) => {',
-    '    // Cantidad cero equivale a eliminar: evita lineas fantasma en el carrito.',
+    '    // Cantidad cero equivale a eliminar: evita líneas fantasma en el carrito.',
     '    if (quantity <= 0) {',
     '      setLines((current) => current.filter((line) => line.productId !== productId));',
     '      return;',
@@ -265,7 +274,7 @@ function productGrid(): string {
     '  products: readonly Product[];',
     '}',
     '',
-    '/** Rejilla de catalogo. Anadir al carrito no navega: la compra sigue abierta. */',
+    '/** Rejilla de catálogo. Añadir al carrito no navega: la compra sigue abierta. */',
     'export function ProductGrid({ products }: ProductGridProps) {',
     '  const cart = useCart();',
     '',
@@ -281,7 +290,7 @@ function productGrid(): string {
     '              )}',
     '            </p>',
     '            <Button onClick={() => cart.add(product)} disabled={Number(product.stock) <= 0}>',
-    "              {Number(product.stock) > 0 ? 'Anadir al carrito' : 'Sin existencias'}",
+    "              {Number(product.stock) > 0 ? 'Añadir al carrito' : 'Sin existencias'}",
     '            </Button>',
     '          </Card>',
     '        </li>',
@@ -317,12 +326,12 @@ function catalogPage(): string {
     '    };',
     '  }, []);',
     '',
-    '  if (loading) return <Spinner label="Cargando catalogo" />;',
+    '  if (loading) return <Spinner label="Cargando catálogo" />;',
     '  if (error) return <Alert tone="error">{error}</Alert>;',
     '',
     '  return (',
     '    <section>',
-    '      <h1 className="mb-4 text-xl font-semibold">Catalogo</h1>',
+    '      <h1 className="mb-4 text-xl font-semibold">Catálogo</h1>',
     '      <ProductGrid products={products} />',
     '    </section>',
     '  );',
@@ -345,9 +354,9 @@ function cartPage(): string {
     '  if (cart.lines.length === 0) {',
     '    return (',
     '      <EmptyState',
-    '        title="Tu carrito esta vacio"',
-    '        description="Anade productos desde el catalogo para continuar."',
-    '        action={<Link to="/catalog">Ver catalogo</Link>}',
+    '        title="Tu carrito está vacío"',
+    '        description="Añade productos desde el catálogo para continuar."',
+    '        action={<Link to="/catalog">Ver catálogo</Link>}',
     '      />',
     '    );',
     '  }',
@@ -503,8 +512,8 @@ function cartDomain(): string {
     '/**',
     ' * Reglas del carrito, en el dominio y sin dependencias.',
     ' *',
-    ' * Estan aqui y no en la ruta HTTP porque son las reglas que mas veces se',
-    ' * tocan y las que mas caro sale equivocar: un redondeo mal hecho es dinero.',
+    ' * Están aquí y no en la ruta HTTP porque son las reglas que más veces se',
+    ' * tocan y las que más caro sale equivocar: un redondeo mal hecho es dinero.',
     ' */',
     '',
     'export interface CartLineInput {',
@@ -542,7 +551,7 @@ function cartDomain(): string {
     "      throw new Error('Producto no encontrado: ' + line.productId);",
     '    }',
     '    if (!Number.isInteger(line.quantity) || line.quantity <= 0) {',
-    "      throw new Error('Cantidad no valida para ' + line.productId);",
+    "      throw new Error('Cantidad no válida para ' + line.productId);",
     '    }',
     '    return {',
     '      productId: line.productId,',
@@ -573,12 +582,12 @@ function cartDomainTest(): string {
     "const prices: Record<string, number> = { 'p-1': 19.99, 'p-2': 5.5 };",
     'const priceOf = (id: string) => prices[id];',
     '',
-    "test('calcula el total de cada linea', () => {",
+    "test('calcula el total de cada línea', () => {",
     "  const lines = priceLines([{ productId: 'p-1', quantity: 3 }], priceOf);",
     '  assert.equal(lines[0]?.lineTotal, 59.97);',
     '});',
     '',
-    "test('rechaza cantidades no validas', () => {",
+    "test('rechaza cantidades no válidas', () => {",
     "  assert.throws(() => priceLines([{ productId: 'p-1', quantity: 0 }], priceOf), /Cantidad/);",
     "  assert.throws(() => priceLines([{ productId: 'p-1', quantity: 1.5 }], priceOf), /Cantidad/);",
     '});',
@@ -627,7 +636,7 @@ function checkoutService(): string {
     ' * Proceso de compra.',
     ' *',
     ' * Recalcula precios en el servidor y reserva existencias antes de crear el',
-    ' * pedido. PENDIENTE: envolver reserva y creacion en una unica transaccion',
+    ' * pedido. PENDIENTE: envolver reserva y creación en una única transacción',
     ' * al conectar la base de datos real; ver RISK-STOCK-RACE en el blueprint.',
     ' */',
     'export class CheckoutService {',
@@ -644,7 +653,7 @@ function checkoutService(): string {
     '',
     '  async checkout(input: CheckoutInput): Promise<CheckoutResult> {',
     '    if (input.lines.length === 0) {',
-    "      throw new Error('El carrito esta vacio');",
+    "      throw new Error('El carrito está vacío');",
     '    }',
     '',
     '    const priced = priceLines(input.lines, (id) => this.#products.priceOf(id));',

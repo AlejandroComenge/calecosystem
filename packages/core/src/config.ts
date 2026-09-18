@@ -7,7 +7,7 @@ import { EcosystemError, toError } from './errors.ts';
 export const CONFIG_FILENAME = 'calecosystem.config.json';
 
 export interface PluginSpecifier {
-  /** Especificador de modulo: nombre de paquete o ruta relativa. */
+  /** Especificador de módulo: nombre de paquete o ruta relativa. */
   readonly module: string;
   /** Export a usar. Por defecto `default`. */
   readonly export?: string;
@@ -19,14 +19,14 @@ export interface TelemetryConfig {
   /**
    * Desactivada por defecto.
    *
-   * Una herramienta de desarrollo que empieza a escribir telemetria sin
+   * Una herramienta de desarrollo que empieza a escribir telemetría sin
    * preguntar pierde la confianza del equipo que la instala. Se activa
    * explicitamente y se documenta que se registra.
    */
   readonly enabled: boolean;
   /** Fichero JSONL de destino. */
   readonly file: string;
-  /** Con `true` se registra tambien el texto de los requisitos. */
+  /** Con `true` se registra también el texto de los requisitos. */
   readonly includeRequirementText: boolean;
 }
 
@@ -62,7 +62,7 @@ export const DEFAULT_CONFIG: EcosystemConfig = {
   },
 };
 
-/** Normaliza JSON arbitrario en una configuracion valida (sin lanzar por campos extra). */
+/** Normaliza JSON arbitrario en una configuración válida (sin lanzar por campos extra). */
 export function normalizeConfig(raw: unknown): EcosystemConfig {
   if (typeof raw !== 'object' || raw === null) return DEFAULT_CONFIG;
   const source = raw as Record<string, unknown>;
@@ -141,7 +141,7 @@ export async function loadConfig(cwd: string = process.cwd()): Promise<Ecosystem
 }
 
 /**
- * Carga dinamicamente los plugins declarados en la configuracion.
+ * Carga dinamicamente los plugins declarados en la configuración.
  *
  * Acepta tanto un plugin como una fabrica `(options) => Plugin`, que es la
  * forma habitual de distribuir plugins parametrizables.

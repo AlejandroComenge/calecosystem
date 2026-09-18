@@ -14,16 +14,16 @@ import { DEFAULT_QUOTAS, nextTierFor, periodReset, periodStart, policyFor } from
 export interface QuotaGuardOptions {
   readonly store: UsageStore;
   readonly quotas?: readonly TierQuotas[];
-  /** Reloj inyectable: hace las pruebas de periodos deterministas. */
+  /** Reloj inyectable: hace las pruebas de períodos deterministas. */
   readonly now?: () => Date;
 }
 
 /**
- * Comprobacion y registro de consumo.
+ * Comprobación y registro de consumo.
  *
- * Separa deliberadamente `check` de `record`. Podrian ser uno solo, pero
- * entonces una generacion que falla a mitad consumiria cuota igual que una
- * que termina, y cobrar por un fallo propio es la forma mas rapida de perder
+ * Separa deliberadamente `check` de `record`. Podrían ser uno solo, pero
+ * entonces una generación que falla a mitad consumiria cuota igual que una
+ * que termina, y cobrar por un fallo propio es la forma más rápida de perder
  * un cliente. El middleware comprueba antes y registra solo si hubo exito.
  */
 export class QuotaGuard implements UsageGuard {
@@ -44,8 +44,8 @@ export class QuotaGuard implements UsageGuard {
   ): Promise<QuotaDecision> {
     const policy = policyFor(principal.tier, operation, this.#quotas);
 
-    // Sin politica definida no hay limite que aplicar. Es la eleccion segura:
-    // una operacion nueva no debe quedar bloqueada porque nadie le puso cuota.
+    // Sin política definida no hay límite que aplicar. Es la elección segura:
+    // una operación nueva no debe quedar bloqueada porque nadie le puso cuota.
     if (!policy) {
       return {
         allowed: true,
@@ -55,7 +55,7 @@ export class QuotaGuard implements UsageGuard {
         remaining: null,
         period: 'total',
         resetAt: null,
-        reason: 'Sin politica de cuota definida para esta operacion.',
+        reason: 'Sin política de cuota definida para esta operación.',
       };
     }
 
@@ -97,7 +97,7 @@ export class QuotaGuard implements UsageGuard {
         : {
             reason:
               `Has usado ${used} de ${policy.limit} en el plan "${principal.tier}"` +
-              (upgrade ? `. El plan "${upgrade}" amplia este limite.` : '.'),
+              (upgrade ? `. El plan "${upgrade}" amplia este límite.` : '.'),
           }),
     };
   }

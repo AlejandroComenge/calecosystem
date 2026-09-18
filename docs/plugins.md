@@ -1,6 +1,6 @@
 # Sistema de plugins
 
-Un plugin es un objeto con nombre, version y una funcion `register` que recibe
+Un plugin es un objeto con nombre, versión y una función `register` que recibe
 la API del kernel. Todo lo demas es opcional.
 
 ```ts
@@ -19,24 +19,24 @@ export default definePlugin({
 });
 ```
 
-## Que puede hacer un plugin
+## Qué puede hacer un plugin
 
-| Metodo de `api` | Para que |
+| Método de `api` | Para que |
 |-----------------|----------|
 | `onEvent(name, handler, opts?)` | Observar el pipeline |
 | `onTransform(name, handler, opts?)` | Modificar requisitos, blueprint, despliegue o ficheros |
-| `registerModule(module)` | Aportar un modulo de ampliacion (optimizador, auditor, testeador, documentador) |
-| `registerFrontendAdapter(adapter)` | Anadir un framework de frontend |
-| `registerBackendAdapter(adapter)` | Anadir un runtime de backend |
-| `registerDeploymentAdapter(adapter)` | Anadir un destino de despliegue |
-| `registerRequirementsEnricher(enricher)` | Refinar el analisis de requisitos (aqui entra un LLM) |
-| `registerTemplate(template)` | Anadir una plantilla de producto (tienda, SaaS, landing...) |
-| `registerComponent(spec)` | Anadir o sustituir un componente del catalogo |
-| `registerComponentRenderer(renderer)` | Traducir el catalogo a otro framework |
-| `registerMiddleware(registration)` | Envolver la generacion completa (cuotas, telemetria) |
+| `registerModule(module)` | Aportar un módulo de ampliación (optimizador, auditor, testeador, documentador) |
+| `registerFrontendAdapter(adapter)` | Añadir un framework de frontend |
+| `registerBackendAdapter(adapter)` | Añadir un runtime de backend |
+| `registerDeploymentAdapter(adapter)` | Añadir un destino de despliegue |
+| `registerRequirementsEnricher(enricher)` | Refinar el análisis de requisitos (aquí entra un LLM) |
+| `registerTemplate(template)` | Añadir una plantilla de producto (tienda, SaaS, landing...) |
+| `registerComponent(spec)` | Añadir o sustituir un componente del catálogo |
+| `registerComponentRenderer(renderer)` | Traducir el catálogo a otro framework |
+| `registerMiddleware(registration)` | Envolver la generación completa (cuotas, telemetría) |
 | `provide(token, value)` / `resolve(token)` | Publicar y consumir servicios entre plugins |
 | `hasModule(kind)` | Adaptar el comportamiento a lo que haya cargado |
-| `api.options` | Opciones de este plugin, tomadas de la configuracion |
+| `api.options` | Opciones de este plugin, tomadas de la configuración |
 | `api.logger` | Logger con el nombre del plugin como contexto |
 
 ## Orden de carga
@@ -54,9 +54,9 @@ Errores detectados antes de ejecutar nada:
 Un plugin cuyo `tier` supera la licencia activa se omite con un aviso. Con
 `strictEntitlements: true` en las opciones del kernel, aborta el arranque.
 
-## Configuracion declarativa
+## Configuración declarativa
 
-`calecosystem.config.json` en la raiz del proyecto:
+`calecosystem.config.json` en la raíz del proyecto:
 
 ```json
 {
@@ -80,7 +80,7 @@ desactiva una entrada sin borrarla.
 
 ## Escribir un adaptador de frontend
 
-Es el caso mas comun y el de mayor valor comercial.
+Es el caso más común y el de mayor valor comercial.
 
 ```ts
 import type { FrontendAdapter } from '@calecosystem/contracts';
@@ -101,14 +101,14 @@ export const svelteAdapter: FrontendAdapter = {
 };
 ```
 
-`scaffold` puede ser sincrono o asincrono y devuelve `VirtualFile[]`. El
-`Scaffolder` los anade al arbol y detecta colisiones: si dos adaptadores
-escriben la misma ruta, la generacion falla con los nombres de ambos en lugar
+`scaffold` puede ser síncrono o asíncrono y devuelve `VirtualFile[]`. El
+`Scaffolder` los añade al árbol y detecta colisiones: si dos adaptadores
+escriben la misma ruta, la generación falla con los nombres de ambos en lugar
 de que uno pise al otro en silencio.
 
-## Escribir un modulo de ampliacion
+## Escribir un módulo de ampliación
 
-Un modulo implementa `EcosystemModule` y se ejecuta en la fase `augment`.
+Un módulo implementa `EcosystemModule` y se ejecuta en la fase `augment`.
 
 ```ts
 import type { EcosystemModule } from '@calecosystem/contracts';
@@ -142,12 +142,12 @@ export const licenseChecker: EcosystemModule = {
 };
 ```
 
-El contexto es de solo lectura salvo `emit` y `warn`: un modulo no muta el
-arbol de otro, **aporta el suyo**. Si dos modulos necesitan negociar, el sitio
-correcto es un hook de transformacion, no la mutacion cruzada.
+El contexto es de solo lectura salvo `emit` y `warn`: un módulo no muta el
+árbol de otro, **aporta el suyo**. Si dos módulos necesitan negociar, el sitio
+correcto es un hook de transformación, no la mutación cruzada.
 
-Un modulo que lanza no tumba la generacion: se registra el fallo en
-`result.warnings` y el pipeline continua. Una auditoria caida no puede dejar a
+Un módulo que lanza no tumba la generación: se registra el fallo en
+`result.warnings` y el pipeline continua. Una auditoría caida no puede dejar a
 un equipo sin su proyecto.
 
 ## Escribir una plantilla de producto
@@ -181,15 +181,15 @@ Tres reglas aprendidas escribiendo las tres incluidas:
 
 - **`refine` tiene que ser idempotente.** Aplicarla dos veces no puede
   duplicar entidades. Hay una prueba que lo comprueba.
-- **El analizador manda sobre la plantilla.** Si `Product` salio del enunciado,
-  sus campos son mas fieles que los de la plantilla: usa `ensureEntity`, que
-  solo anade lo que falta.
-- **Declara contra-senales.** Son lo que evita generar un carrito de la compra
+- **El analizador manda sobre la plantilla.** Si `Product` salió del enunciado,
+  sus campos son más fieles que los de la plantilla: usa `ensureEntity`, que
+  solo añade lo que falta.
+- **Declara contra-señales.** Son lo que evita generar un carrito de la compra
   en una landing que menciona "producto".
 
 ## Escribir un middleware
 
-Para lo que envuelve la ejecucion entera: cuotas, autorizacion, medicion.
+Para lo que envuelve la ejecución entera: cuotas, autorización, medición.
 
 ```ts
 api.registerMiddleware({
@@ -211,20 +211,20 @@ api.registerMiddleware({
 });
 ```
 
-No llamar a `next` corta la ejecucion: asi se implementa "cuota agotada".
-Llamarlo dos veces es un error explicito, porque duplicaria la generacion y el
+No llamar a `next` corta la ejecución: así se implementa "cuota agotada".
+Llamarlo dos veces es un error explicito, porque duplicaría la generación y el
 contador de consumo.
 
-## Buenas practicas
+## Buenas prácticas
 
-- **Un plugin, una responsabilidad.** Es mas facil de versionar y de facturar.
+- **Un plugin, una responsabilidad.** Es más fácil de versionar y de facturar.
 - **Declara `requires`.** Depender del orden de carga por casualidad es una
   bomba de relojeria.
 - **Declara el `tier` real.** El kernel lo respeta; la coherencia comercial
-  del catalogo depende de ello.
+  del catálogo depende de ello.
 - **Implementa `dispose`** si abres conexiones, ficheros o procesos.
-- **No dependas de otro modulo por su id.** Usa `hasModule(kind)` o el
+- **No dependas de otro módulo por su id.** Usa `hasModule(kind)` o el
   contenedor de servicios.
 - **Declara dependencias, no escribas `package.json`.** Usa
-  `context.dependencies.require(...)` con una `reason` util: acaba en la
-  documentacion del proyecto generado.
+  `context.dependencies.require(...)` con una `reason` útil: acaba en la
+  documentación del proyecto generado.

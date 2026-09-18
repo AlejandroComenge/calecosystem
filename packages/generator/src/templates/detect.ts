@@ -2,25 +2,25 @@ import type { RequirementsModel, TemplateMatch } from '@calecosystem/contracts';
 import { containsTerm, normalize } from '../analysis/text.ts';
 
 export interface DetectionRules {
-  /** Terminos que apuntan a esta plantilla. Cada acierto suma. */
+  /** Términos que apuntan a esta plantilla. Cada acierto suma. */
   readonly signals: readonly string[];
   /** Entidades cuya presencia refuerza la hipotesis. */
   readonly entities?: readonly string[];
   /** Capacidades que refuerzan la hipotesis. */
   readonly features?: readonly (keyof RequirementsModel['features'])[];
-  /** Terminos que la descartan: evita falsos positivos entre plantillas. */
+  /** Términos que la descartan: evita falsos positivos entre plantillas. */
   readonly antiSignals?: readonly string[];
 }
 
 /**
- * Puntuacion comun a todas las plantillas.
+ * Puntuación común a todas las plantillas.
  *
  * Tres fuentes de evidencia con pesos distintos: las palabras del enunciado
- * pesan mas que las entidades deducidas, porque las entidades ya son una
+ * pesan más que las entidades deducidas, porque las entidades ya son una
  * inferencia y encadenar inferencias multiplica el error.
  *
- * Las contra-senales restan de verdad. Sin ellas, "tienda" en un enunciado de
- * SaaS bastaria para generar un carrito de la compra que nadie pidio.
+ * Las contra-señales restan de verdad. Sin ellas, "tienda" en un enunciado de
+ * SaaS bastaría para generar un carrito de la compra que nadie pidio.
  */
 export function scoreTemplate(
   requirements: RequirementsModel,

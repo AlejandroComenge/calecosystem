@@ -1,6 +1,6 @@
 import type { ComponentProp, ComponentRenderer, ComponentSpec } from '@calecosystem/contracts';
 
-/** Tipo TypeScript de una prop segun su clase. */
+/** Tipo TypeScript de una prop según su clase. */
 export function propType(prop: ComponentProp): string {
   switch (prop.kind) {
     case 'string':
@@ -20,7 +20,7 @@ export function propType(prop: ComponentProp): string {
   }
 }
 
-/** Declaracion de la interfaz de props, con JSDoc por campo cuando lo hay. */
+/** Declaración de la interfaz de props, con JSDoc por campo cuando lo hay. */
 function propsInterface(spec: ComponentSpec): string[] {
   if (spec.props.length === 0) return [];
   const lines = [`export interface ${spec.name}Props {`];
@@ -32,15 +32,15 @@ function propsInterface(spec: ComponentSpec): string[] {
   return lines;
 }
 
-/** Desestructuracion con valores por defecto para las props opcionales. */
+/** Desestructuración con valores por defecto para las props opcionales. */
 function destructuring(spec: ComponentSpec): string {
   if (spec.props.length === 0) return '';
   const parts = spec.props.map((prop) =>
     prop.defaultValue !== undefined ? `${prop.name} = ${prop.defaultValue}` : prop.name,
   );
   const inline = `{ ${parts.join(', ')} }: ${spec.name}Props`;
-  // Firmas largas en una sola linea son ilegibles; a partir de cierto ancho
-  // se rompe en varias, como haria cualquier formateador.
+  // Firmas largas en una sola línea son ilegibles; a partir de cierto ancho
+  // se rompe en varias, como haría cualquier formateador.
   if (inline.length <= 88) return inline;
   return `{\n  ${parts.join(',\n  ')},\n}: ${spec.name}Props`;
 }
@@ -49,8 +49,8 @@ function destructuring(spec: ComponentSpec): string {
  * Renderizador de componentes a React + TypeScript.
  *
  * Toma una `ComponentSpec` (datos) y produce un componente funcional tipado.
- * El catalogo de componentes se describe una sola vez; anadir soporte para
- * otro framework es escribir otro renderizador, no otro catalogo.
+ * El catálogo de componentes se describe una sola vez; añadir soporte para
+ * otro framework es escribir otro renderizador, no otro catálogo.
  */
 export const reactComponentRenderer: ComponentRenderer = {
   id: 'calec.components.react',
@@ -86,10 +86,10 @@ export const reactComponentRenderer: ComponentRenderer = {
   },
 };
 
-/** Fichero barril del catalogo: un solo punto de importacion. */
+/** Fichero barril del catálogo: un solo punto de importación. */
 export function componentBarrel(specs: readonly ComponentSpec[]): string {
   const lines = [
-    '/** Catalogo de componentes generado. Reexporta todo el kit de UI. */',
+    '/** Catálogo de componentes generado. Reexporta todo el kit de UI. */',
     ...[...specs]
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((spec) => {

@@ -1,4 +1,4 @@
-/** Errores del ecosistema con codigo estable para diagnostico y telemetria. */
+/** Errores del ecosistema con código estable para diagnostico y telemetría. */
 export class EcosystemError extends Error {
   readonly code: string;
   readonly details: Readonly<Record<string, unknown>>;

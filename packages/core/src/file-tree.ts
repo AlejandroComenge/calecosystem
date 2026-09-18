@@ -2,12 +2,12 @@ import type { VirtualFile } from '@calecosystem/contracts';
 import { GenerationError } from './errors.ts';
 
 /**
- * Arbol de ficheros en memoria.
+ * Árbol de ficheros en memoria.
  *
  * Generar contra memoria y no contra disco es la decision que hace el
- * ecosistema testeable: los modulos pueden inspeccionar y ampliar el
+ * ecosistema testeable: los módulos pueden inspeccionar y ampliar el
  * resultado completo antes de que nada toque el sistema de ficheros, y los
- * tests comprueban el arbol sin E/S.
+ * tests comprueban el árbol sin E/S.
  */
 export class FileTree {
   readonly #files = new Map<string, VirtualFile>();
@@ -19,7 +19,7 @@ export class FileTree {
   static normalizePath(rawPath: string): string {
     const unified = rawPath.replaceAll('\\', '/').trim();
     if (unified === '') {
-      throw new GenerationError('INVALID_PATH', 'La ruta del fichero no puede estar vacia.');
+      throw new GenerationError('INVALID_PATH', 'La ruta del fichero no puede estar vacía.');
     }
     if (unified.startsWith('/') || /^[a-zA-Z]:\//.test(unified)) {
       throw new GenerationError('INVALID_PATH', `Se esperaba una ruta relativa: "${rawPath}".`, {
@@ -39,7 +39,7 @@ export class FileTree {
       segments.push(segment);
     }
     if (segments.length === 0) {
-      throw new GenerationError('INVALID_PATH', `Ruta no valida: "${rawPath}".`, { path: rawPath });
+      throw new GenerationError('INVALID_PATH', `Ruta no válida: "${rawPath}".`, { path: rawPath });
     }
     return segments.join('/');
   }
@@ -57,7 +57,7 @@ export class FileTree {
   }
 
   /**
-   * Anade un fichero. Un choque de rutas es un error salvo que el nuevo
+   * Añade un fichero. Un choque de rutas es un error salvo que el nuevo
    * fichero declare `overwrite`: preferimos un fallo ruidoso a que un plugin
    * pise en silencio la salida de otro.
    */
@@ -68,7 +68,7 @@ export class FileTree {
       throw new GenerationError(
         'FILE_CONFLICT',
         `"${file.producedBy}" intenta escribir "${path}", ya generado por "${existing.producedBy}". ` +
-          'Usa `overwrite: true` si la sustitucion es intencionada.',
+          'Usa `overwrite: true` si la sustitución es intencionada.',
         { path, existingProducer: existing.producedBy, newProducer: file.producedBy },
       );
     }

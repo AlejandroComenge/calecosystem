@@ -14,7 +14,7 @@ function fakeModule(kind: ModuleDescriptor['kind'], tier: ModuleDescriptor['tier
       kind,
       version: '0.0.1',
       displayName: kind,
-      description: 'modulo de prueba',
+      description: 'módulo de prueba',
       tier,
       status: 'preview',
     },
@@ -69,7 +69,7 @@ test('con strictEntitlements un plugin de pago aborta el arranque', async () => 
   await assert.rejects(() => kernel.init(), EntitlementError);
 });
 
-test('los modulos se resuelven por tipo y en el orden canonico de la fase augment', async () => {
+test('los módulos se resuelven por tipo y en el orden canonico de la fase augment', async () => {
   const kernel = await createKernel({
     ...silent(),
     plugins: [
@@ -77,7 +77,7 @@ test('los modulos se resuelven por tipo y en el orden canonico de la fase augmen
         name: 'modulos',
         version: '1.0.0',
         register: (api) => {
-          // Registrados a proposito en desorden.
+          // Registrados a propósito en desorden.
           api.registerModule(fakeModule('documenter'));
           api.registerModule(fakeModule('optimizer'));
           api.registerModule(fakeModule('tester'));
@@ -95,7 +95,7 @@ test('los modulos se resuelven por tipo y en el orden canonico de la fase augmen
   assert.equal(kernel.hasModule('generator'), false);
 });
 
-test('registrar dos veces el mismo modulo es un error', async () => {
+test('registrar dos veces el mismo módulo es un error', async () => {
   const kernel = new EcosystemKernel(silent());
   kernel.use(
     definePlugin({
@@ -108,10 +108,10 @@ test('registrar dos veces el mismo modulo es un error', async () => {
     }),
   );
 
-  await assert.rejects(() => kernel.init(), /ya esta registrado/);
+  await assert.rejects(() => kernel.init(), /ya está registrado/);
 });
 
-test('un modulo por encima del tier no se puede registrar', async () => {
+test('un módulo por encima del tier no se puede registrar', async () => {
   const kernel = new EcosystemKernel({
     ...silent(),
     entitlements: new Entitlements({ tier: 'community' }),
@@ -127,7 +127,7 @@ test('un modulo por encima del tier no se puede registrar', async () => {
   await assert.rejects(() => kernel.init(), /enterprise/);
 });
 
-test('un plugin publica un servicio y otro lo consume', async () => {
+test('un plugin pública un servicio y otro lo consume', async () => {
   const token = createServiceToken<{ saluda(): string }>('test.saludador');
   let received = '';
 
@@ -153,7 +153,7 @@ test('un plugin publica un servicio y otro lo consume', async () => {
   assert.equal(received, 'hola');
 });
 
-test('las opciones de configuracion llegan al plugin correspondiente', async () => {
+test('las opciones de configuración llegan al plugin correspondiente', async () => {
   let seen: unknown;
   await createKernel({
     ...silent(),
@@ -191,12 +191,12 @@ test('dispose libera en orden inverso y deja el kernel reutilizable', async () =
   assert.deepEqual(kernel.diagnostics().plugins, []);
 });
 
-test('no se pueden anadir plugins despues de inicializar', async () => {
+test('no se pueden añadir plugins después de inicializar', async () => {
   const kernel = await createKernel(silent());
 
   assert.throws(
     () => kernel.use(definePlugin({ name: 'tardio', version: '1.0.0', register: () => {} })),
-    /ya esta inicializado/,
+    /ya está inicializado/,
   );
 });
 

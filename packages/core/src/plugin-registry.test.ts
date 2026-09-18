@@ -56,7 +56,7 @@ test('un nombre de plugin duplicado es un error', () => {
   assert.throws(() => resolvePluginOrder([plugin('repetido'), plugin('repetido')]), /dos veces/);
 });
 
-test('assertValidPlugin exige nombre, version y funcion de registro', () => {
+test('assertValidPlugin exige nombre, version y función de registro', () => {
   assert.throws(() => assertValidPlugin(null), /objeto/);
   assert.throws(() => assertValidPlugin({ version: '1.0.0', register: () => {} }), /name/);
   assert.throws(() => assertValidPlugin({ name: 'x', register: () => {} }), /version/);

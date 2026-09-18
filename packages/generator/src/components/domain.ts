@@ -2,7 +2,7 @@ import type { ComponentSpec, DomainEntity, EntityField } from '@calecosystem/con
 import { camelCase } from '../analysis/text.ts';
 import { listColumns } from '../scaffold/shared.ts';
 
-/** Campos editables: sin identificadores ni marcas de tiempo automaticas. */
+/** Campos editables: sin identificadores ni marcas de tiempo automáticas. */
 export function editableFields(entity: DomainEntity): EntityField[] {
   return entity.fields.filter(
     (field) => field.name !== 'id' && field.name !== 'createdAt' && field.name !== 'updatedAt',
@@ -30,9 +30,9 @@ function inputTypeFor(field: EntityField): string {
 /**
  * Componentes derivados del modelo de dominio.
  *
- * Es donde el catalogo deja de ser generico: una tabla y un formulario por
+ * Es donde el catálogo deja de ser genérico: una tabla y un formulario por
  * entidad, tipados contra el modelo real. Son los dos componentes que todo
- * el mundo escribe a mano una vez por entidad, y los que mas tiempo ahorran.
+ * el mundo escribe a mano una vez por entidad, y los que más tiempo ahorran.
  */
 export function domainComponents(entity: DomainEntity): ComponentSpec[] {
   return [entityTable(entity), entityForm(entity)];
@@ -98,7 +98,7 @@ function entityForm(entity: DomainEntity): ComponentSpec {
     name: `${entity.name}Form`,
     category: 'domain',
     directory: 'domain',
-    description: `Formulario de alta y edicion de ${entity.name}, con validacion de campos obligatorios.`,
+    description: `Formulario de alta y edición de ${entity.name}, con validación de campos obligatorios.`,
     props: [
       {
         name: 'initialValues',
@@ -130,7 +130,7 @@ function entityForm(entity: DomainEntity): ComponentSpec {
       '    setValues((current) => ({ ...current, [field]: value }));',
       '  };',
       '',
-      '  // La validacion vive tambien en el backend; esta solo evita el viaje.',
+      '  // La validación vive también en el backend; está solo evita el viaje.',
       `  const requiredFields: readonly string[] = [${fields
         .filter((field) => field.required)
         .map((field) => `'${field.name}'`)

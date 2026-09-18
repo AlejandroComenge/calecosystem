@@ -8,14 +8,14 @@ export const DEFAULT_PLUGIN_PRIORITY = 100;
  * como desempate determinista.
  *
  * Kahn con cola ordenada: dos ejecuciones con el mismo conjunto de plugins
- * producen siempre el mismo orden, condicion necesaria para que la
- * generacion sea reproducible.
+ * producen siempre el mismo orden, condición necesaria para que la
+ * generación sea reproducible.
  */
 export function resolvePluginOrder(plugins: readonly Plugin[]): Plugin[] {
   const byName = new Map<string, Plugin>();
   for (const plugin of plugins) {
     if (byName.has(plugin.name)) {
-      throw new PluginError('DUPLICATE_PLUGIN', `El plugin "${plugin.name}" esta registrado dos veces.`, {
+      throw new PluginError('DUPLICATE_PLUGIN', `El plugin "${plugin.name}" está registrado dos veces.`, {
         plugin: plugin.name,
       });
     }
@@ -31,7 +31,7 @@ export function resolvePluginOrder(plugins: readonly Plugin[]): Plugin[] {
       if (!byName.has(dependency)) {
         throw new PluginError(
           'MISSING_DEPENDENCY',
-          `El plugin "${plugin.name}" requiere "${dependency}", que no esta registrado.`,
+          `El plugin "${plugin.name}" requiere "${dependency}", que no está registrado.`,
           { plugin: plugin.name, missing: dependency },
         );
       }
@@ -86,7 +86,7 @@ export function assertValidPlugin(candidate: unknown): asserts candidate is Plug
   }
   const plugin = candidate as Partial<Plugin>;
   if (typeof plugin.name !== 'string' || plugin.name.trim() === '') {
-    throw new PluginError('INVALID_PLUGIN', 'Un plugin necesita un `name` no vacio.');
+    throw new PluginError('INVALID_PLUGIN', 'Un plugin necesita un `name` no vacío.');
   }
   if (typeof plugin.version !== 'string' || plugin.version.trim() === '') {
     throw new PluginError('INVALID_PLUGIN', `El plugin "${plugin.name}" necesita un \`version\`.`, {
@@ -96,7 +96,7 @@ export function assertValidPlugin(candidate: unknown): asserts candidate is Plug
   if (typeof plugin.register !== 'function') {
     throw new PluginError(
       'INVALID_PLUGIN',
-      `El plugin "${plugin.name}" necesita una funcion \`register\`.`,
+      `El plugin "${plugin.name}" necesita una función \`register\`.`,
       { plugin: plugin.name },
     );
   }

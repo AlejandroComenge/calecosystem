@@ -14,7 +14,7 @@ export interface ConsoleLoggerOptions {
   readonly sink?: (line: string, meta?: Record<string, unknown>) => void;
 }
 
-/** Logger minimo sin dependencias. Sustituible por cualquier `Logger`. */
+/** Logger mínimo sin dependencias. Sustituible por cualquier `Logger`. */
 export function createLogger(options: ConsoleLoggerOptions = {}): Logger {
   const level = options.level ?? 'info';
   const scope = options.scope ?? '';
@@ -38,12 +38,12 @@ export function createLogger(options: ConsoleLoggerOptions = {}): Logger {
   };
 }
 
-/** Logger que descarta todo. Util en tests. */
+/** Logger que descarta todo. Útil en tests. */
 export function createSilentLogger(): Logger {
   return createLogger({ level: 'silent', sink: () => {} });
 }
 
-/** Logger que acumula las lineas en memoria. Util para aserciones en tests. */
+/** Logger que acumula las líneas en memoria. Útil para aserciones en tests. */
 export function createMemoryLogger(level: LogLevel = 'debug'): {
   logger: Logger;
   lines: string[];

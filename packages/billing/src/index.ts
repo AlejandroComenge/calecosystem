@@ -1,7 +1,7 @@
 /**
  * @calecosystem/billing
  *
- * Limites de uso por plan, contador de consumo y cambio de plan.
+ * Límites de uso por plan, contador de consumo y cambio de plan.
  * Es lo que convierte tres niveles de precio en un producto que se puede
  * vender y medir.
  */

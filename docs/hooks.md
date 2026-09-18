@@ -1,21 +1,21 @@
-# Puntos de extension: hooks
+# Puntos de extensión: hooks
 
 Todo lo que el pipeline hace es interceptable. Esta es la referencia completa.
 
-> Los hooks intervienen **dentro** del pipeline. Para envolver la ejecucion
-> entera (cuotas, autorizacion, medicion de extremo a extremo) el mecanismo es
+> Los hooks intervienen **dentro** del pipeline. Para envolver la ejecución
+> entera (cuotas, autorización, medición de extremo a extremo) el mecanismo es
 > el middleware; ver [`plugins.md`](plugins.md#escribir-un-middleware).
 
 ## Dos familias
 
 | | Eventos (`onEvent`) | Transformaciones (`onTransform`) |
 |---|---|---|
-| Proposito | Observar | Modificar el valor que circula |
+| Propósito | Observar | Modificar el valor que circula |
 | Valor de retorno | Se ignora | Alimenta al siguiente handler |
 | Si el handler falla | Se registra, el pipeline continua | **Detiene el pipeline** |
 | Si devuelve `undefined` | Irrelevante | Se conserva el valor anterior (con aviso) |
 
-La asimetria es intencionada: un plugin de telemetria roto no debe impedir que
+La asimetria es intencionada: un plugin de telemetría roto no debe impedir que
 un equipo reciba su proyecto, pero un blueprint corrupto no puede seguir
 avanzando.
 
@@ -24,35 +24,35 @@ avanzando.
 | Hook | Payload | Cuando | Para que sirve |
 |------|---------|--------|----------------|
 | `requirements:analyzed` | `RequirementsModel` | Tras analizar el texto | Corregir o enriquecer entidades, roles y capacidades detectadas |
-| `blueprint:planned` | `Blueprint` | Tras decidir la arquitectura | Imponer politica corporativa: stack obligatorio, capas propias |
-| `deployment:planned` | `DeploymentPlan` | Antes de emitir contenedores y CI | Cambiar destino, servicios o secretos segun el entorno del cliente |
-| `files:finalized` | `readonly VirtualFile[]` | Antes de cerrar el resultado | Anadir, filtrar o reescribir ficheros del arbol completo |
+| `blueprint:planned` | `Blueprint` | Tras decidir la arquitectura | Imponer política corporativa: stack obligatorio, capas propias |
+| `deployment:planned` | `DeploymentPlan` | Antes de emitir contenedores y CI | Cambiar destino, servicios o secretos según el entorno del cliente |
+| `files:finalized` | `readonly VirtualFile[]` | Antes de cerrar el resultado | Añadir, filtrar o reescribir ficheros del árbol completo |
 
 ## Eventos
 
 | Hook | Payload | Cuando |
 |------|---------|--------|
 | `plugin:registered` | `{ name, version }` | Al registrarse cada plugin |
-| `module:registered` | `{ descriptor }` | Al registrarse cada modulo |
+| `module:registered` | `{ descriptor }` | Al registrarse cada módulo |
 | `pipeline:phase-start` | `{ phase }` | Al empezar cada una de las cinco fases |
 | `pipeline:phase-end` | `{ phase, durationMs }` | Al terminar cada fase |
-| `module:before-run` | `{ descriptor }` | Antes de ejecutar un modulo de ampliacion |
-| `module:after-run` | `{ descriptor, report }` | Despues, con su informe |
-| `file:emitted` | `{ file }` | Cada vez que un modulo aporta un fichero |
+| `module:before-run` | `{ descriptor }` | Antes de ejecutar un módulo de ampliación |
+| `module:after-run` | `{ descriptor, report }` | Después, con su informe |
+| `file:emitted` | `{ file }` | Cada vez que un módulo aporta un fichero |
 | `generation:completed` | `GenerationResult` | Al terminar con exito |
 | `generation:failed` | `{ error, phase }` | Al abortar, indicando la fase |
 
-## Orden de ejecucion
+## Orden de ejecución
 
 Determinista, siempre:
 
 1. `priority` ascendente (por defecto `100`; menor se ejecuta antes).
 2. A igualdad de prioridad, orden de registro.
 
-Sin esta garantia, dos ejecuciones identicas podrian producir proyectos
+Sin esta garantía, dos ejecuciones identicas podrían producir proyectos
 distintos, y la reproducibilidad es una promesa del producto.
 
-## Ejemplo: politica corporativa
+## Ejemplo: política corporativa
 
 Un cliente que obliga a PostgreSQL y a Kubernetes, sin tocar el generador:
 
@@ -87,9 +87,9 @@ export default definePlugin({
 });
 ```
 
-Anadir la decision a `blueprint.decisions` no es adorno: hace que el README y
+Añadir la decisión a `blueprint.decisions` no es adorno: hace que el README y
 `docs/ARCHITECTURE.md` del proyecto generado expliquen de donde sale esa
-imposicion, en vez de que alguien la descubra seis meses despues.
+imposición, en vez de que alguien la descubra seis meses después.
 
 ## Ejemplo: observar sin interferir
 
@@ -108,10 +108,10 @@ api.onEvent('module:after-run', ({ descriptor, report }) => {
 ## Reglas para escribir handlers
 
 - **No mutes el payload.** Devuelve un objeto nuevo. Los payloads son
-  `readonly` en el tipo, pero TypeScript no lo impide en tiempo de ejecucion.
+  `readonly` en el tipo, pero TypeScript no lo impide en tiempo de ejecución.
 - **Devuelve siempre un valor en las transformaciones.** Olvidarlo conserva el
   valor anterior y deja un aviso en el log, pero es un error silencioso caro
   de diagnosticar.
 - **Usa `priority` solo cuando el orden importe de verdad.** Si dos plugins
-  compiten por ser el primero, el problema suele estar en el diseno.
+  compiten por ser el primero, el problema suele estar en el diseño.
 - **Los handlers pueden ser asincronos.** Se esperan uno a uno.

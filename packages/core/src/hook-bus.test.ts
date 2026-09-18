@@ -37,7 +37,7 @@ test('las transformaciones encadenan el valor de un handler al siguiente', async
   assert.equal(result.projectName, 'Paso1+Paso2');
 });
 
-test('una transformacion asincrona se espera antes de continuar la cadena', async () => {
+test('una transformación asíncrona se espera antes de continuar la cadena', async () => {
   const hooks = bus();
   hooks.onTransform('blueprint:planned', async (blueprint) => {
     await new Promise((resolve) => setTimeout(resolve, 1));
@@ -53,7 +53,7 @@ test('una transformacion asincrona se espera antes de continuar la cadena', asyn
   assert.equal(result.slug, 'async-final');
 });
 
-test('una transformacion que no devuelve nada conserva el valor anterior', async () => {
+test('una transformación que no devuelve nada conserva el valor anterior', async () => {
   const { logger, lines } = createMemoryLogger('warn');
   const hooks = new HookBus(logger);
   hooks.onTransform('requirements:analyzed', () => undefined as never, { source: 'plugin-olvidadizo' });
@@ -82,7 +82,7 @@ test('un evento que lanza no interrumpe a los demas handlers', async () => {
   assert.ok(lines.some((line) => line.includes('plugin-roto')));
 });
 
-test('una transformacion que lanza si detiene el pipeline', async () => {
+test('una transformación que lanza si detiene el pipeline', async () => {
   const hooks = bus();
   hooks.onTransform('requirements:analyzed', () => {
     throw new Error('blueprint corrupto');

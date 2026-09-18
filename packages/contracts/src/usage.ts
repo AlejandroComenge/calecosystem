@@ -1,13 +1,13 @@
 /**
- * Limites de uso y planes.
+ * Límites de uso y planes.
  *
  * El control de cuota es lo que convierte tres niveles de precio en un
  * producto. Vive en contratos porque tanto el CLI como un futuro servicio
- * web o una accion de CI tienen que hablar el mismo idioma de cuotas.
+ * web o una acción de CI tienen que hablar el mismo idioma de cuotas.
  */
 import type { Tier } from './tiers.ts';
 
-/** Quien ejecuta una operacion. El id de proyecto permite cuotas por repo. */
+/** Quien ejecuta una operación. El id de proyecto permite cuotas por repo. */
 export interface Principal {
   readonly userId: string;
   readonly tier: Tier;
@@ -30,7 +30,7 @@ export type QuotaPeriod = 'day' | 'month' | 'total';
 
 export interface QuotaPolicy {
   readonly operation: UsageOperation;
-  /** `null` = sin limite. */
+  /** `null` = sin límite. */
   readonly limit: number | null;
   readonly period: QuotaPeriod;
 }
@@ -75,20 +75,20 @@ export interface UsageStore {
 export interface QuotaDecision {
   readonly allowed: boolean;
   readonly operation: UsageOperation;
-  /** `null` = sin limite. */
+  /** `null` = sin límite. */
   readonly limit: number | null;
   readonly used: number;
-  /** `null` cuando no hay limite. */
+  /** `null` cuando no hay límite. */
   readonly remaining: number | null;
   readonly period: QuotaPeriod;
-  /** Cuando se reinicia el contador. `null` para periodos `total`. */
+  /** Cuando se reinicia el contador. `null` para períodos `total`. */
   readonly resetAt: string | null;
-  /** Plan minimo que levantaria este limite, si existe. */
+  /** Plan mínimo que levantaria este límite, si existe. */
   readonly upgradeTo?: Tier;
   readonly reason?: string;
 }
 
-/** Comprueba y registra consumo. Es el punto unico de verdad sobre limites. */
+/** Comprueba y registra consumo. Es el punto único de verdad sobre límites. */
 export interface UsageGuard {
   check(principal: Principal, operation: UsageOperation, quantity?: number): Promise<QuotaDecision>;
   record(

@@ -21,7 +21,7 @@ export type TemplateKind = 'ecommerce' | 'saas' | 'landing' | 'generic' | (strin
 export interface TemplateMatch {
   /** Confianza 0..1 de que esta plantilla encaja con los requisitos. */
   readonly score: number;
-  /** Terminos del enunciado que la activaron. Se muestra al usuario. */
+  /** Términos del enunciado que la activaron. Se muestra al usuario. */
   readonly signals: readonly string[];
 }
 
@@ -31,16 +31,16 @@ export interface ProjectTemplate {
   readonly description: string;
   readonly kind: TemplateKind;
   readonly tier: Tier;
-  /** Frameworks soportados. Vacio o ausente = todos. */
+  /** Frameworks soportados. Vacío o ausente = todos. */
   readonly frameworks?: readonly string[];
 
-  /** Cuanto encaja esta plantilla con los requisitos detectados. */
+  /** Cuánto encaja esta plantilla con los requisitos detectados. */
   detect(requirements: RequirementsModel): TemplateMatch;
 
   /** Completa el blueprint con lo propio de este tipo de producto. */
   refine(blueprint: Blueprint): Blueprint;
 
-  /** Pantallas y componentes especificos del dominio. */
+  /** Pantallas y componentes específicos del dominio. */
   scaffold(context: ScaffoldContext): VirtualFile[] | Promise<VirtualFile[]>;
 }
 

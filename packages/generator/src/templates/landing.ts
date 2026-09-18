@@ -7,39 +7,48 @@ import type {
   VirtualFile,
 } from '@calecosystem/contracts';
 import { fileFactory } from '../scaffold/shared.ts';
-import { scoreTemplate } from './detect.ts';
+import { scoreTemplate, type DetectionRules } from './detect.ts';
 import { addEndpoints, addPages, ensureEntity, recordTemplateDecision } from './shared.ts';
 
 const TOOL = 'calec.template.landing';
 const file = fileFactory(TOOL);
 
 /**
- * Plantilla de pagina de captacion.
+ * Plantilla de página de captación.
  *
- * Aqui el trabajo no es generar mucho, es generar poco y rapido. Una landing
- * se mide en conversion y tiempo de carga, asi que la plantilla evita estado
+ * Aquí el trabajo no es generar mucho, es generar poco y rápido. Una landing
+ * se mide en conversion y tiempo de carga, así que la plantilla evita estado
  * global, enrutado innecesario y cualquier dependencia que no se vea en
  * pantalla.
  */
+/**
+ * Reglas de deteccion, expuestas para poder inspeccionarlas y probarlas.
+ *
+ * Los terminos se comparan contra el resumen NORMALIZADO, asi que no
+ * pueden llevar tildes: una senal acentuada no casaria nunca y el fallo
+ * seria silencioso. Hay una prueba que lo verifica.
+ */
+export const LANDING_RULES: DetectionRules = {
+  signals: [
+    'landing', 'pagina de aterrizaje', 'captacion', 'leads', 'lead',
+    'formulario de contacto', 'pagina promocional', 'micrositio',
+    'campana', 'lanzamiento', 'lista de espera',
+  ],
+  entities: ['Lead', 'Campaign'],
+  features: ['seo'],
+  antiSignals: ['carrito', 'panel de administracion', 'suscripcion', 'multiempresa'],
+  };
+
 export const landingTemplate: ProjectTemplate = {
   id: 'calec.template.landing',
-  name: 'Landing de captacion',
-  description: 'Pagina unica con secciones de venta y formulario de contacto.',
+  name: 'Landing de captación',
+  description: 'Página única con secciones de venta y formulario de contacto.',
   kind: 'landing',
   tier: 'community',
   frameworks: ['react'],
 
   detect(requirements: RequirementsModel): TemplateMatch {
-    return scoreTemplate(requirements, {
-      signals: [
-        'landing', 'pagina de aterrizaje', 'captacion', 'leads', 'lead',
-        'formulario de contacto', 'pagina promocional', 'micrositio',
-        'campana', 'lanzamiento', 'lista de espera',
-      ],
-      entities: ['Lead', 'Campaign'],
-      features: ['seo'],
-      antiSignals: ['carrito', 'panel de administracion', 'suscripcion', 'multiempresa'],
-    });
+    return scoreTemplate(requirements, LANDING_RULES);
   },
 
   refine(blueprint: Blueprint): Blueprint {
@@ -48,7 +57,7 @@ export const landingTemplate: ProjectTemplate = {
       { name: 'email', type: 'email', required: true },
       { name: 'name', type: 'string', required: false },
       { name: 'message', type: 'text', required: false },
-      { name: 'source', type: 'string', required: false, description: 'Campana o medio de origen' },
+      { name: 'source', type: 'string', required: false, description: 'Campaña o medio de origen' },
       { name: 'createdAt', type: 'datetime', required: true },
       { name: 'updatedAt', type: 'datetime', required: true },
     ]);
@@ -68,17 +77,17 @@ export const landingTemplate: ProjectTemplate = {
       },
     ]);
 
-    // Un formulario publico sin proteccion se llena de spam en dias.
+    // Un formulario público sin protección se llena de spam en días.
     refined = {
       ...refined,
       risks: [
         ...refined.risks,
         {
           id: 'RISK-LEAD-SPAM',
-          title: 'Formulario publico sin proteccion frente a envios automatizados',
+          title: 'Formulario público sin protección frente a envios automatizados',
           impact: 'medium',
           mitigation:
-            'Limitar por IP, anadir campo trampa y verificar el correo antes de dar el contacto por bueno.',
+            'Limitar por IP, añadir campo trampa y verificar el correo antes de dar el contacto por bueno.',
           owner: 'security',
         },
       ],
@@ -86,7 +95,7 @@ export const landingTemplate: ProjectTemplate = {
 
     return recordTemplateDecision(
       refined,
-      'Landing de captacion',
+      'Landing de captación',
       'secciones de venta, formulario de contacto y metadatos para buscadores',
     );
   },
@@ -114,7 +123,7 @@ function hero(projectName: string): string {
     '  action?: ReactNode;',
     '}',
     '',
-    '/** Primera pantalla. Un solo mensaje y una sola accion. */',
+    '/** Primera pantalla. Un solo mensaje y una sola acción. */',
     'export function Hero({',
     `  headline = '${projectName}',`,
     "  subheadline = 'Explica en una frase que problema resuelves y para quien.',",
@@ -142,7 +151,7 @@ function featureList(): string {
     '  features: readonly Feature[];',
     '}',
     '',
-    '/** Tres beneficios. Mas de tres y no se lee ninguno. */',
+    '/** Tres beneficios. Más de tres y no se lee ninguno. */',
     'export function FeatureList({ features }: FeatureListProps) {',
     '  return (',
     '    <section className="mx-auto grid max-w-4xl gap-6 px-4 py-12 sm:grid-cols-3">',
@@ -219,7 +228,7 @@ function leadForm(): string {
     '        />',
     '      </div>',
     "      <Button type=\"submit\" loading={state === 'sending'}>",
-    '        Quiero saber mas',
+    '        Quiero saber más',
     '      </Button>',
     '    </form>',
     '  );',
@@ -237,12 +246,12 @@ function landingPage(projectName: string): string {
     'const features = [',
     "  { title: 'Beneficio uno', description: 'Sustituye por el problema real que resuelves.' },",
     "  { title: 'Beneficio dos', description: 'Habla de resultados, no de caracteristicas.' },",
-    "  { title: 'Beneficio tres', description: 'Anade una prueba: un numero o un cliente.' },",
+    "  { title: 'Beneficio tres', description: 'Añade una prueba: un número o un cliente.' },",
     '];',
     '',
     'export function LandingPage() {',
     '  useEffect(() => {',
-    '    // Metadatos minimos para buscadores y para compartir en redes.',
+    '    // Metadatos mínimos para buscadores y para compartir en redes.',
     `    document.title = '${projectName}';`,
     "    const description = document.querySelector('meta[name=\"description\"]');",
     "    description?.setAttribute('content', 'Sustituye por tu propuesta de valor en una frase.');",
@@ -260,7 +269,7 @@ function landingPage(projectName: string): string {
 
 function leadValidation(): string {
   return [
-    '/** Validacion de contactos entrantes. Publica y por tanto hostil por defecto. */',
+    '/** Validación de contactos entrantes. Pública y por tanto hostil por defecto. */',
     '',
     'export interface LeadInput {',
     '  email?: string;',
@@ -268,8 +277,8 @@ function leadValidation(): string {
     '  source?: string;',
     '}',
     '',
-    '// Deliberadamente permisiva: rechazar correos validos cuesta clientes.',
-    '// La verificacion real es el correo de confirmacion, no la expresion regular.',
+    '// Deliberadamente permisiva: rechazar correos válidos cuesta clientes.',
+    '// La verificación real es el correo de confirmación, no la expresión regular.',
     'const EMAIL_PATTERN = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/;',
     '',
     'export const MAX_NAME_LENGTH = 120;',
@@ -278,7 +287,7 @@ function leadValidation(): string {
     '  const errors: string[] = [];',
     '',
     '  if (!input.email || !EMAIL_PATTERN.test(input.email)) {',
-    "    errors.push('email no valido');",
+    "    errors.push('email no válido');",
     '  }',
     '  if (input.name && input.name.length > MAX_NAME_LENGTH) {',
     "    errors.push('name demasiado largo');",
@@ -294,7 +303,7 @@ function leadValidationTest(): string {
     "import assert from 'node:assert/strict';",
     "import { MAX_NAME_LENGTH, validateLead } from './Lead.validation.ts';",
     '',
-    "test('acepta un contacto valido', () => {",
+    "test('acepta un contacto válido', () => {",
     "  assert.deepEqual(validateLead({ email: 'ana@example.com', name: 'Ana' }), []);",
     '});',
     '',

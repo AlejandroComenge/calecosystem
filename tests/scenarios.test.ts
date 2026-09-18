@@ -1,13 +1,13 @@
 /**
- * Contrato del catalogo de ejemplos.
+ * Contrato del catálogo de ejemplos.
  *
  * Cada ejemplo de `examples/scenarios.ts` es una promesa: "si escribes esto,
  * obtienes aquello". Estas pruebas la verifican en memoria y en segundos, para
  * que una regresion se detecte al ejecutar `npm test` y no cuando un cliente
  * prueba la demo.
  *
- * El validador (`npm run validate`) hace lo mismo y ademas escribe a disco y
- * ejecuta las pruebas generadas. Este fichero es la version rapida que corre
+ * El validador (`npm run validate`) hace lo mismo y además escribe a disco y
+ * ejecuta las pruebas generadas. Este fichero es la version rápida que corre
  * en cada cambio.
  */
 import test from 'node:test';
@@ -61,7 +61,7 @@ for (const scenario of SCENARIOS) {
     assert.equal(
       result.template?.kind ?? null,
       scenario.expectTemplate,
-      `"${scenario.title}" deberia dar ${scenario.expectTemplate ?? 'ninguna plantilla'}`,
+      `"${scenario.title}" debería dar ${scenario.expectTemplate ?? 'ninguna plantilla'}`,
     );
   });
 
@@ -70,7 +70,7 @@ for (const scenario of SCENARIOS) {
     const features = result.requirements.features as unknown as Record<string, boolean>;
 
     for (const feature of scenario.expectFeatures) {
-      assert.equal(features[feature], true, `no se detecto "${feature}"`);
+      assert.equal(features[feature], true, `no se detectó "${feature}"`);
     }
   });
 
@@ -87,10 +87,10 @@ for (const scenario of SCENARIOS) {
     const result = await generate(scenario.id);
 
     assert.ok(result.metrics.fileCount >= 40, `solo ${result.metrics.fileCount} ficheros`);
-    assert.ok(result.metrics.lineCount >= 1000, `solo ${result.metrics.lineCount} lineas`);
+    assert.ok(result.metrics.lineCount >= 1000, `solo ${result.metrics.lineCount} líneas`);
     assert.deepEqual(result.dependencyConflicts, [], 'no puede haber choques de version');
 
-    // Todo proyecto llega con arranque, contenedores y documentacion.
+    // Todo proyecto llega con arranque, contenedores y documentación.
     const paths = new Set(result.files.map((file) => file.path));
     assert.ok(paths.has('README.md'));
     assert.ok(paths.has('apps/api/package.json'));
@@ -104,11 +104,11 @@ for (const scenario of SCENARIOS) {
       (file) => file.path.startsWith('apps/api/src/domain/') && file.path.endsWith('.test.ts'),
     );
 
-    assert.ok(tests.length > 0, 'ningun proyecto deberia entregarse sin pruebas');
+    assert.ok(tests.length > 0, 'ningún proyecto debería entregarse sin pruebas');
   });
 }
 
-test('el catalogo cubre los tipos de web que se venden', () => {
+test('el catálogo cubre los tipos de web que se venden', () => {
   const ids = SCENARIOS.map((scenario) => scenario.id);
 
   for (const expected of ['tienda', 'saas', 'landing', 'panel']) {
@@ -124,9 +124,9 @@ test('el catalogo cubre los tipos de web que se venden', () => {
   );
 });
 
-test('cada ejemplo esta descrito para alguien que no programa', () => {
+test('cada ejemplo está descrito para alguien que no programa', () => {
   for (const scenario of SCENARIOS) {
-    assert.ok(scenario.title.length > 5, `${scenario.id}: titulo demasiado corto`);
+    assert.ok(scenario.title.length > 5, `${scenario.id}: título demasiado corto`);
     assert.ok(scenario.audience.length > 15, `${scenario.id}: falta decir para quien es`);
     assert.ok(scenario.brief.length > 120, `${scenario.id}: enunciado poco realista`);
     assert.ok(scenario.expectFiles.length >= 2, `${scenario.id}: promete muy poco`);
@@ -145,7 +145,7 @@ test('los comandos de ejemplo son copiables tal cual', () => {
   }
 });
 
-test('los identificadores del catalogo son unicos', () => {
+test('los identificadores del catálogo son únicos', () => {
   const ids = SCENARIOS.map((scenario) => scenario.id);
   assert.equal(new Set(ids).size, ids.length);
 });

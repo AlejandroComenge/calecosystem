@@ -1,5 +1,5 @@
 /**
- * Contrato de modulo. Los cinco componentes del ecosistema (generador,
+ * Contrato de módulo. Los cinco componentes del ecosistema (generador,
  * optimizador, auditor, testeador y documentador) se enchufan al kernel
  * exactamente por la misma puerta.
  */
@@ -21,11 +21,11 @@ export const MODULE_KINDS: readonly ModuleKind[] = [
 ];
 
 /**
- * Orden de ejecucion en la fase `augment`.
+ * Orden de ejecución en la fase `augment`.
  *
- * Analizan primero (optimizador y seguridad, que pueden anadir hallazgos que
- * cambian lo que hay que probar) y producen ficheros despues (testeador y
- * documentador, que quieren ver el arbol ya estabilizado).
+ * Analizan primero (optimizador y seguridad, que pueden añadir hallazgos que
+ * cambian lo que hay que probar) y producen ficheros después (testeador y
+ * documentador, que quieren ver el árbol ya estabilizado).
  */
 export const AUGMENT_ORDER: readonly ModuleKind[] = [
   'optimizer',
@@ -37,20 +37,20 @@ export const AUGMENT_ORDER: readonly ModuleKind[] = [
 export type ModuleStatus = 'ga' | 'preview' | 'planned';
 
 export interface ModuleDescriptor {
-  /** Identificador unico, p.ej. `@calecosystem/security`. */
+  /** Identificador único, p.ej. `@calecosystem/security`. */
   readonly id: string;
   readonly kind: ModuleKind;
   readonly version: string;
   readonly displayName: string;
   readonly description: string;
-  /** Tier minimo requerido para activar el modulo. */
+  /** Tier mínimo requerido para activar el módulo. */
   readonly tier: Tier;
   readonly status: ModuleStatus;
 }
 
 /**
- * Contexto entregado a cada modulo en la fase `augment`. Es deliberadamente
- * de solo lectura salvo por `emit` y `warn`: un modulo no muta el arbol de
+ * Contexto entregado a cada módulo en la fase `augment`. Es deliberadamente
+ * de solo lectura salvo por `emit` y `warn`: un módulo no muta el árbol de
  * otro, aporta el suyo.
  */
 export interface ModuleRunContext {
@@ -58,7 +58,7 @@ export interface ModuleRunContext {
   readonly blueprint: Blueprint;
   readonly files: readonly VirtualFile[];
   readonly logger: Logger;
-  /** Anade un fichero al proyecto generado. */
+  /** Añade un fichero al proyecto generado. */
   emit(file: VirtualFile): void;
   /** Registra un aviso no bloqueante en el resultado. */
   warn(message: string): void;
@@ -70,7 +70,7 @@ export interface EcosystemModule {
 }
 
 /* --- Especializaciones por tipo -------------------------------------- */
-/* Narrowing nominal por `kind`: permite que el kernel resuelva modulos por
+/* Narrowing nominal por `kind`: permite que el kernel resuelva módulos por
    tipo sin castings y que cada paquete declare su intencion. */
 
 export interface OptimizerModule extends EcosystemModule {

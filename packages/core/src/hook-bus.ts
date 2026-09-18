@@ -16,25 +16,25 @@ import { toError } from './errors.ts';
 export const DEFAULT_HOOK_PRIORITY = 100;
 
 interface Registration {
-  /** Se guarda sin tipar: la seguridad de tipos la da la API publica. */
+  /** Se guarda sin tipar: la seguridad de tipos la da la API pública. */
   readonly handler: unknown;
   readonly meta: HookMeta;
-  /** Orden de inscripcion; desempata prioridades iguales de forma estable. */
+  /** Orden de inscripción; desempata prioridades iguales de forma estable. */
   readonly seq: number;
 }
 
 /**
  * Bus de hooks tipado.
  *
- * Reglas de diseno:
+ * Reglas de diseño:
  *  - Los handlers se ordenan por `priority` y, a igualdad, por orden de
  *    registro. El resultado es determinista, que es imprescindible para
  *    que dos ejecuciones del generador produzcan lo mismo.
  *  - Un evento que lanza no tumba el pipeline: se registra y se continua.
- *    Una transformacion que lanza si lo hace, porque su salida alimenta al
+ *    Una transformación que lanza si lo hace, porque su salida alimenta al
  *    siguiente handler y seguir con un valor corrupto es peor.
- *  - Una transformacion que devuelve `undefined` conserva el valor previo:
- *    error muy comun al escribir plugins, y es mas util perdonarlo que
+ *  - Una transformación que devuelve `undefined` conserva el valor previo:
+ *    error muy común al escribir plugins, y es más útil perdonarlo que
  *    dejar el blueprint en `undefined`.
  */
 export class HookBus implements HookRegistry {
@@ -101,7 +101,7 @@ export class HookBus implements HookRegistry {
     return current;
   }
 
-  /** Numero de handlers registrados para un hook. Util en diagnostico. */
+  /** Número de handlers registrados para un hook. Útil en diagnostico. */
   countHandlers(name: EventHookName | TransformHookName): number {
     return (
       (this.#events.get(name)?.length ?? 0) + (this.#transforms.get(name)?.length ?? 0)

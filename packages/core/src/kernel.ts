@@ -31,8 +31,8 @@ export interface KernelOptions {
   readonly pluginOptions?: Readonly<Record<string, Record<string, unknown>>>;
   /**
    * Con `strict`, un plugin por encima del tier activo aborta el arranque.
-   * Sin el (por defecto), se omite con un aviso: una instalacion community
-   * sigue funcionando aunque la configuracion mencione plugins de pago.
+   * Sin el (por defecto), se omite con un aviso: una instalación community
+   * sigue funcionando aunque la configuración mencione plugins de pago.
    */
   readonly strictEntitlements?: boolean;
 }
@@ -60,7 +60,7 @@ export interface KernelDiagnostics {
  */
 export class EcosystemKernel {
   readonly hooks: HookBus;
-  /** Middlewares que envuelven la generacion completa. Ver `middleware-chain.ts`. */
+  /** Middlewares que envuelven la generación completa. Ver `middleware-chain.ts`. */
   readonly middleware = new MiddlewareChain();
   readonly logger: Logger;
   readonly entitlements: Entitlements;
@@ -96,7 +96,7 @@ export class EcosystemKernel {
     if (this.#initialized) {
       throw new PluginError(
         'KERNEL_ALREADY_INITIALIZED',
-        `No se puede anadir "${plugin.name}": el kernel ya esta inicializado.`,
+        `No se puede añadir "${plugin.name}": el kernel ya está inicializado.`,
         { plugin: plugin.name },
       );
     }
@@ -143,14 +143,14 @@ export class EcosystemKernel {
     return this;
   }
 
-  /* --- Resolucion de capacidades ------------------------------------- */
+  /* --- Resolución de capacidades ------------------------------------- */
 
   modules(kind?: ModuleKind): EcosystemModule[] {
     if (kind) return [...(this.#modules.get(kind) ?? [])];
     return AUGMENT_ORDER.flatMap((moduleKind) => this.#modules.get(moduleKind) ?? []);
   }
 
-  /** Modulos de ampliacion en el orden canonico de la fase `augment`. */
+  /** Módulos de ampliación en el orden canonico de la fase `augment`. */
   augmentModules(): EcosystemModule[] {
     return AUGMENT_ORDER.flatMap((kind) => [...(this.#modules.get(kind) ?? [])]);
   }
@@ -197,7 +197,7 @@ export class EcosystemKernel {
    * Elige la plantilla que mejor encaja con los requisitos.
    *
    * Devuelve `undefined` si ninguna supera el umbral: generar una tienda
-   * porque el enunciado menciona "productos" de pasada seria peor que no
+   * porque el enunciado menciona "productos" de pasada sería peor que no
    * aplicar plantilla.
    */
   selectTemplate(
@@ -214,13 +214,13 @@ export class EcosystemKernel {
       )
       .map((template) => ({ template, ...template.detect(requirements) }))
       .filter((candidate) => candidate.score >= TEMPLATE_MATCH_THRESHOLD)
-      // Empate resuelto por id para que la seleccion sea reproducible.
+      // Empate resuelto por id para que la selección sea reproducible.
       .sort((a, b) => b.score - a.score || a.template.id.localeCompare(b.template.id));
 
     return candidates[0];
   }
 
-  /** Catalogo de componentes registrado por todos los plugins. */
+  /** Catálogo de componentes registrado por todos los plugins. */
   components(): ComponentSpec[] {
     return [...this.#components.values()].sort((a, b) => a.name.localeCompare(b.name));
   }
@@ -306,7 +306,7 @@ export class EcosystemKernel {
         if (existing.some((candidate) => candidate.descriptor.id === module.descriptor.id)) {
           throw new PluginError(
             'DUPLICATE_MODULE',
-            `El modulo "${module.descriptor.id}" ya esta registrado.`,
+            `El módulo "${module.descriptor.id}" ya está registrado.`,
             { module: module.descriptor.id },
           );
         }
@@ -336,7 +336,7 @@ export class EcosystemKernel {
         if (this.#templates.has(template.id)) {
           throw new PluginError(
             'DUPLICATE_TEMPLATE',
-            `La plantilla "${template.id}" ya esta registrada.`,
+            `La plantilla "${template.id}" ya está registrada.`,
             { template: template.id },
           );
         }
@@ -344,8 +344,8 @@ export class EcosystemKernel {
       },
 
       registerComponent: (component) => {
-        // Se permite reemplazar: asi una plantilla puede sustituir un
-        // componente del catalogo base por su propia version.
+        // Se permite reemplazar: así una plantilla puede sustituir un
+        // componente del catálogo base por su propia version.
         this.#components.set(component.name, component);
       },
 

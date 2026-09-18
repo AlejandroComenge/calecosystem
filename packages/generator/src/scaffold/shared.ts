@@ -31,7 +31,7 @@ export function tsTypeOf(field: EntityField): string {
   }
 }
 
-/** Declaracion de interfaz TypeScript para una entidad. */
+/** Declaración de interfaz TypeScript para una entidad. */
 export function entityInterface(entity: DomainEntity): string {
   const fields = entity.fields
     .map((field) => {
@@ -64,7 +64,7 @@ export function banner(blueprint: Blueprint, tool: string): string {
     '/**',
     ` * Generado por ${tool} para "${blueprint.projectName}".`,
     ' *',
-    ' * Este fichero es un punto de partida, no una caja negra: esta pensado',
+    ' * Este fichero es un punto de partida, no una caja negra: está pensado',
     ' * para editarse. Vuelve a generar solo si no lo has modificado.',
     ' */',
   ].join('\n');
@@ -73,6 +73,6 @@ export function banner(blueprint: Blueprint, tool: string): string {
 export function hashBanner(blueprint: Blueprint, tool: string): string {
   return [
     `# Generado por ${tool} para "${blueprint.projectName}".`,
-    '# Punto de partida editable: revisalo antes de llevarlo a produccion.',
+    '# Punto de partida editable: revísalo antes de llevarlo a producción.',
   ].join('\n');
 }

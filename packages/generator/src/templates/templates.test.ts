@@ -12,13 +12,13 @@ const analyzer = new RequirementsAnalyzer({ logger });
 const planner = new ArchitecturePlanner({ logger });
 
 const SHOP =
-  'Tienda online con catalogo de productos, carrito de la compra, checkout con pagos ' +
-  'por Stripe y panel de administracion de pedidos.';
+  'Tienda online con catálogo de productos, carrito de la compra, checkout con pagos ' +
+  'por Stripe y panel de administración de pedidos.';
 const SAAS =
-  'Plataforma SaaS multiempresa: cada organizacion tiene su espacio de trabajo, usuarios ' +
+  'Plataforma SaaS multiempresa: cada organización tiene su espacio de trabajo, usuarios ' +
   'con roles, suscripciones mensuales y planes con distinta cuota.';
 const LANDING =
-  'Landing de captacion para el lanzamiento de un producto, con formulario de contacto ' +
+  'Landing de captación para el lanzamiento de un producto, con formulario de contacto ' +
   'para recoger leads y buen posicionamiento SEO.';
 
 async function requirementsFor(text: string) {
@@ -35,7 +35,7 @@ test('cada plantilla reconoce su propio tipo de producto', async () => {
   assert.ok((await landingTemplate.detect(await requirementsFor(LANDING))).score >= 0.4);
 });
 
-test('cada plantilla puntua mas alto que las otras en su terreno', async () => {
+test('cada plantilla puntua más alto que las otras en su terreno', async () => {
   const shop = await requirementsFor(SHOP);
 
   const scores = {
@@ -48,13 +48,13 @@ test('cada plantilla puntua mas alto que las otras en su terreno', async () => {
   assert.ok(scores.ecommerce > scores.landing);
 });
 
-test('las contra-senales evitan que una landing se confunda con una tienda', async () => {
+test('las contra-señales evitan que una landing se confunda con una tienda', async () => {
   const landing = await requirementsFor(LANDING);
 
   assert.ok(ecommerceTemplate.detect(landing).score < 0.35, 'no debe superar el umbral');
 });
 
-test('la deteccion explica que terminos la activaron', async () => {
+test('la detección explica que términos la activaron', async () => {
   const match = ecommerceTemplate.detect(await requirementsFor(SHOP));
 
   assert.ok(match.signals.includes('carrito'));
@@ -73,7 +73,7 @@ test('la plantilla de e-commerce completa el dominio y las vistas', async () => 
   assert.ok(refined.endpoints.some((endpoint) => endpoint.path === '/api/checkout'));
 });
 
-test('la plantilla anade el riesgo de stock con dueno asignado', async () => {
+test('la plantilla añade el riesgo de stock con dueño asignado', async () => {
   const refined = ecommerceTemplate.refine(await blueprintFor(SHOP));
   const risk = refined.risks.find((candidate) => candidate.id === 'RISK-STOCK-RACE');
 
@@ -82,7 +82,7 @@ test('la plantilla anade el riesgo de stock con dueno asignado', async () => {
   assert.equal(risk.impact, 'high');
 });
 
-test('la plantilla deja constancia de su intervencion', async () => {
+test('la plantilla deja constancia de su intervención', async () => {
   const refined = ecommerceTemplate.refine(await blueprintFor(SHOP));
   const decision = refined.decisions.find((candidate) => candidate.id === 'ADR-PLANTILLA');
 
@@ -119,7 +119,7 @@ test('la plantilla SaaS impone el aislamiento por inquilino', async () => {
   assert.ok(refined.pages.some((page) => page.route === '/settings/billing'));
 });
 
-test('la plantilla de landing prevé el spam del formulario publico', async () => {
+test('la plantilla de landing prevé el spam del formulario público', async () => {
   const refined = landingTemplate.refine(await blueprintFor(LANDING));
 
   assert.ok(refined.entities.some((entity) => entity.name === 'Lead'));

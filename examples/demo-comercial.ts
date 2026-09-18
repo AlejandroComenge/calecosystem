@@ -3,16 +3,16 @@
  *
  * Pensada para ejecutarse **en vivo delante de un cliente**. Va por pasos,
  * con pausas, y cuenta una historia: el problema, el enunciado en lenguaje de
- * negocio, lo que sale, lo que cuesta y lo que todavia hay que hacer.
+ * negocio, lo que sale, lo que cuesta y lo que todavía hay que hacer.
  *
  * Opciones:
- *   --rapido            sin pausas (para grabar o para probarla)
- *   --caso <id>         otro ejemplo del catalogo (por defecto: tienda)
- *   --out <directorio>  ademas, escribe el proyecto en disco
+ *   --rápido            sin pausas (para grabar o para probarla)
+ *   --caso <id>         otro ejemplo del catálogo (por defecto: tienda)
+ *   --out <directorio>  además, escribe el proyecto en disco
  *
- * Decision deliberada: el ultimo paso enseña lo que el sistema NO ha hecho.
+ * Decision deliberada: el último paso enseña lo que el sistema NO ha hecho.
  * Una demo que solo enseña lo bueno gana la reunion y pierde el cliente tres
- * semanas despues.
+ * semanas después.
  */
 import { parseArgs } from 'node:util';
 import { setTimeout as sleep } from 'node:timers/promises';
@@ -25,11 +25,11 @@ import { testerPlugin } from '@calecosystem/tester';
 import { documenterPlugin } from '@calecosystem/documenter';
 import { SCENARIOS, scenarioById } from './scenarios.ts';
 
-/* --- Supuestos economicos, explicitos y discutibles -------------------- */
+/* --- Supuestos económicos, explicitos y discutibles -------------------- */
 
 /**
- * Estos tres numeros son los unicos que sostienen el calculo de retorno.
- * Estan aqui arriba, con nombre, para que un cliente pueda decir "en mi
+ * Estos tres números son los únicos que sostienen el cálculo de retorno.
+ * Están aquí arriba, con nombre, para que un cliente pueda decir "en mi
  * empresa es otra cifra" y recalcularlo delante de el. Un ROI con los
  * supuestos escondidos no es un argumento, es un truco.
  */
@@ -50,7 +50,7 @@ const { values } = parseArgs({
 });
 
 const scenario = scenarioById(values.caso ?? 'tienda') ?? SCENARIOS[0];
-if (!scenario) throw new Error('El catalogo de ejemplos esta vacio.');
+if (!scenario) throw new Error('El catálogo de ejemplos está vacío.');
 
 const out = (line = '') => process.stdout.write(`${line}\n`);
 const pausa = (ms: number) => (values.rapido ? Promise.resolve() : sleep(ms));
@@ -67,7 +67,7 @@ async function titulo(numero: number, texto: string): Promise<void> {
 
 out();
 out('='.repeat(74));
-out('  CalEcosystem - Demostracion');
+out('  CalEcosystem - Demostración');
 out('='.repeat(74));
 await pausa(900);
 
@@ -85,7 +85,7 @@ out(`  Para: ${scenario.audience}`);
 out();
 for (const line of wrap(scenario.brief, 68)) out(`    "${line}"`);
 out();
-out('  Ni una palabra tecnica. Esto lo escribe un responsable de producto.');
+out('  Ni una palabra técnica. Esto lo escribe un responsable de producto.');
 await pausa(3200);
 
 await titulo(3, 'EL SISTEMA DECIDE LA ARQUITECTURA');
@@ -115,7 +115,7 @@ if (resultado.template) {
   out(`  Tipo de producto:      ${resultado.template.name} (encaje ${pct(resultado.template.score)})`);
 }
 out();
-out('  Y deja por escrito POR QUE eligio cada cosa:');
+out('  Y deja por escrito POR QUE eligió cada cosa:');
 out();
 for (const decision of resultado.blueprint.decisions.slice(0, 3)) {
   out(`    ${decision.id}: ${decision.choice}`);
@@ -125,15 +125,15 @@ await pausa(4000);
 
 await titulo(4, 'EL RESULTADO');
 const { metrics } = resultado;
-out(`  Tiempo de generacion   ${metrics.durationMs.toFixed(0)} milisegundos`);
+out(`  Tiempo de generación   ${metrics.durationMs.toFixed(0)} milisegundos`);
 out(`  Ficheros               ${metrics.fileCount}`);
-out(`  Lineas de codigo       ${metrics.lineCount.toLocaleString('es-ES')}`);
+out(`  Líneas de código       ${metrics.lineCount.toLocaleString('es-ES')}`);
 out(`  Componentes de interfaz ${metrics.componentCount}`);
 out(`  Endpoints de API       ${resultado.blueprint.endpoints.length}`);
 out(`  Pantallas              ${resultado.blueprint.pages.length}`);
 out();
-out('  Incluye frontend, backend, base de datos, contenedores, integracion');
-out('  continua, documentacion tecnica y pruebas.');
+out('  Incluye frontend, backend, base de datos, contenedores, integración');
+out('  continua, documentación técnica y pruebas.');
 await pausa(3200);
 
 await titulo(5, 'LAS PRUEBAS VIENEN INCLUIDAS Y PASAN');
@@ -141,7 +141,7 @@ const pruebas = resultado.files.filter((file) => file.path.endsWith('.test.ts'))
 out(`  ${pruebas.length} ficheros de prueba entregados con el proyecto:`);
 out();
 for (const prueba of pruebas.slice(0, 6)) out(`    ${prueba.path}`);
-if (pruebas.length > 6) out(`    ... y ${pruebas.length - 6} mas`);
+if (pruebas.length > 6) out(`    ... y ${pruebas.length - 6} más`);
 out();
 out('  Se pueden ejecutar tal cual, sin instalar nada:');
 out('    node --test "apps/api/src/domain/*.test.ts"');
@@ -152,8 +152,8 @@ for (const informe of resultado.reports) {
   out(`  [${informe.kind.padEnd(11)}] ${String(informe.score).padStart(3)}/100  ${informe.summary}`);
 }
 out();
-out('  Los cuatro modulos revisan el proyecto antes de que exista:');
-out('  rendimiento, seguridad, cobertura de pruebas y documentacion.');
+out('  Los cuatro módulos revisan el proyecto antes de que exista:');
+out('  rendimiento, seguridad, cobertura de pruebas y documentación.');
 await pausa(3400);
 
 await titulo(7, 'LO QUE **NO** HACE (y conviene saber antes de comprar)');
@@ -165,8 +165,8 @@ for (const hallazgo of bloqueantes.slice(0, 5)) {
   out(`  !  ${hallazgo.title}`);
 }
 out();
-out('  El proyecto es un punto de partida correcto, no una aplicacion');
-out('  terminada. La autenticacion y la persistencia son esqueletos, y el');
+out('  El proyecto es un punto de partida correcto, no una aplicación');
+out('  terminada. La autenticación y la persistencia son esqueletos, y el');
 out('  sistema lo dice en voz alta en lugar de disimularlo.');
 await pausa(3600);
 
@@ -175,17 +175,17 @@ const ahorroMin = SUPUESTOS.horasArranqueManualMin * SUPUESTOS.costeHoraDesarrol
 const ahorroMax = SUPUESTOS.horasArranqueManualMax * SUPUESTOS.costeHoraDesarrollador;
 const costeAnualPro = SUPUESTOS.precioPlanProMes * 12;
 
-out('  Supuestos (cambialos por los tuyos y recalculamos en directo):');
+out('  Supuestos (cámbialos por los tuyos y recalculamos en directo):');
 out(`    Coste hora de un desarrollador senior   ${SUPUESTOS.costeHoraDesarrollador} EUR`);
 out(`    Horas de arranque manual por proyecto   ${SUPUESTOS.horasArranqueManualMin}-${SUPUESTOS.horasArranqueManualMax} h`);
 out();
 out('  Calculo:');
 out(`    Coste de arrancar un proyecto a mano    ${euros(ahorroMin)} - ${euros(ahorroMax)}`);
 out(`    Coste anual del plan Pro (1 persona)    ${euros(costeAnualPro)}`);
-out(`    Se paga solo con                        1 proyecto al ano`);
+out(`    Se paga solo con                        1 proyecto al año`);
 out();
-out('  Lo que este calculo NO dice: cuanto del tiempo ahorrado se reinvierte');
-out('  en revisar lo generado. Es la primera cifra que mediriamos contigo.');
+out('  Lo que este cálculo NO dice: cuánto del tiempo ahorrado se reinvierte');
+out('  en revisar lo generado. Es la primera cifra que mediríamos contigo.');
 await pausa(3600);
 
 if (values.out) {
@@ -196,9 +196,9 @@ if (values.out) {
 
 out();
 out('='.repeat(74));
-out('  Siguiente paso: pruebalo con TU proyecto.');
+out('  Siguiente paso: pruébalo con TU proyecto.');
 out();
-out('    npm run calec -- plan "describe aqui tu proyecto"');
+out('    npm run calec -- plan "describe aquí tu proyecto"');
 out();
 out('='.repeat(74));
 out();

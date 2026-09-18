@@ -12,10 +12,10 @@ const DB_IMAGES: Record<string, string> = {
 };
 
 /**
- * Adaptador de despliegue: contenedores, orquestacion local y CI.
+ * Adaptador de despliegue: contenedores, orquestación local y CI.
  *
  * Genera el camino completo de "clonar" a "levantado" porque un proyecto
- * que no se puede arrancar el primer dia se abandona el segundo.
+ * que no se puede arrancar el primer día se abandona el segundo.
  */
 export const dockerDeploymentAdapter: DeploymentAdapter = {
   id: 'calec.deployment.docker',

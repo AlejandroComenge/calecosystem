@@ -1,16 +1,16 @@
 # Empezar en 5 minutos
 
-Guia para probar CalEcosystem **sin saber programar**. Todos los comandos son
+Guía para probar CalEcosystem **sin saber programar**. Todos los comandos son
 para copiar y pegar tal cual.
 
 ---
 
 ## Antes de nada: ¿que es esto?
 
-Escribes en espanol normal lo que quieres que haga tu web. El sistema te
+Escribes en español normal lo que quieres que haga tu web. El sistema te
 devuelve el proyecto montado: la parte que ve el usuario, la parte del
-servidor, la base de datos, la configuracion para publicarlo y la
-documentacion.
+servidor, la base de datos, la configuración para publicarlo y la
+documentación.
 
 **Lo que NO es:** una web terminada lista para vender. Es el andamiaje, que es
 justo la parte aburrida y cara. Un programador tiene que terminar el trabajo.
@@ -27,10 +27,10 @@ node --version
 
 **Tiene que decir `v22.18.0` o superior.** Si dice menos, o dice que el comando
 no existe, descarga Node desde [nodejs.org](https://nodejs.org) (elige la
-version "LTS") y vuelve a intentarlo.
+versión "LTS") y vuelve a intentarlo.
 
-> ⚠️ Este es el fallo numero uno. Con una version antigua nada funciona y el
-> error que sale no te dice por que.
+> ⚠️ Este es el fallo número uno. Con una versión antigua nada funciona y el
+> error que sale no te dice por qué.
 
 ---
 
@@ -42,11 +42,11 @@ cd calecosystem
 npm install
 ```
 
-Tarda unos segundos. Al terminar veras algo como `added 13 packages`.
+Tarda unos segundos. Al terminar verás algo como `added 13 packages`.
 
 ---
 
-## Paso 3 — Comprobar que todo esta bien
+## Paso 3 — Comprobar que todo está bien
 
 ```bash
 npm run verify
@@ -60,20 +60,20 @@ Al final tiene que poner:
 # fail 0
 ```
 
-**Si pone `fail 0`, todo correcto.** Si sale otra cosa, para aqui: lo demas
-tampoco funcionara.
+**Si pone `fail 0`, todo correcto.** Si sale otra cosa, para aquí: lo demas
+tampoco funcionará.
 
 ---
 
-## Paso 4 — Ver la demostracion
+## Paso 4 — Ver la demostración
 
 ```bash
 npm run demo:comercial
 ```
 
-Es una presentacion en la terminal, paso a paso, de unos 30 segundos. Te
+Es una presentación en la terminal, paso a paso, de unos 30 segundos. Te
 cuenta el problema, te enseña una tienda online generada de cero y termina con
-el calculo de cuanto dinero ahorra.
+el cálculo de cuánto dinero ahorra.
 
 Si tienes prisa, sin pausas:
 
@@ -99,13 +99,13 @@ Ejemplos disponibles (8). Para ver uno: calec examples <id>
   tienda           Tienda online (e-commerce)
                    Comercios que venden productos por internet
 
-  saas             Aplicacion SaaS por suscripcion
+  saas             Aplicación SaaS por suscripción
                    Productos que se venden como servicio mensual
 
-  landing          Landing de captacion
-                   Lanzamientos de producto y campanas de marketing
+  landing          Landing de captación
+                   Lanzamientos de producto y campañas de marketing
 
-  panel            Panel interno de gestion
+  panel            Panel interno de gestión
                    Equipos que gestionan datos de negocio a diario
   ...
 ```
@@ -116,7 +116,7 @@ Para ver uno concreto, con el comando exacto ya escrito:
 npm run calec -- examples tienda
 ```
 
-Te da el comando completo. **Copialo y pegalo.** Genera la tienda en la carpeta
+Te da el comando completo. **Cópialo y pégalo.** Genera la tienda en la carpeta
 `pruebas/tienda`.
 
 ---
@@ -128,31 +128,31 @@ cd pruebas/tienda
 ls
 ```
 
-Veras esto:
+Verás esto:
 
 ```
-README.md          <- explica el proyecto y por que se eligio cada cosa
-apps/              <- el codigo: `web` es lo que ve el usuario, `api` el servidor
+README.md          <- explica el proyecto y por qué se eligio cada cosa
+apps/              <- el código: `web` es lo que ve el usuario, `api` el servidor
 docs/              <- documentacion tecnica
 docker-compose.yml <- para arrancarlo todo con un comando
 package.json       <- la lista de piezas que usa
 ```
 
-Lo mas interesante para alguien que no programa:
+Lo más interesante para alguien que no programa:
 
 ```bash
 cat README.md
 ```
 
-Ahi esta, en espanol, que tecnologias se eligieron, **por que**, que riesgos
+Ahí esta, en español, que tecnologias se eligieron, **por qué**, que riesgos
 tiene el proyecto y que preguntas quedaron sin responder.
 
 ---
 
-## Paso 7 — Comprobar que el codigo generado funciona de verdad
+## Paso 7 — Comprobar que el código generado funciona de verdad
 
 Esto es lo que separa una demo de un producto. El sistema entrega pruebas
-automaticas y **se pueden ejecutar sin instalar nada**:
+automáticas y **se pueden ejecutar sin instalar nada**:
 
 ```bash
 node --test "apps/api/src/domain/*.test.ts"
@@ -166,14 +166,14 @@ funcionan correctamente.
 
 ## Paso 8 — Probar con TU idea
 
-Ahora lo importante. Describe tu proyecto en espanol, en 3 o 4 frases:
+Ahora lo importante. Describe tu proyecto en español, en 3 o 4 frases:
 
 ```bash
 npm run calec -- plan "Quiero una web para mi academia de idiomas. Los alumnos se apuntan a cursos, pagan la mensualidad online y los profesores gestionan las clases y la asistencia."
 ```
 
-`plan` solo te enseña **que haria**, sin crear nada. Cuando te convenza,
-cambia `plan` por `generate` y anade donde guardarlo:
+`plan` solo te enseña **que haría**, sin crear nada. Cuando te convenza,
+cambia `plan` por `generate` y añade donde guardarlo:
 
 ```bash
 npm run calec -- generate "Quiero una web para mi academia de idiomas. Los alumnos se apuntan a cursos, pagan la mensualidad online y los profesores gestionan las clases y la asistencia." --out ./pruebas/academia
@@ -183,14 +183,14 @@ npm run calec -- generate "Quiero una web para mi academia de idiomas. Los alumn
 
 ## Cosas que te van a pasar (y son normales)
 
-| Lo que ves | Que significa |
+| Lo que ves | Qué significa |
 |---|---|
-| El comando "falla" con codigo 1 | **Es correcto.** Avisa de que hay cosas criticas pendientes (la seguridad esta a medias a proposito). El proyecto se ha creado igual. |
-| Solo aparece un informe, el de documentacion | Estas en el plan gratuito. Los otros tres modulos son de pago. Ver abajo como probarlos. |
-| Puntuaciones bajas (36/100, 7/100) | **Es el sistema funcionando.** Te esta diciendo lo que falta en vez de fingir que esta terminado. |
-| Con Vue o Angular sale menos codigo | Las plantillas avanzadas solo funcionan en React por ahora. Esta documentado como limitacion. |
+| El comando "falla" con código 1 | **Es correcto.** Avisa de que hay cosas críticas pendientes (la seguridad está a medias a propósito). El proyecto se ha creado igual. |
+| Solo aparece un informe, el de documentación | Estas en el plan gratuito. Los otros tres módulos son de pago. Ver abajo como probarlos. |
+| Puntuaciones bajas (36/100, 7/100) | **Es el sistema funcionando.** Te está diciendo lo que falta en vez de fingir que está terminado. |
+| Con Vue o Angular sale menos código | Las plantillas avanzadas solo funcionan en React por ahora. Está documentado como limitación. |
 
-### Ver los cuatro modulos de pago
+### Ver los cuatro módulos de pago
 
 ```bash
 CALEC_LICENSE_TIER=enterprise npm run calec -- generate "tu descripcion" --dry-run
@@ -206,7 +206,7 @@ CALEC_LICENSE_TIER=enterprise npm run calec -- generate "tu descripcion" --dry-r
 |---|---|
 | Ver los ejemplos | `npm run calec -- examples` |
 | Ver un ejemplo concreto | `npm run calec -- examples tienda` |
-| Ver que haria, sin crear nada | `npm run calec -- plan "mi idea"` |
+| Ver que haría, sin crear nada | `npm run calec -- plan "mi idea"` |
 | Crear el proyecto | `npm run calec -- generate "mi idea" --out ./pruebas/mi-web` |
 | Ver la demo para clientes | `npm run demo:comercial` |
 | Comprobar que todo funciona | `npm run verify` |
@@ -214,27 +214,27 @@ CALEC_LICENSE_TIER=enterprise npm run calec -- generate "tu descripcion" --dry-r
 | Ver mi consumo del mes | `npm run calec -- usage --user tu-nombre` |
 | Ver la ayuda completa | `npm run calec -- help` |
 
-> El `--` despues de `calec` **es obligatorio**. Separa las opciones de npm de
+> El `--` después de `calec` **es obligatorio**. Separa las opciones de npm de
 > las del programa. Si lo olvidas, las opciones se pierden.
 
 ---
 
 ## Si algo va mal
 
-| Error | Solucion |
+| Error | Solución |
 |---|---|
 | `ERR_INVALID_TYPESCRIPT_SYNTAX` | Tu Node es antiguo. Necesitas 22.18 o superior. |
 | `command not found: npm` | No tienes Node instalado. Descargalo de nodejs.org. |
-| `EMPTY_REQUIREMENTS` | Tu descripcion es muy corta. Escribe al menos 2 o 3 frases. |
-| `QUOTA_EXCEEDED` | Has llegado al limite del plan gratuito (10 al mes). |
-| Las opciones no hacen nada | Te falta el `--` despues de `calec`. |
+| `EMPTY_REQUIREMENTS` | Tu descripción es muy corta. Escribe al menos 2 o 3 frases. |
+| `QUOTA_EXCEEDED` | Has llegado al límite del plan gratuito (10 al mes). |
+| Las opciones no hacen nada | Te falta el `--` después de `calec`. |
 
 ---
 
-## Y despues, ¿que?
+## Y después, ¿qué?
 
-- **[Pagina de demostracion](https://claude.ai/artifact/GmgDzFTqHzQzuQyMrWFLha)** — para enseñar el producto a alguien sin instalar nada.
+- **[Página de demostración](https://claude.ai/artifact/GmgDzFTqHzQzuQyMrWFLha)** — para enseñar el producto a alguien sin instalar nada.
 - **`docs/PRUEBAS.md`** — como probar cada tipo de web a fondo.
-- **`docs/case-study-ecommerce.md`** — el caso de la tienda con todos los numeros.
+- **`docs/case-study-ecommerce.md`** — el caso de la tienda con todos los números.
 - **`docs/demo-comercial.md`** — guion de venta y argumentos por plan.
-- **`README.md`** — la vision completa del producto.
+- **`README.md`** — la visión completa del producto.

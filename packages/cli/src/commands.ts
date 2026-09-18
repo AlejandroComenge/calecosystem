@@ -80,7 +80,7 @@ export async function runGenerate(options: CommandOptions): Promise<CommandResul
       ...renderResult(result),
       '',
       options.dryRun
-        ? `Simulacion: se escribirian ${report.written.length} ficheros en ${report.destination}`
+        ? `Simulación: se escribirían ${report.written.length} ficheros en ${report.destination}`
         : `Escritos ${report.written.length} ficheros en ${report.destination}`,
     ];
     if (report.skipped.length > 0) {
@@ -146,7 +146,7 @@ export async function runModules(options: CommandOptions): Promise<CommandResult
       `Plugins cargados (${diagnostics.plugins.length}):`,
       ...diagnostics.plugins.map((plugin) => `  - ${plugin.name}@${plugin.version}`),
       '',
-      `Modulos disponibles (${diagnostics.modules.length}):`,
+      `Módulos disponibles (${diagnostics.modules.length}):`,
       ...diagnostics.modules.map((module) => `  - ${module.kind.padEnd(11)} ${module.id} [${module.status}]`),
       '',
       `Frameworks de frontend: ${diagnostics.frontendAdapters.join(', ') || 'ninguno'}`,
@@ -156,7 +156,7 @@ export async function runModules(options: CommandOptions): Promise<CommandResult
       `Plantillas de producto (${diagnostics.templates.length}):`,
       ...diagnostics.templates.map((template) => `  - ${template.kind.padEnd(10)} ${template.id} [${template.tier}]`),
       '',
-      `Componentes en catalogo: ${diagnostics.components}`,
+      `Componentes en catálogo: ${diagnostics.components}`,
       `Middlewares activos: ${diagnostics.middlewares.join(', ') || 'ninguno'}`,
     ];
 
@@ -172,7 +172,7 @@ export async function runModules(options: CommandOptions): Promise<CommandResult
   }
 }
 
-/** `calec usage`: consumo del periodo y limites del plan activo. */
+/** `calec usage`: consumo del período y límites del plan activo. */
 export async function runUsage(options: CommandOptions): Promise<CommandResult> {
   const { kernel, principal, usageGuard } = await bootstrapEcosystem({
     logger: quietLogger(),
@@ -189,7 +189,7 @@ export async function runUsage(options: CommandOptions): Promise<CommandResult> 
       };
     }
     if (!usageGuard) {
-      return { exitCode: 1, output: 'El plugin de facturacion no esta cargado.' };
+      return { exitCode: 1, output: 'El plugin de facturación no está cargado.' };
     }
 
     const summary = await usageGuard.summary(principal);
@@ -259,7 +259,7 @@ export async function runUpgrade(options: CommandOptions): Promise<CommandResult
     // Honestidad por delante: sin claves no hay cobro posible, y decirlo
     // es mejor que abrir una URL que va a fallar.
     lines.push(
-      'Stripe no esta configurado en esta instalacion, asi que no se puede iniciar el pago.',
+      'Stripe no está configurado en esta instalación, así que no se puede iniciar el pago.',
       'Define STRIPE_SECRET_KEY y STRIPE_WEBHOOK_SECRET, y asigna el `priceId` de cada plan.',
       '',
       'Mientras tanto, para probar el plan superior en local:',
@@ -269,7 +269,7 @@ export async function runUpgrade(options: CommandOptions): Promise<CommandResult
   }
 
   lines.push(
-    'Stripe configurado. Crea la sesion de pago desde tu backend con:',
+    'Stripe configurado. Crea la sesión de pago desde tu backend con:',
     '',
     '  const provider = new StripeBillingProvider({ secretKey, webhookSecret, plans });',
     '  const session = await provider.createCheckoutSession({',
@@ -277,7 +277,7 @@ export async function runUpgrade(options: CommandOptions): Promise<CommandResult
     "    successUrl: '...', cancelUrl: '...',",
     '  });',
     '',
-    'El CLI no abre la sesion directamente: el pago debe iniciarse desde un',
+    'El CLI no abre la sesión directamente: el pago debe iniciarse desde un',
     'servicio con la clave secreta, nunca desde la maquina de un usuario.',
   );
   return { exitCode: 0, output: lines.join('\n') };
@@ -313,7 +313,7 @@ export async function runTemplates(options: CommandOptions): Promise<CommandResu
       lines.push(`    frameworks: ${(template.frameworks ?? ['todos']).join(', ')}  tier: ${template.tier}`);
     }
 
-    // Si ademas dan un enunciado, se muestra el encaje de cada una.
+    // Si además dan un enunciado, se muestra el encaje de cada una.
     const description = options.description ?? (options.file ? await readFile(options.file, 'utf8') : '');
     if (description.trim().length >= 10) {
       const generator = new CodeGenerator({ kernel, runModules: false, useTemplates: false });
@@ -336,7 +336,7 @@ export async function runTemplates(options: CommandOptions): Promise<CommandResu
 }
 
 /**
- * `calec examples`: catalogo de ejemplos listos para copiar y pegar.
+ * `calec examples`: catálogo de ejemplos listos para copiar y pegar.
  *
  * Existe para que alguien que no programa pueda probar el producto sin
  * inventarse un enunciado. Con un id concreto (`calec examples tienda`)
@@ -372,7 +372,7 @@ export async function runExamples(options: CommandOptions): Promise<CommandResul
           (scenario.framework ? ` --framework ${scenario.framework}` : '') +
           ` --out ./pruebas/${scenario.id}`,
         '',
-        'Deberia generar, entre otros:',
+        'Debería generar, entre otros:',
         ...scenario.expectFiles.map((file) => `  - ${file}`),
       ].join('\n'),
     };
@@ -394,9 +394,9 @@ export async function runExamples(options: CommandOptions): Promise<CommandResul
   return { exitCode: 0, output: lines.join('\n') };
 }
 
-/* --- Presentacion ----------------------------------------------------- */
+/* --- Presentación ----------------------------------------------------- */
 
-/** Parte un texto en lineas de ancho maximo, sin cortar palabras. */
+/** Parte un texto en líneas de ancho máximo, sin cortar palabras. */
 function wrap(text: string, width: number): string[] {
   const words = text.split(/\s+/);
   const lines: string[] = [];
@@ -415,7 +415,7 @@ function wrap(text: string, width: number): string[] {
 }
 
 
-/** Barra de consumo en texto. Un numero se lee; una barra se entiende. */
+/** Barra de consumo en texto. Un número se lee; una barra se entiende. */
 function usageBar(used: number, limit: number, width = 20): string {
   const filled = Math.min(width, Math.round((used / Math.max(1, limit)) * width));
   return `[${'#'.repeat(filled)}${'.'.repeat(width - filled)}]`;
@@ -426,17 +426,17 @@ function renderResult(result: GenerationResult): string[] {
   const lines = [
     `Proyecto: ${result.blueprint.projectName}`,
     `Stack: ${result.blueprint.stack.frontend} + ${result.blueprint.stack.backend} + ${result.blueprint.stack.database}`,
-    `Confianza del analisis: ${(result.requirements.confidence * 100).toFixed(0)}%`,
+    `Confianza del análisis: ${(result.requirements.confidence * 100).toFixed(0)}%`,
     result.template
       ? `Plantilla: ${result.template.name} (encaje ${(result.template.score * 100).toFixed(0)}%)`
       : 'Plantilla: ninguna (CRUD deducido del enunciado)',
-    `Ficheros: ${result.metrics.fileCount} | Lineas: ${result.metrics.lineCount} | ` +
+    `Ficheros: ${result.metrics.fileCount} | Líneas: ${result.metrics.lineCount} | ` +
       `Componentes: ${result.metrics.componentCount} | ${(result.metrics.totalBytes / 1024).toFixed(1)} KB`,
     `Tiempo: ${result.metrics.durationMs.toFixed(0)} ms`,
   ];
 
   if (result.reports.length > 0) {
-    lines.push('', 'Informes de los modulos:');
+    lines.push('', 'Informes de los módulos:');
     for (const report of result.reports) {
       const score = report.score === null ? '--' : `${report.score}/100`;
       lines.push(`  [${report.kind}] ${score}  ${report.summary}`);

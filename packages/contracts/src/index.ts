@@ -1,9 +1,9 @@
 /**
  * @calecosystem/contracts
  *
- * Unico paquete del que dependen todos los demas. No contiene logica de
- * negocio: define el lenguaje comun (tipos, interfaces y unas pocas
- * funciones puras) que hace posible que los cinco modulos evolucionen y se
+ * Único paquete del que dependen todos los demas. No contiene lógica de
+ * negocio: define el lenguaje común (tipos, interfaces y unas pocas
+ * funciones puras) que hace posible que los cinco módulos evolucionen y se
  * publiquen por separado.
  */
 export * from './tiers.ts';

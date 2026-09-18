@@ -16,15 +16,15 @@ function provider(fetchImpl?: typeof fetch) {
   });
 }
 
-/** Firma un cuerpo igual que lo haria Stripe. */
+/** Firma un cuerpo igual que lo haría Stripe. */
 function sign(payload: string, secret = WEBHOOK_SECRET, timestamp = Math.floor(Date.now() / 1000)) {
   const signature = createHmac('sha256', secret).update(`${timestamp}.${payload}`, 'utf8').digest('hex');
   return `t=${timestamp},v1=${signature}`;
 }
 
-/* --- Verificacion de webhooks ---------------------------------------- */
+/* --- Verificación de webhooks ---------------------------------------- */
 
-test('acepta una firma valida y reciente', () => {
+test('acepta una firma válida y reciente', () => {
   const payload = JSON.stringify({ id: 'evt_1', type: 'checkout.session.completed' });
 
   assert.deepEqual(provider().verifyWebhook(payload, sign(payload)), { valid: true });
@@ -76,7 +76,7 @@ test('una firma de longitud distinta se rechaza sin lanzar', () => {
   assert.equal(verification.valid, false);
 });
 
-/* --- Normalizacion de eventos ---------------------------------------- */
+/* --- Normalización de eventos ---------------------------------------- */
 
 test('traduce un pago completado a un cambio de plan', () => {
   const payload = JSON.stringify({
@@ -94,7 +94,7 @@ test('traduce un pago completado a un cambio de plan', () => {
   assert.equal(event.tier, 'pro');
 });
 
-test('una cancelacion degrada a community en lugar de bloquear la cuenta', () => {
+test('una cancelación degrada a community en lugar de bloquear la cuenta', () => {
   const payload = JSON.stringify({
     id: 'evt_3',
     type: 'customer.subscription.deleted',
@@ -117,9 +117,9 @@ test('un tipo de evento desconocido no rompe el procesamiento', () => {
   assert.equal(event.userId, null);
 });
 
-/* --- Sesion de pago --------------------------------------------------- */
+/* --- Sesión de pago --------------------------------------------------- */
 
-test('crea la sesion de pago con los metadatos necesarios', async () => {
+test('crea la sesión de pago con los metadatos necesarios', async () => {
   let capturedBody = '';
   let capturedAuth = '';
 
@@ -160,7 +160,7 @@ test('un plan sin precio configurado falla con un mensaje accionable', async () 
   );
 });
 
-test('un error de Stripe se propaga con su mensaje y su codigo', async () => {
+test('un error de Stripe se propaga con su mensaje y su código', async () => {
   const fake = (async () =>
     new Response(JSON.stringify({ error: { message: 'No such price' } }), {
       status: 400,

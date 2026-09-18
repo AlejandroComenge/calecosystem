@@ -27,7 +27,7 @@ export interface GeneratorOptions {
   readonly logger?: Logger;
   readonly planner?: Omit<PlannerOptions, 'logger'>;
   /**
-   * Con `false` se omite la fase `augment`: util para previsualizar el
+   * Con `false` se omite la fase `augment`: útil para previsualizar el
    * scaffolding puro sin esperar a optimizador, auditor, tests ni docs.
    */
   readonly runModules?: boolean;
@@ -36,27 +36,27 @@ export interface GeneratorOptions {
 }
 
 export interface GenerateOptions {
-  /** Quien lanza la generacion. Necesario para que apliquen las cuotas. */
+  /** Quien lanza la generación. Necesario para que apliquen las cuotas. */
   readonly principal?: Principal;
-  /** Identificador propio de la ejecucion; si falta se genera uno. */
+  /** Identificador propio de la ejecución; si falta se genera uno. */
   readonly requestId?: string;
 }
 
 /**
- * Generador de codigo base: el modulo principal del ecosistema.
+ * Generador de código base: el módulo principal del ecosistema.
  *
- * El pipeline tiene cinco fases y cada una publica sus hooks:
+ * El pipeline tiene cinco fases y cada una pública sus hooks:
  *
  *   analyze  -> requirements:analyzed   (transform)
  *   plan     -> blueprint:planned       (transform)
  *              deployment:planned       (transform)
- *   scaffold -> arbol virtual de ficheros
- *   augment  -> los otros cuatro modulos aportan informes y ficheros
+ *   scaffold -> árbol virtual de ficheros
+ *   augment  -> los otros cuatro módulos aportan informes y ficheros
  *   finalize -> files:finalized         (transform)
  *              generation:completed     (evento)
  *
- * La regla que sostiene todo: nada se escribe en disco hasta que el arbol
- * completo existe en memoria y todos los modulos han opinado sobre el.
+ * La regla que sostiene todo: nada se escribe en disco hasta que el árbol
+ * completo existe en memoria y todos los módulos han opinado sobre el.
  */
 export class CodeGenerator {
   readonly #kernel: EcosystemKernel;
@@ -72,9 +72,9 @@ export class CodeGenerator {
   /**
    * Ejecuta el pipeline completo.
    *
-   * La ejecucion va envuelta en la cadena de middlewares del kernel, que es
-   * donde viven las cuotas y la telemetria. Un middleware puede rechazar la
-   * peticion antes de que se analice una sola palabra.
+   * La ejecución va envuelta en la cadena de middlewares del kernel, que es
+   * donde viven las cuotas y la telemetría. Un middleware puede rechazar la
+   * petición antes de que se analice una sola palabra.
    */
   async generate(
     input: RequirementsInput,
@@ -161,7 +161,7 @@ export class CodeGenerator {
         };
         await this.#kernel.hooks.emit('generation:completed', result);
         this.#logger.info(
-          `Generacion completada: ${files.length} ficheros, ${metrics.lineCount} lineas, ` +
+          `Generación completada: ${files.length} ficheros, ${metrics.lineCount} líneas, ` +
             `${reports.length} informes, ${metrics.durationMs.toFixed(0)} ms.`,
         );
         return result;
@@ -189,7 +189,7 @@ export class CodeGenerator {
     return selection;
   }
 
-  /** Solo analiza y planifica: util para previsualizar sin generar ficheros. */
+  /** Solo analiza y planifica: útil para previsualizar sin generar ficheros. */
   async plan(input: RequirementsInput): Promise<Blueprint> {
     const requirements = await this.#analyze(input);
     const selection = this.#selectTemplate(requirements);
@@ -200,7 +200,7 @@ export class CodeGenerator {
     if (!input.text || input.text.trim().length < 10) {
       throw new GenerationError(
         'EMPTY_REQUIREMENTS',
-        'La descripcion de requisitos es demasiado corta para deducir una arquitectura. ' +
+        'La descripción de requisitos es demasiado corta para deducir una arquitectura. ' +
           'Describe que hace el producto, quien lo usa y que gestiona.',
         { received: input.text?.length ?? 0 },
       );
@@ -222,15 +222,15 @@ export class CodeGenerator {
     let planned = planner.plan(requirements);
 
     // La plantilla completa el blueprint ANTES de reconciliar capacidades:
-    // puede anadir entidades y vistas, pero no puede exigir un adaptador
-    // que esta instalacion no tenga.
+    // puede añadir entidades y vistas, pero no puede exigir un adaptador
+    // que esta instalación no tenga.
     if (template) planned = template.refine(planned);
 
     const draft = this.#reconcileWithCapabilities(planned, warnings);
 
-    // El plan de despliegue se expone por separado porque es lo que mas
+    // El plan de despliegue se expone por separado porque es lo que más
     // varia entre clientes: el mismo producto va a Docker en una PYME y a
-    // Kubernetes en una corporacion.
+    // Kubernetes en una corporación.
     const deployment: DeploymentPlan = await this.#kernel.hooks.applyTransform(
       'deployment:planned',
       draft.deployment,
@@ -242,10 +242,10 @@ export class CodeGenerator {
    * Ajusta el blueprint a lo que el kernel sabe generar de verdad.
    *
    * El planificador decide con criterios de arquitectura, sin saber que
-   * adaptadores hay instalados. Sin este paso, el blueprint podria prometer
+   * adaptadores hay instalados. Sin este paso, el blueprint podría prometer
    * un runtime que nadie puede materializar, y el README del proyecto
    * generado describiria un stack distinto del que tiene delante. Un
-   * documento que miente sobre su propio codigo es peor que no tenerlo.
+   * documento que miente sobre su propio código es peor que no tenerlo.
    */
   #reconcileWithCapabilities(blueprint: Blueprint, warnings: string[]): Blueprint {
     let reconciled = blueprint;
@@ -263,11 +263,11 @@ export class CodeGenerator {
             ...reconciled.decisions,
             {
               id: 'ADR-BACKEND-SUSTITUIDO',
-              title: 'Sustitucion del runtime de backend',
+              title: 'Sustitución del runtime de backend',
               choice: fallback,
               rationale:
-                `La arquitectura pedia "${blueprint.stack.backend}", pero esta instalacion no tiene ` +
-                'ese adaptador. Se genera con el disponible y se deja constancia para poder migrar despues.',
+                `La arquitectura pedia "${blueprint.stack.backend}", pero esta instalación no tiene ` +
+                'ese adaptador. Se genera con el disponible y se deja constancia para poder migrar después.',
               alternatives: [blueprint.stack.backend],
             },
           ],
@@ -295,11 +295,11 @@ export class CodeGenerator {
   }
 
   /**
-   * Fase de ampliacion: aqui se enchufan los otros cuatro modulos.
+   * Fase de ampliación: aquí se enchufan los otros cuatro módulos.
    *
-   * Un modulo que falla no tumba la generacion. Si el auditor de seguridad
+   * Un módulo que falla no tumba la generación. Si el auditor de seguridad
    * se cae, el equipo debe recibir igualmente su proyecto y un aviso claro
-   * de que la auditoria no se ejecuto.
+   * de que la auditoría no se ejecuto.
    */
   async #augment(blueprint: Blueprint, tree: FileTree, warnings: string[]): Promise<ModuleReport[]> {
     if (this.#options.runModules === false) return [];
@@ -334,8 +334,8 @@ export class CodeGenerator {
         await this.#kernel.hooks.emit('module:after-run', { descriptor, report: enriched });
       } catch (error) {
         const message = toError(error).message;
-        warnings.push(`El modulo "${descriptor.id}" fallo y se omitio: ${message}`);
-        this.#logger.error(`Modulo "${descriptor.id}" fallido: ${message}`);
+        warnings.push(`El módulo "${descriptor.id}" fallo y se omitio: ${message}`);
+        this.#logger.error(`Módulo "${descriptor.id}" fallido: ${message}`);
       }
     }
     return reports;
@@ -366,8 +366,8 @@ function buildMetrics(
   let lineCount = 0;
   for (const file of files) {
     totalBytes += Buffer.byteLength(file.contents, 'utf8');
-    // Se cuentan lineas no vacias: es la cifra que un equipo reconoceria
-    // como "codigo escrito", y la que no se infla con espaciado.
+    // Se cuentan líneas no vacías: es la cifra que un equipo reconoceria
+    // como "código escrito", y la que no se infla con espaciado.
     for (const line of file.contents.split('\n')) {
       if (line.trim() !== '') lineCount += 1;
     }

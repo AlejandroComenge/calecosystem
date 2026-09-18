@@ -32,11 +32,11 @@ export interface BootstrapResult {
 }
 
 /**
- * Arranque estandar del ecosistema.
+ * Arranque estándar del ecosistema.
  *
  * Los siete plugins se cargan en igualdad de condiciones con cualquier plugin
- * de terceros que declare la configuracion. Los que exceden el tier activo se
- * omiten con un aviso: una instalacion community genera proyectos igualmente,
+ * de terceros que declare la configuración. Los que exceden el tier activo se
+ * omiten con un aviso: una instalación community genera proyectos igualmente,
  * solo que sin las fases de pago.
  */
 export async function bootstrapEcosystem(options: BootstrapOptions = {}): Promise<BootstrapResult> {

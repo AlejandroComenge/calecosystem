@@ -7,39 +7,48 @@ import type {
   VirtualFile,
 } from '@calecosystem/contracts';
 import { fileFactory } from '../scaffold/shared.ts';
-import { scoreTemplate } from './detect.ts';
+import { scoreTemplate, type DetectionRules } from './detect.ts';
 import { addEndpoints, addPages, ensureEntity, recordTemplateDecision } from './shared.ts';
 
 const TOOL = 'calec.template.saas';
 const file = fileFactory(TOOL);
 
 /**
- * Plantilla de SaaS por suscripcion.
+ * Plantilla de SaaS por suscripción.
  *
  * Lo que distingue a un SaaS de un CRUD con login no son las pantallas: es el
- * limite del inquilino y el estado de la suscripcion. Ambas cosas hay que
- * ponerlas el primer dia, porque anadirlas despues obliga a revisar cada
+ * límite del inquilino y el estado de la suscripción. Ambas cosas hay que
+ * ponerlas el primer día, porque anadirlas después obliga a revisar cada
  * consulta del sistema.
  */
+/**
+ * Reglas de deteccion, expuestas para poder inspeccionarlas y probarlas.
+ *
+ * Los terminos se comparan contra el resumen NORMALIZADO, asi que no
+ * pueden llevar tildes: una senal acentuada no casaria nunca y el fallo
+ * seria silencioso. Hay una prueba que lo verifica.
+ */
+export const SAAS_RULES: DetectionRules = {
+  signals: [
+    'saas', 'suscripcion', 'suscripciones', 'multiempresa', 'multi tenant',
+    'multitenant', 'organizaciones', 'workspaces', 'planes', 'cuota',
+    'facturacion recurrente', 'panel de control',
+  ],
+  entities: ['Organization', 'Subscription', 'Plan', 'User'],
+  features: ['multiTenant', 'payments', 'analytics'],
+  antiSignals: ['carrito', 'catalogo de productos'],
+  };
+
 export const saasTemplate: ProjectTemplate = {
   id: 'calec.template.saas',
-  name: 'SaaS por suscripcion',
-  description: 'Organizaciones, planes, suscripciones, panel y facturacion.',
+  name: 'SaaS por suscripción',
+  description: 'Organizaciones, planes, suscripciones, panel y facturación.',
   kind: 'saas',
   tier: 'community',
   frameworks: ['react'],
 
   detect(requirements: RequirementsModel): TemplateMatch {
-    return scoreTemplate(requirements, {
-      signals: [
-        'saas', 'suscripcion', 'suscripciones', 'multiempresa', 'multi tenant',
-        'multitenant', 'organizaciones', 'workspaces', 'planes', 'cuota',
-        'facturacion recurrente', 'panel de control',
-      ],
-      entities: ['Organization', 'Subscription', 'Plan', 'User'],
-      features: ['multiTenant', 'payments', 'analytics'],
-      antiSignals: ['carrito', 'catalogo de productos'],
-    });
+    return scoreTemplate(requirements, SAAS_RULES);
   },
 
   refine(blueprint: Blueprint): Blueprint {
@@ -59,7 +68,7 @@ export const saasTemplate: ProjectTemplate = {
       {
         method: 'GET',
         path: '/api/me/subscription',
-        summary: 'Plan y consumo de la organizacion actual',
+        summary: 'Plan y consumo de la organización actual',
         entity: 'Subscription',
         requiresAuth: true,
       },
@@ -78,10 +87,10 @@ export const saasTemplate: ProjectTemplate = {
         ...refined.risks,
         {
           id: 'RISK-TENANT-QUERY',
-          title: 'Consulta sin filtro de organizacion',
+          title: 'Consulta sin filtro de organización',
           impact: 'high',
           mitigation:
-            'El identificador de organizacion es obligatorio en la firma del repositorio, no un parametro opcional.',
+            'El identificador de organización es obligatorio en la firma del repositorio, no un parámetro opcional.',
           owner: 'security',
         },
       ],
@@ -89,7 +98,7 @@ export const saasTemplate: ProjectTemplate = {
 
     return recordTemplateDecision(
       refined,
-      'SaaS por suscripcion',
+      'SaaS por suscripción',
       'organizaciones, planes, suscripciones y aislamiento por inquilino',
     );
   },
@@ -238,14 +247,14 @@ function dashboardPage(): string {
     '',
     '  return (',
     '    <section className="grid gap-4 md:grid-cols-2">',
-    '      <Card title="Suscripcion">',
+    '      <Card title="Suscripción">',
     '        <p className="text-sm text-slate-600">Plan: {summary.planName}</p>',
     '        <p className="text-sm text-slate-600">Estado: {summary.status}</p>',
     '        <p className="text-sm text-slate-600">Renueva: {summary.renewsAt}</p>',
     '      </Card>',
     '      <Card title="Consumo del periodo">',
     '        <p className="mb-2 text-sm text-slate-600">',
-    "          {summary.usage.used} de {summary.usage.limit ?? 'sin limite'}",
+    "          {summary.usage.used} de {summary.usage.limit ?? 'sin límite'}",
     '        </p>',
     '        <div className="h-2 w-full rounded bg-slate-100" role="progressbar" aria-valuenow={percentage}>',
     "          <div className=\"h-2 rounded bg-slate-900\" style={{ width: percentage + '%' }} />",
@@ -260,11 +269,11 @@ function dashboardPage(): string {
 function tenantDomain(): string {
   return [
     '/**',
-    ' * Limite del inquilino.',
+    ' * Límite del inquilino.',
     ' *',
-    ' * Un SaaS multiempresa tiene un unico fallo catastrofico: devolver datos de',
-    ' * otra organizacion. Estas funciones existen para que ese fallo sea',
-    ' * imposible de cometer por descuido y facil de detectar en una prueba.',
+    ' * Un SaaS multiempresa tiene un único fallo catastrofico: devolver datos de',
+    ' * otra organización. Estas funciones existen para que ese fallo sea',
+    ' * imposible de cometer por descuido y fácil de detectar en una prueba.',
     ' */',
     '',
     'export interface TenantOwned {',
@@ -273,12 +282,12 @@ function tenantDomain(): string {
     '',
     'export class TenantIsolationError extends Error {',
     '  constructor(expected: string, actual: string) {',
-    "    super('Acceso cruzado entre organizaciones: se esperaba ' + expected + ' y llego ' + actual);",
+    "    super('Acceso cruzado entre organizaciones: se esperaba ' + expected + ' y llegó ' + actual);",
     "    this.name = 'TenantIsolationError';",
     '  }',
     '}',
     '',
-    '/** Falla en vez de devolver el recurso de otra organizacion. */',
+    '/** Falla en vez de devolver el recurso de otra organización. */',
     'export function assertSameTenant<T extends TenantOwned>(resource: T, organizationId: string): T {',
     '  if (resource.organizationId !== organizationId) {',
     '    throw new TenantIsolationError(organizationId, resource.organizationId);',
@@ -286,7 +295,7 @@ function tenantDomain(): string {
     '  return resource;',
     '}',
     '',
-    '/** Filtra una coleccion dejando solo lo que pertenece a la organizacion. */',
+    '/** Filtra una colección dejando solo lo que pertenece a la organización. */',
     'export function onlyTenant<T extends TenantOwned>(',
     '  resources: readonly T[],',
     '  organizationId: string,',
@@ -302,12 +311,12 @@ function tenantDomainTest(): string {
     "import assert from 'node:assert/strict';",
     "import { TenantIsolationError, assertSameTenant, onlyTenant } from './Tenant.ts';",
     '',
-    "test('deja pasar un recurso de la misma organizacion', () => {",
+    "test('deja pasar un recurso de la misma organización', () => {",
     "  const resource = { organizationId: 'org-1' };",
     "  assert.equal(assertSameTenant(resource, 'org-1'), resource);",
     '});',
     '',
-    "test('rechaza un recurso de otra organizacion', () => {",
+    "test('rechaza un recurso de otra organización', () => {",
     "  assert.throws(() => assertSameTenant({ organizationId: 'org-2' }, 'org-1'), TenantIsolationError);",
     '});',
     '',
@@ -325,15 +334,15 @@ function tenantScope(): string {
     '/**',
     ' * Envoltura de repositorio con el inquilino ya fijado.',
     ' *',
-    ' * El identificador de organizacion se pasa en el constructor, no en cada',
-    ' * llamada: asi olvidarlo es un error de compilacion y no una fuga de datos.',
+    ' * El identificador de organización se pasa en el constructor, no en cada',
+    ' * llamada: así olvidarlo es un error de compilación y no una fuga de datos.',
     ' */',
     'export class TenantScope {',
     '  readonly #organizationId: string;',
     '',
     '  constructor(organizationId: string) {',
     '    if (!organizationId) {',
-    "      throw new Error('TenantScope requiere un identificador de organizacion.');",
+    "      throw new Error('TenantScope requiere un identificador de organización.');",
     '    }',
     '    this.#organizationId = organizationId;',
     '  }',

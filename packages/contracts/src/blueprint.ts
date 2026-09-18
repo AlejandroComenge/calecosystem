@@ -3,7 +3,7 @@
  *
  * Separar "decidir" de "escribir" es lo que permite que el optimizador y el
  * auditor de seguridad intervengan sobre las decisiones (baratas de cambiar)
- * en lugar de sobre el codigo ya emitido (caro de cambiar).
+ * en lugar de sobre el código ya emitido (caro de cambiar).
  */
 import type { DomainEntity, RequirementsModel } from './requirements.ts';
 
@@ -71,7 +71,7 @@ export interface Risk {
   readonly title: string;
   readonly impact: 'low' | 'medium' | 'high';
   readonly mitigation: string;
-  /** Modulo del ecosistema que deberia hacerse cargo del riesgo. */
+  /** Módulo del ecosistema que debería hacerse cargo del riesgo. */
   readonly owner: 'generator' | 'optimizer' | 'security' | 'tester' | 'documenter';
 }
 

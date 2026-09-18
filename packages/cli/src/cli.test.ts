@@ -18,14 +18,14 @@ test('un comando desconocido falla y ofrece la ayuda', async () => {
   assert.match(result.output, /Comando desconocido/);
 });
 
-test('una opcion desconocida no revienta el proceso', async () => {
+test('una opción desconocida no revienta el proceso', async () => {
   const result = await runCli(['plan', BRIEF, '--opcion-que-no-existe']);
 
   assert.equal(result.exitCode, 1);
   assert.match(result.output, /opcion-que-no-existe/);
 });
 
-test('plan --json devuelve un blueprint valido', async () => {
+test('plan --json devuelve un blueprint válido', async () => {
   const result = await runCli(['plan', BRIEF, '--json']);
   const blueprint = JSON.parse(result.output) as {
     stack: { frontend: string };
@@ -46,27 +46,27 @@ test('--framework fuerza el adaptador de frontend', async () => {
   assert.equal(blueprint.stack.frontend, 'angular');
 });
 
-test('plan sin descripcion explica que falta', async () => {
+test('plan sin descripción explica que falta', async () => {
   const result = await runCli(['plan']);
 
   assert.equal(result.exitCode, 1, 'un error de uso no es un fallo inesperado');
   assert.match(result.output, /MISSING_DESCRIPTION/);
 });
 
-test('una descripcion demasiado corta se rechaza con un codigo estable', async () => {
+test('una descripción demasiado corta se rechaza con un código estable', async () => {
   const result = await runCli(['plan', 'corto']);
 
   assert.equal(result.exitCode, 1);
   assert.match(result.output, /EMPTY_REQUIREMENTS/);
 });
 
-test('generate --dry-run no escribe nada y describe lo que haria', async () => {
+test('generate --dry-run no escribe nada y describe lo que haría', async () => {
   const result = await runCli(['generate', BRIEF, '--dry-run', '--quiet']);
 
-  assert.match(result.output, /Simulacion: se escribirian \d+ ficheros/);
+  assert.match(result.output, /Simulación: se escribirían \d+ ficheros/);
 });
 
-test('modules --json lista plugins, modulos y adaptadores', async () => {
+test('modules --json lista plugins, módulos y adaptadores', async () => {
   const result = await runCli(['modules', '--json']);
   const diagnostics = JSON.parse(result.output) as {
     tier: string;
@@ -86,7 +86,7 @@ test('version devuelve la version publicada', async () => {
   assert.match(result.output, /^\d+\.\d+\.\d+$/);
 });
 
-test('examples lista el catalogo completo', async () => {
+test('examples lista el catálogo completo', async () => {
   const result = await runCli(['examples']);
 
   assert.equal(result.exitCode, 0);

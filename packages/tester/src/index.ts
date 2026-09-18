@@ -17,20 +17,20 @@ const DESCRIPTOR = {
   version: '0.1.0',
   displayName: 'Testeador automatico',
   description:
-    'Genera pruebas de humo y de dominio para el proyecto, y senala los riesgos que quedan sin cubrir.',
+    'Genera pruebas de humo y de dominio para el proyecto, y señala los riesgos que quedan sin cubrir.',
   tier: 'pro',
   status: 'preview',
 } as const satisfies ModuleDescriptor;
 
 /**
- * Testeador automatico (v0.1).
+ * Testeador automático (v0.1).
  *
- * Alcance actual: genera la bateria inicial (salud del API y validacion de
+ * Alcance actual: genera la batería inicial (salud del API y validación de
  * dominio) y convierte cada riesgo del blueprint sin prueba asociada en un
- * hallazgo. No genera pruebas end-to-end ni de carga todavia.
+ * hallazgo. No genera pruebas end-to-end ni de carga todavía.
  *
- * Criterio: pocas pruebas que pasan y significan algo. Una bateria generada
- * que falla el primer dia se borra, y con ella la costumbre de tener tests.
+ * Criterio: pocas pruebas que pasan y significan algo. Una batería generada
+ * que falla el primer día se borra, y con ella la costumbre de tener tests.
  */
 export class AutomatedTester implements TesterModule {
   readonly descriptor = DESCRIPTOR;
@@ -52,8 +52,8 @@ export class AutomatedTester implements TesterModule {
       findings.push({
         id: `TEST-UNCOVERED-${risk.id}`,
         severity: risk.impact === 'high' ? 'high' : 'medium',
-        title: `Riesgo sin prueba automatica: ${risk.title}`,
-        detail: `La bateria generada no cubre este riesgo. Mitigacion prevista: ${risk.mitigation}`,
+        title: `Riesgo sin prueba automática: ${risk.title}`,
+        detail: `La batería generada no cubre este riesgo. Mitigación prevista: ${risk.mitigation}`,
         remediation: 'Escribir una prueba que falle si el riesgo se materializa, antes de la primera release.',
         tags: ['coverage', 'risk'],
       });
@@ -63,10 +63,10 @@ export class AutomatedTester implements TesterModule {
       findings.push({
         id: 'TEST-AUTH-FLOW',
         severity: 'high',
-        title: 'El flujo de autenticacion no tiene pruebas de integracion',
+        title: 'El flujo de autenticación no tiene pruebas de integración',
         detail:
-          'Los endpoints de registro, login y renovacion de token se generan como esqueleto y sin cobertura.',
-        remediation: 'Cubrir alta, inicio de sesion, token invalido y token caducado antes de exponer el servicio.',
+          'Los endpoints de registro, login y renovación de token se generan como esqueleto y sin cobertura.',
+        remediation: 'Cubrir alta, inicio de sesión, token invalido y token caducado antes de exponer el servicio.',
         tags: ['auth', 'integration'],
       });
     }
@@ -150,35 +150,35 @@ function testPlan(blueprint: Blueprint): VirtualFile {
     '',
     `Punto de partida para **${blueprint.projectName}**. Lo generado cubre la base; el resto es trabajo del equipo.`,
     '',
-    '## Generado automaticamente',
+    '## Generado automáticamente',
     '',
     '- Sonda de salud del API.',
-    `- Validacion de dominio de ${blueprint.entities.length} entidades.`,
+    `- Validación de dominio de ${blueprint.entities.length} entidades.`,
     '',
     '## Pendiente de escribir',
     '',
     '| Nivel | Alcance | Prioridad |',
     '| --- | --- | --- |',
-    '| Integracion | Endpoints CRUD con base de datos real | Alta |',
+    '| Integración | Endpoints CRUD con base de datos real | Alta |',
   ];
 
   if (blueprint.requirements.features.auth) {
-    lines.push('| Integracion | Alta, login, renovacion y expiracion de token | Alta |');
+    lines.push('| Integración | Alta, login, renovación y expiración de token | Alta |');
   }
   if (blueprint.requirements.features.payments) {
-    lines.push('| Integracion | Webhook de pagos: firma valida, invalida y reintentos | Alta |');
+    lines.push('| Integración | Webhook de pagos: firma válida, invalida y reintentos | Alta |');
   }
   if (blueprint.requirements.features.multiTenant) {
-    lines.push('| Seguridad | Aislamiento entre inquilinos en cada repositorio | Critica |');
+    lines.push('| Seguridad | Aislamiento entre inquilinos en cada repositorio | Crítica |');
   }
   lines.push(
     '| E2E | Recorrido principal de usuario en navegador | Media |',
     '| Carga | Perfil de trafico esperado sobre los listados | Media |',
     '',
-    '## Criterio de aceptacion sugerido',
+    '## Criterio de aceptación sugerido',
     '',
-    '- La rama principal no se rompe: CI en verde es condicion de merge.',
-    '- Toda correccion de fallo llega con una prueba que falla sin el arreglo.',
+    '- La rama principal no se rompe: CI en verde es condición de merge.',
+    '- Toda corrección de fallo llega con una prueba que falla sin el arreglo.',
     '',
   );
 
@@ -190,8 +190,8 @@ function testPlan(blueprint: Blueprint): VirtualFile {
 }
 
 /**
- * Estimacion honesta de cobertura estructural: que proporcion de las piezas
- * criticas tiene al menos una prueba. No es cobertura de lineas y no
+ * Estimación honesta de cobertura estructural: que proporción de las piezas
+ * críticas tiene al menos una prueba. No es cobertura de líneas y no
  * pretende serlo.
  */
 function estimateCoverage(blueprint: Blueprint, findings: readonly Finding[]): number {
@@ -206,7 +206,7 @@ export function testerPlugin(): Plugin {
   return definePlugin({
     name: '@calecosystem/tester',
     version: '0.1.0',
-    description: 'Registra el testeador automatico en la fase `augment`.',
+    description: 'Registra el testeador automático en la fase `augment`.',
     tier: 'pro',
     register(api) {
       api.registerModule(new AutomatedTester());

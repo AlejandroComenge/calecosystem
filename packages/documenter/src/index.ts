@@ -16,7 +16,7 @@ const DESCRIPTOR = {
   version: '0.1.0',
   displayName: 'Documentador inteligente',
   description:
-    'Genera documentacion de arquitectura y de API a partir del blueprint, con las decisiones y su justificacion.',
+    'Genera documentación de arquitectura y de API a partir del blueprint, con las decisiones y su justificación.',
   tier: 'community',
   status: 'preview',
 } as const satisfies ModuleDescriptor;
@@ -24,10 +24,10 @@ const DESCRIPTOR = {
 /**
  * Documentador inteligente (v0.1).
  *
- * Documenta lo que el codigo no puede contar por si solo: por que se eligio
+ * Documenta lo que el código no puede contar por si solo: por qué se eligió
  * cada cosa, que alternativas se descartaron y que preguntas siguen abiertas.
- * Repetir en prosa lo que ya dice una firma de funcion solo crea documentacion
- * que envejece mal, asi que no lo hace.
+ * Repetir en prosa lo que ya dice una firma de función solo crea documentación
+ * que envejece mal, así que no lo hace.
  */
 export class IntelligentDocumenter implements DocumenterModule {
   readonly descriptor = DESCRIPTOR;
@@ -46,9 +46,9 @@ export class IntelligentDocumenter implements DocumenterModule {
       findings.push({
         id: 'DOC-OPEN-QUESTIONS',
         severity: 'medium',
-        title: `${undocumented.length} preguntas de negocio sin respuesta en la documentacion`,
+        title: `${undocumented.length} preguntas de negocio sin respuesta en la documentación`,
         detail:
-          'El analisis de requisitos dejo puntos sin resolver. Documentar una arquitectura sobre supuestos ' +
+          'El análisis de requisitos dejo puntos sin resolver. Documentar una arquitectura sobre supuestos ' +
           'no verificados genera confianza injustificada en ella.',
         remediation: 'Resolver las preguntas con el responsable de producto y actualizar `docs/ARCHITECTURE.md`.',
         tags: ['requirements'],
@@ -59,11 +59,11 @@ export class IntelligentDocumenter implements DocumenterModule {
       findings.push({
         id: 'DOC-LOW-CONFIDENCE',
         severity: 'high',
-        title: `Confianza del analisis baja (${(blueprint.requirements.confidence * 100).toFixed(0)}%)`,
+        title: `Confianza del análisis baja (${(blueprint.requirements.confidence * 100).toFixed(0)}%)`,
         detail:
-          'La descripcion de partida daba poca senal, asi que la documentacion generada describe una ' +
+          'La descripción de partida daba poca señal, así que la documentación generada describe una ' +
           'arquitectura deducida con escasa evidencia.',
-        remediation: 'Ampliar la descripcion de negocio y regenerar antes de usar estos documentos como referencia.',
+        remediation: 'Ampliar la descripción de negocio y regenerar antes de usar estos documentos como referencia.',
         tags: ['requirements', 'quality'],
       });
     }
@@ -71,7 +71,7 @@ export class IntelligentDocumenter implements DocumenterModule {
     return {
       module: DESCRIPTOR.id,
       kind: 'documenter',
-      summary: '3 documentos generados: arquitectura, referencia de API e incorporacion.',
+      summary: '3 documentos generados: arquitectura, referencia de API e incorporación.',
       findings,
       score: Math.round(blueprint.requirements.confidence * 100),
       emittedFiles: [],
@@ -85,7 +85,7 @@ function architectureDoc(blueprint: Blueprint): VirtualFile {
     '# Arquitectura',
     '',
     `> Documento generado a partir del blueprint de **${blueprint.projectName}**.`,
-    '> Actualizalo cuando cambien las decisiones, no cuando cambie el codigo.',
+    '> Actualizalo cuando cambien las decisiones, no cuando cambie el código.',
     '',
     '## Contexto',
     '',
@@ -117,7 +117,7 @@ function architectureDoc(blueprint: Blueprint): VirtualFile {
     lines.push(
       `### ${decision.id}: ${decision.title}`,
       '',
-      `- **Eleccion:** ${decision.choice}`,
+      `- **Elección:** ${decision.choice}`,
       `- **Motivo:** ${decision.rationale}`,
       `- **Descartado:** ${decision.alternatives.join(', ') || 'nada'}`,
       '',
@@ -125,7 +125,7 @@ function architectureDoc(blueprint: Blueprint): VirtualFile {
   }
 
   if (blueprint.risks.length > 0) {
-    lines.push('## Riesgos y responsables', '', '| Riesgo | Impacto | Mitigacion | Responsable |', '| --- | --- | --- | --- |');
+    lines.push('## Riesgos y responsables', '', '| Riesgo | Impacto | Mitigación | Responsable |', '| --- | --- | --- | --- |');
     for (const risk of blueprint.risks) {
       lines.push(`| ${risk.title} | ${risk.impact} | ${risk.mitigation} | ${risk.owner} |`);
     }
@@ -146,7 +146,7 @@ function apiReference(blueprint: Blueprint): VirtualFile {
     '',
     `Base: \`http://localhost:3000\`. ${blueprint.endpoints.length} endpoints previstos.`,
     '',
-    '| Metodo | Ruta | Descripcion | Auth |',
+    '| Método | Ruta | Descripción | Auth |',
     '| --- | --- | --- | --- |',
   ];
 
@@ -172,31 +172,31 @@ function apiReference(blueprint: Blueprint): VirtualFile {
 
 function onboardingDoc(blueprint: Blueprint): VirtualFile {
   const lines = [
-    '# Incorporacion al proyecto',
+    '# Incorporación al proyecto',
     '',
-    `Objetivo: que una persona nueva tenga **${blueprint.projectName}** funcionando y entienda por que esta hecho asi.`,
+    `Objetivo: que una persona nueva tenga **${blueprint.projectName}** funcionando y entienda por qué está hecho así.`,
     '',
-    '## Primer dia',
+    '## Primer día',
     '',
-    '1. `cp .env.example .env` y pedir los valores reales al responsable tecnico.',
+    '1. `cp .env.example .env` y pedir los valores reales al responsable técnico.',
     '2. `docker compose up --build`.',
     '3. Comprobar `http://localhost:3000/api/health`.',
-    '4. Leer `docs/ARCHITECTURE.md`, empezando por la seccion de decisiones.',
+    '4. Leer `docs/ARCHITECTURE.md`, empezando por la sección de decisiones.',
     '',
     '## Donde tocar cada cosa',
     '',
     '| Quiero... | Voy a... |',
     '| --- | --- |',
     '| Cambiar una regla de negocio | `apps/api/src/domain/` |',
-    '| Anadir un caso de uso | `apps/api/src/application/` |',
+    '| Añadir un caso de uso | `apps/api/src/application/` |',
     '| Cambiar de base de datos | `apps/api/src/infrastructure/` |',
-    '| Anadir un endpoint | `apps/api/src/routes/` |',
+    '| Añadir un endpoint | `apps/api/src/routes/` |',
     '| Cambiar una pantalla | `apps/web/src/pages/` |',
     '',
     '## Antes de tu primer merge',
     '',
-    '- Lee `SECURITY.md`: hay hallazgos abiertos que bloquean produccion.',
-    '- Lee `docs/TEST-PLAN.md`: sabras que cubre la bateria actual y que no.',
+    '- Lee `SECURITY.md`: hay hallazgos abiertos que bloquean producción.',
+    '- Lee `docs/TEST-PLAN.md`: sabras que cubre la batería actual y que no.',
     '',
   ];
 

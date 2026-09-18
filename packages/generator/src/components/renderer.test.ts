@@ -32,7 +32,7 @@ test('las props opcionales con defecto se desestructuran con su valor', () => {
   assert.match(code, /export function Saludo\(\{ nombre, veces = 1, onClose \}: SaludoProps\)/);
 });
 
-test('la descripcion de la prop se conserva como JSDoc', () => {
+test('la descripción de la prop se conserva como JSDoc', () => {
   assert.match(reactComponentRenderer.render(spec), /\/\*\* A quien saludar\. \*\//);
 });
 
@@ -47,14 +47,14 @@ test('importa ReactNode solo cuando alguna prop lo necesita', () => {
   assert.match(conNode, /import type \{ ReactNode \} from 'react';/);
 });
 
-test('un componente sin props no genera interfaz vacia', () => {
+test('un componente sin props no genera interfaz vacía', () => {
   const code = reactComponentRenderer.render({ ...spec, props: [] });
 
   assert.equal(code.includes('Props {'), false);
   assert.match(code, /export function Saludo\(\)/);
 });
 
-test('las firmas largas se reparten en varias lineas', () => {
+test('las firmas largas se reparten en varias líneas', () => {
   const code = reactComponentRenderer.render({
     ...spec,
     props: Array.from({ length: 10 }, (_unused, index) => ({
@@ -67,7 +67,7 @@ test('las firmas largas se reparten en varias lineas', () => {
   assert.match(code, /export function Saludo\(\{\n/);
 });
 
-test('la ruta del componente sigue su categoria', () => {
+test('la ruta del componente sigue su categoría', () => {
   assert.equal(reactComponentRenderer.pathFor(spec), 'apps/web/src/components/ui/Saludo.tsx');
   assert.equal(
     reactComponentRenderer.pathFor({ ...spec, directory: 'domain' }),
@@ -82,7 +82,7 @@ test('propType traduce cada clase de prop', () => {
   assert.equal(propType({ name: 'a', kind: 'callback', required: true }), '() => void');
 });
 
-test('el barril reexporta todo el catalogo ordenado', () => {
+test('el barril reexporta todo el catálogo ordenado', () => {
   const barrel = componentBarrel(uiKit());
 
   assert.match(barrel, /export \{ Alert \} from '\.\/ui\/Alert\.tsx';/);
@@ -90,7 +90,7 @@ test('el barril reexporta todo el catalogo ordenado', () => {
   assert.ok(barrel.indexOf('Alert') < barrel.indexOf('Button'), 'orden alfabetico estable');
 });
 
-test('el catalogo base cubre lo que necesita una aplicacion de gestion', () => {
+test('el catálogo base cubre lo que necesita una aplicación de gestión', () => {
   const names = uiKit().map((component) => component.name);
 
   for (const expected of ['Button', 'Input', 'DataTable', 'Alert', 'Pagination']) {
@@ -98,7 +98,7 @@ test('el catalogo base cubre lo que necesita una aplicacion de gestion', () => {
   }
 });
 
-test('todo el catalogo base se renderiza sin fallar', () => {
+test('todo el catálogo base se renderiza sin fallar', () => {
   for (const component of uiKit()) {
     const code = reactComponentRenderer.render(component);
     assert.ok(code.includes(`export function ${component.name}`), `${component.name} no se renderizo`);
@@ -129,7 +129,7 @@ test('cada entidad produce su tabla y su formulario', () => {
   const form = reactComponentRenderer.render(components[1] as ComponentSpec);
   assert.match(form, /import type \{ NewProduct \} from '\.\.\/\.\.\/types\.ts';/);
   assert.match(form, /requiredFields: readonly string\[\] = \['name', 'price'\]/);
-  // Los campos automaticos no se piden al usuario.
+  // Los campos automáticos no se piden al usuario.
   assert.equal(form.includes('id="product-id"'), false);
   assert.equal(form.includes('id="product-createdAt"'), false);
 });

@@ -3,7 +3,7 @@
  *
  * `npm run demo:ecommerce`
  *
- * Genera la tienda en memoria, mide el resultado y publica las metricas que
+ * Genera la tienda en memoria, mide el resultado y pública las métricas que
  * aparecen en `docs/case-study-ecommerce.md`. No escribe nada en disco salvo
  * que se pase `--out <directorio>`.
  */
@@ -20,8 +20,8 @@ import { MemorySink, telemetryPlugin } from '@calecosystem/telemetry';
 
 const BRIEF = `
 Tienda online de productos artesanales. Los clientes navegan el catalogo,
-anaden productos al carrito y pagan con Stripe en el checkout. Hay valoraciones
-de productos, login de usuarios con roles y un panel de administracion para
+añaden productos al carrito y pagan con Stripe en el checkout. Hay valoraciones
+de productos, login de usuarios con roles y un panel de administración para
 gestionar pedidos, productos y clientes. Esperamos 20.000 usuarios y cumplimos
 el RGPD.
 `.trim();
@@ -71,12 +71,12 @@ function report(generated: GenerationResult): void {
   out(`Senales: ${generated.template?.signals.join(', ')}`);
   out();
 
-  out('--- Metricas de generacion ---');
+  out('--- Métricas de generación ---');
   out(`  Tiempo total            ${metrics.durationMs.toFixed(0)} ms`);
   out(`  Ficheros                ${metrics.fileCount}`);
-  out(`  Lineas de codigo        ${metrics.lineCount}`);
+  out(`  Líneas de código        ${metrics.lineCount}`);
   out(`  Componentes de interfaz ${metrics.componentCount}`);
-  out(`  Tamano total            ${(metrics.totalBytes / 1024).toFixed(1)} KB`);
+  out(`  Tamaño total            ${(metrics.totalBytes / 1024).toFixed(1)} KB`);
   out();
 
   out('--- Reparto por fase ---');
@@ -86,7 +86,7 @@ function report(generated: GenerationResult): void {
   }
   out();
 
-  out('--- Que se genero ---');
+  out('--- Qué se genero ---');
   out(`  Entidades de dominio    ${blueprint.entities.length}`);
   out(`  Endpoints de API        ${blueprint.endpoints.length}`);
   out(`  Vistas                  ${blueprint.pages.length}`);
@@ -100,7 +100,7 @@ function report(generated: GenerationResult): void {
   }
   out();
 
-  out('--- Informes de los modulos ---');
+  out('--- Informes de los módulos ---');
   for (const moduleReport of generated.reports) {
     out(`  [${moduleReport.kind.padEnd(11)}] ${String(moduleReport.score).padStart(3)}/100  ${moduleReport.summary}`);
   }
@@ -111,13 +111,13 @@ function report(generated: GenerationResult): void {
   for (const testFile of generatedTests) out(`  ${testFile.path}`);
   out();
 
-  out('--- Telemetria recogida ---');
+  out('--- Telemetría recogida ---');
   const counts = new Map<string, number>();
   for (const event of sink.events) counts.set(event.name, (counts.get(event.name) ?? 0) + 1);
   for (const [name, count] of [...counts].sort()) out(`  ${name.padEnd(24)} ${count}`);
   out();
 
-  out('--- Lo que el equipo todavia tiene que hacer ---');
+  out('--- Lo que el equipo todavía tiene que hacer ---');
   const blockers = generated.reports
     .flatMap((moduleReport) => moduleReport.findings)
     .filter((finding) => finding.severity === 'critical' || finding.severity === 'high');

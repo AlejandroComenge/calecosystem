@@ -50,7 +50,7 @@ test('overwrite explicito si permite sustituir un fichero', () => {
   assert.equal(tree.size, 1);
 });
 
-test('la salida esta ordenada por ruta para que la generacion sea reproducible', () => {
+test('la salida está ordenada por ruta para que la generación sea reproducible', () => {
   const tree = new FileTree();
   tree.addAll([file('z.txt'), file('a.txt'), file('m/b.txt')]);
 

@@ -1,8 +1,8 @@
 # CalEcosystem
 
 **Ecosistema interconectado de desarrollo web automatizado.**
-De una descripcion de negocio en lenguaje natural a un proyecto completo:
-arquitectura, frontend, backend, despliegue, seguridad, pruebas y documentacion.
+De una descripción de negocio en lenguaje natural a un proyecto completo:
+arquitectura, frontend, backend, despliegue, seguridad, pruebas y documentación.
 
 ```bash
 npx calec generate "Marketplace de productos artesanales con pagos y valoraciones"
@@ -14,41 +14,41 @@ npx calec generate "Marketplace de productos artesanales con pagos y valoracione
 
 Arrancar un producto web cuesta entre dos y seis semanas de trabajo que se
 repite en cada proyecto: elegir stack, montar el esqueleto, configurar el
-despliegue, escribir las primeras pruebas y documentar por que se hizo asi.
+despliegue, escribir las primeras pruebas y documentar por qué se hizo así.
 Ese trabajo no diferencia a nadie, pero consume el presupuesto justo cuando
-el producto aun no ha validado nada.
+el producto aún no ha validado nada.
 
 Los generadores clasicos (`create-react-app`, `nest new`, plantillas de
-empresa) resuelven un 10% de eso: dan un esqueleto vacio e identico para
+empresa) resuelven un 10% de eso: dan un esqueleto vacío e identico para
 todos. No leen los requisitos, no deciden nada, no explican sus decisiones y
-no se enteran de lo que pasa despues.
+no se enteran de lo que pasa después.
 
 ## La propuesta
 
-Cinco modulos que comparten un mismo modelo de datos y se comunican por un
-bus de extension, en lugar de cinco herramientas que no se hablan.
+Cinco módulos que comparten un mismo modelo de datos y se comunican por un
+bus de extensión, en lugar de cinco herramientas que no se hablan.
 
-| # | Modulo | Que hace | Estado v0.2 |
+| # | Módulo | Qué hace | Estado v0.2 |
 |---|--------|----------|-------------|
-| 1 | **Generador de codigo base** | Analiza requisitos, decide la arquitectura, aplica plantillas de producto y genera el proyecto | **Completo** |
+| 1 | **Generador de código base** | Analiza requisitos, decide la arquitectura, aplica plantillas de producto y genera el proyecto | **Completo** |
 | 2 | **Optimizador de rendimiento** | Detecta decisiones que no escalan, antes de escribirlas | Vista previa |
-| 3 | **Auditor de seguridad** | Audita el codigo generado y el plan frente a fallos conocidos | Vista previa |
-| 4 | **Testeador automatico** | Genera la bateria inicial y senala lo que queda sin cubrir | Vista previa |
-| 5 | **Documentador inteligente** | Documenta decisiones, API e incorporacion al proyecto | Vista previa |
+| 3 | **Auditor de seguridad** | Audita el código generado y el plan frente a fallos conocidos | Vista previa |
+| 4 | **Testeador automático** | Genera la batería inicial y señala lo que queda sin cubrir | Vista previa |
+| 5 | **Documentador inteligente** | Documenta decisiones, API e incorporación al proyecto | Vista previa |
 
-Ademas, dos piezas de producto: **cuotas por plan** (`@calecosystem/billing`,
-con integracion basica de Stripe) y **telemetria de uso**
+Además, dos piezas de producto: **cuotas por plan** (`@calecosystem/billing`,
+con integración básica de Stripe) y **telemetría de uso**
 (`@calecosystem/telemetry`).
 
-El valor no esta en cada modulo por separado: esta en que **el auditor sabe
-que el generador eligio Stripe**, el testeador sabe que riesgos declaro el
+El valor no está en cada módulo por separado: está en que **el auditor sabe
+que el generador eligió Stripe**, el testeador sabe que riesgos declaro el
 arquitecto, y el documentador escribe sobre decisiones reales y no sobre
-suposiciones. Ese contexto compartido es lo que ninguna combinacion de
+suposiciones. Ese contexto compartido es lo que ninguna combinación de
 herramientas sueltas puede replicar.
 
 ## Lo que hace hoy, sin adornos
 
-Una ejecucion real sobre un enunciado de cinco lineas (`npm run demo:ecommerce`):
+Una ejecución real sobre un enunciado de cinco líneas (`npm run demo:ecommerce`):
 
 ```
 Plantilla detectada: E-commerce (encaje 90%)
@@ -56,7 +56,7 @@ Plantilla detectada: E-commerce (encaje 90%)
 --- Metricas de generacion ---
   Tiempo total            32 ms
   Ficheros                117
-  Lineas de codigo        3996
+  Lineas de código        3996
   Componentes de interfaz 26
 
 --- Informes de los modulos ---
@@ -67,48 +67,48 @@ Plantilla detectada: E-commerce (encaje 90%)
 ```
 
 Las puntuaciones bajas **son el producto funcionando**: el proyecto recien
-generado tiene autenticacion sin verificar y listados sin paginar, y el
+generado tiene autenticación sin verificar y listados sin paginar, y el
 ecosistema lo dice en voz alta en lugar de entregar un esqueleto con
 apariencia de estar terminado.
 
-El caso completo, con reparto por fases y por areas, esta en
+El caso completo, con reparto por fases y por áreas, está en
 [`docs/case-study-ecommerce.md`](docs/case-study-ecommerce.md). Sus cifras
-estan verificadas por pruebas: si el producto cambia y dejan de ser ciertas,
+están verificadas por pruebas: si el producto cambia y dejan de ser ciertas,
 la suite falla.
 
-### Lo que **no** hace todavia
+### Lo que **no** hace todavía
 
 Conviene decirlo antes de que lo descubra un cliente:
 
-- El analisis de requisitos es **deterministico** (lexicos y reglas), no un
+- El análisis de requisitos es **deterministico** (lexicos y reglas), no un
   modelo de lenguaje. Es reproducible y gratis, pero no entiende matices.
-  El puerto para enchufar un LLM existe (`RequirementsEnricher`) y esta sin
+  El puerto para enchufar un LLM existe (`RequirementsEnricher`) y está sin
   implementar.
-- Los modulos 2-5 hacen **analisis estatico**: no ejecutan el proyecto, no
+- Los módulos 2-5 hacen **análisis estático**: no ejecutan el proyecto, no
   miden tiempos reales ni escanean dependencias.
-- Las plantillas de producto solo generan para **React**. El eje esta separado
-  para que portarlas sea escribir el `scaffold`, pero hoy la limitacion es real.
-- La integracion con Stripe cubre **sesion de pago y webhooks**, no prorrateos,
+- Las plantillas de producto solo generan para **React**. El eje está separado
+  para que portarlas sea escribir el `scaffold`, pero hoy la limitación es real.
+- La integración con Stripe cubre **sesión de pago y webhooks**, no prorrateos,
   impuestos ni portal del cliente.
-- El contador de uso local es **manipulable por diseno** y esta documentado
-  como tal; la verdad de facturacion vivira en el servidor.
-- El codigo generado es un **punto de partida correcto y sintacticamente
-  valido**, no una aplicacion terminada. La autenticacion y la persistencia
+- El contador de uso local es **manipulable por diseño** y está documentado
+  como tal; la verdad de facturación vivira en el servidor.
+- El código generado es un **punto de partida correcto y sintácticamente
+  valido**, no una aplicación terminada. La autenticación y la persistencia
   son esqueletos marcados como tales.
 
-## Instalacion y uso
+## Instalación y uso
 
 Requiere Node.js 22.18 o superior (usa el soporte nativo de TypeScript; no
 hace falta compilar nada).
 
-> **¿Primera vez?** Empieza por [`EMPEZAR.md`](EMPEZAR.md): guia de 5 minutos
+> **¿Primera vez?** Empieza por [`EMPEZAR.md`](EMPEZAR.md): guía de 5 minutos
 > escrita para alguien que no programa, con comandos para copiar y pegar.
 
 ```bash
 git clone <este-repositorio> && cd calecosystem
 npm install
 npm run verify        # typecheck + 247 pruebas
-npm run validate      # comprueba que el codigo GENERADO es valido
+npm run validate      # comprueba que el código GENERADO es válido
 npm run demo:comercial # demostracion para enseñar a un cliente
 
 npm run calec -- examples                  # 8 ejemplos listos para copiar
@@ -123,11 +123,11 @@ npm run calec -- modules
 | `calec plan <texto>` | Muestra la arquitectura propuesta sin escribir nada |
 | `calec generate <texto>` | Genera el proyecto completo |
 | `calec templates [texto]` | Plantillas disponibles y su encaje con un enunciado |
-| `calec modules` | Plugins, modulos, adaptadores y middlewares activos |
-| `calec usage --user <id>` | Consumo del periodo y limites del plan |
-| `calec upgrade --tier pro` | Que incluye el plan y como cambiarse |
+| `calec modules` | Plugins, módulos, adaptadores y middlewares activos |
+| `calec usage --user <id>` | Consumo del período y límites del plan |
+| `calec upgrade --tier pro` | Qué incluye el plan y como cambiarse |
 
-Opciones utiles: `--framework react\|vue\|angular`, `--database`,
+Opciones útiles: `--framework react\|vue\|angular`, `--database`,
 `--deployment docker-compose\|vercel\|netlify`, `--user`, `--dry-run`,
 `--json`, `--out`.
 
@@ -136,16 +136,16 @@ Opciones utiles: `--framework react\|vue\|angular`, `--database`,
 El generador detecta que tipo de producto describe el enunciado y completa lo
 que ese tipo **siempre** necesita y nadie menciona:
 
-| Plantilla | Se activa con | Anade |
+| Plantilla | Se activa con | Añade |
 |-----------|---------------|-------|
-| **E-commerce** | tienda, carrito, checkout, catalogo | Carrito con persistencia, proceso de compra con precios recalculados en servidor, panel de pedidos |
-| **SaaS** | suscripcion, multiempresa, organizaciones, planes | Organizaciones, planes, aislamiento por inquilino, panel y facturacion |
-| **Landing** | captacion, leads, formulario de contacto | Secciones de venta, formulario con campo trampa, metadatos para buscadores |
+| **E-commerce** | tienda, carrito, checkout, catálogo | Carrito con persistencia, proceso de compra con precios recalculados en servidor, panel de pedidos |
+| **SaaS** | suscripción, multiempresa, organizaciones, planes | Organizaciones, planes, aislamiento por inquilino, panel y facturación |
+| **Landing** | captación, leads, formulario de contacto | Secciones de venta, formulario con campo trampa, metadatos para buscadores |
 
-La deteccion es puntuada y tiene contra-senales: una landing no dispara la
+La detección es puntuada y tiene contra-señales: una landing no dispara la
 plantilla de tienda porque mencione "producto".
 
-## Como se usa desde codigo
+## Cómo se usa desde código
 
 ```ts
 import { createKernel } from '@calecosystem/core';
@@ -164,7 +164,7 @@ console.log(result.template);          // plantilla aplicada y su encaje
 console.log(result.metrics.lineCount); // lineas generadas
 ```
 
-Con cuotas por plan, basta anadir el plugin de facturacion y un `principal`:
+Con cuotas por plan, basta añadir el plugin de facturación y un `principal`:
 
 ```ts
 const result = await generator.generate(
@@ -173,11 +173,11 @@ const result = await generator.generate(
 );
 ```
 
-Nada se escribe en disco hasta que se llama a `writeFileTree`. Esa separacion
-es la que hace el sistema testeable y la que permite que un modulo revise el
+Nada se escribe en disco hasta que se llama a `writeFileTree`. Esa separación
+es la que hace el sistema testeable y la que permite que un módulo revise el
 proyecto **antes** de que exista.
 
-## Arquitectura en una pagina
+## Arquitectura en una página
 
 ```
                         EcosystemKernel
@@ -199,28 +199,28 @@ generador optimizador seguridad testeador documentador billing
    +-- finalize -> files:finalized         (transformable)
 ```
 
-Todo, incluido el generador, se carga como plugin. Si el modulo principal
-necesitara un trato especial del kernel, el sistema de extension no serviria
-para nadie mas.
+Todo, incluido el generador, se carga como plugin. Si el módulo principal
+necesitara un trato especial del kernel, el sistema de extensión no serviría
+para nadie más.
 
 Detalle completo en [`docs/architecture.md`](docs/architecture.md).
-Puntos de extension en [`docs/hooks.md`](docs/hooks.md) y
+Puntos de extensión en [`docs/hooks.md`](docs/hooks.md) y
 [`docs/plugins.md`](docs/plugins.md).
 
 ## Modelo de negocio
 
-Tres planes; el generador y la documentacion son gratuitos **a proposito**,
+Tres planes; el generador y la documentación son gratuitos **a propósito**,
 porque son la puerta de entrada y lo que demuestra que el sistema funciona.
 
 | Plan | Precio orientativo | Incluye |
 |------|--------------------|---------|
 | **Community** | 0 € | Generador, documentador, 3 frameworks, CLI, uso comercial |
-| **Pro** | 49 €/desarrollador/mes | + optimizador, auditor de seguridad, testeador, integracion CI |
+| **Pro** | 49 €/desarrollador/mes | + optimizador, auditor de seguridad, testeador, integración CI |
 | **Enterprise** | desde 1.500 €/mes | + SSO, plugins privados, on-premise, adaptadores a medida, SLA |
 
 El control de plan (`Entitlements`) es **empaquetado de producto, no
-seguridad**: quien tiene el codigo puede editarlo. Su funcion es que cada
-instalacion declare de forma explicita y auditable que modulos tiene activos.
+seguridad**: quien tiene el código puede editarlo. Su función es que cada
+instalación declare de forma explicita y auditable que módulos tiene activos.
 
 Desglose por componente, supuestos de unit economics y modelo del marketplace
 de plugins en [`docs/pricing.md`](docs/pricing.md). Las cifras son un punto de
@@ -252,38 +252,38 @@ tests/         Pruebas de integracion del ecosistema completo.
 | [`docs/PRUEBAS.md`](docs/PRUEBAS.md) | Quien necesita verificar que funciona |
 | [`docs/demo-comercial.md`](docs/demo-comercial.md) | Quien va a enseñarlo a un cliente |
 | [`docs/case-study-ecommerce.md`](docs/case-study-ecommerce.md) | Quien quiere las cifras del caso real |
-| [`docs/architecture.md`](docs/architecture.md) | Quien va a tocar el codigo |
+| [`docs/architecture.md`](docs/architecture.md) | Quien va a tocar el código |
 ```
 
 ## Licencia
 
-El codigo de este repositorio es propietario (`UNLICENSED` en los paquetes).
+El código de este repositorio es propietario (`UNLICENSED` en los paquetes).
 El modelo de licencia definitivo —licencia dual con nucleo abierto para
 `contracts` y `core`, o propietario completo— es una decision de negocio
-pendiente y esta anotada como tal en `docs/pricing.md`. No se distribuye bajo
-ninguna licencia de codigo abierto mientras tanto.
+pendiente y está anotada como tal en `docs/pricing.md`. No se distribuye bajo
+ninguna licencia de código abierto mientras tanto.
 
-## Como se verifica
+## Cómo se verifica
 
 Dos capas que responden preguntas distintas. Confundirlas es el error tipico
-al evaluar un generador de codigo:
+al evaluar un generador de código:
 
 | | `npm test` | `npm run validate` |
 |---|---|---|
-| Verifica | Que el **generador** funciona | Que el **codigo generado** es valido |
+| Verifica | Qué el **generador** funciona | Qué el **código generado** es válido |
 | Alcance | 247 pruebas | 8 ejemplos completos |
 | Incluye | Analisis, planificacion, plantillas, cuotas, Stripe, integracion | Sintaxis de todo el TS, JSON, YAML, y **ejecuta las pruebas que el generador entrega** |
 
 Ultima ejecucion de `npm run validate`:
 
 ```
-8 ejemplos | 663 ficheros | 20194 lineas | 505 TS sin errores de sintaxis
+8 ejemplos | 663 ficheros | 20194 líneas | 505 TS sin errores de sintaxis
           | 54 pruebas generadas en verde
 
-TODO CORRECTO: la salida del generador es valida en todos los ejemplos.
+TODO CORRECTO: la salida del generador es válida en todos los ejemplos.
 ```
 
-Un generador puede pasar sus propias pruebas y producir codigo que no compila.
+Un generador puede pasar sus propias pruebas y producir código que no compila.
 Por eso existen las dos capas. Guia completa en [`docs/PRUEBAS.md`](docs/PRUEBAS.md).
 
 ## Para enseñarlo a un cliente
@@ -296,14 +296,14 @@ npm run demo:comercial          # 8 pasos, ~30 segundos
 npm run demo:comercial -- --caso saas
 ```
 
-El guion, los beneficios con sus supuestos economicos y los argumentos por
-plan estan en [`docs/demo-comercial.md`](docs/demo-comercial.md). El paso 7 de
-la demo enseña a proposito **lo que el sistema no hace**: una demo que solo
-enseña lo bueno gana la reunion y pierde al cliente tres semanas despues.
+El guion, los beneficios con sus supuestos económicos y los argumentos por
+plan están en [`docs/demo-comercial.md`](docs/demo-comercial.md). El paso 7 de
+la demo enseña a propósito **lo que el sistema no hace**: una demo que solo
+enseña lo bueno gana la reunión y pierde al cliente tres semanas después.
 
 ## Estado del proyecto
 
-v0.2.0 — 247 pruebas + validacion de salida, sin dependencias de ejecucion.
-Lo previsto para las siguientes versiones esta en
+v0.2.0 — 247 pruebas + validación de salida, sin dependencias de ejecución.
+Lo previsto para las siguientes versiones está en
 [`docs/roadmap.md`](docs/roadmap.md), separando lo comprometido de lo que
-todavia es una hipotesis.
+todavía es una hipotesis.

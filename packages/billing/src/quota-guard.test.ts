@@ -14,7 +14,7 @@ function guardWith(now = new Date('2026-03-15T12:00:00Z')) {
   return { store, guard: new QuotaGuard({ store, now: () => now }) };
 }
 
-test('el plan gratuito permite generar hasta su limite', async () => {
+test('el plan gratuito permite generar hasta su límite', async () => {
   const { guard } = guardWith();
   const decision = await guard.check(community, 'generation');
 
@@ -51,7 +51,7 @@ test('al agotar la cuota se deniega y se propone el plan que la levanta', async 
   assert.match(decision.reason ?? '', /pro/);
 });
 
-test('un plan sin limite nunca deniega', async () => {
+test('un plan sin límite nunca deniega', async () => {
   const { guard } = guardWith();
   for (let index = 0; index < 500; index += 1) {
     await guard.record(enterprise, 'generation');
@@ -102,7 +102,7 @@ test('los proyectos se cuentan de forma acumulada, no mensual', async () => {
   const decision = await junio.check(community, 'project');
   assert.equal(decision.period, 'total');
   assert.equal(decision.used, 3);
-  assert.equal(decision.allowed, false, 'el limite total no se reinicia con el mes');
+  assert.equal(decision.allowed, false, 'el límite total no se reinicia con el mes');
 });
 
 test('summary devuelve el estado de todas las operaciones sin consumir', async () => {
@@ -117,23 +117,23 @@ test('summary devuelve el estado de todas las operaciones sin consumir', async (
   assert.ok(summary.every((decision) => decision.allowed));
 });
 
-test('una operacion sin politica definida se permite', async () => {
+test('una operación sin política definida se permite', async () => {
   const store = new MemoryUsageStore();
   const guard = new QuotaGuard({ store, quotas: [{ tier: 'community', policies: [] }] });
 
   const decision = await guard.check(community, 'generation');
 
   assert.equal(decision.allowed, true);
-  assert.match(decision.reason ?? '', /Sin politica/);
+  assert.match(decision.reason ?? '', /Sin política/);
 });
 
-test('nextTierFor encuentra el primer plan que amplia el limite', () => {
+test('nextTierFor encuentra el primer plan que amplia el límite', () => {
   assert.equal(nextTierFor('community', 'generation'), 'pro');
   assert.equal(nextTierFor('pro', 'generation'), 'enterprise');
   assert.equal(nextTierFor('enterprise', 'generation'), undefined);
 });
 
-test('las ventanas de periodo se calculan en UTC', () => {
+test('las ventanas de período se calculan en UTC', () => {
   const now = new Date('2026-03-15T23:30:00Z');
 
   assert.equal(periodStart('month', now)?.toISOString(), '2026-03-01T00:00:00.000Z');
@@ -143,9 +143,9 @@ test('las ventanas de periodo se calculan en UTC', () => {
   assert.equal(periodReset('total', now), null);
 });
 
-test('el catalogo por defecto cubre los tres planes', () => {
+test('el catálogo por defecto cubre los tres planes', () => {
   for (const tier of ['community', 'pro', 'enterprise'] as const) {
-    assert.ok(policyFor(tier, 'generation', DEFAULT_QUOTAS), `falta politica para ${tier}`);
+    assert.ok(policyFor(tier, 'generation', DEFAULT_QUOTAS), `falta política para ${tier}`);
   }
   assert.equal(policyFor('pro', 'generation')?.limit, 200);
 });

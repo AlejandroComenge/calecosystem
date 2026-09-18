@@ -1,4 +1,4 @@
-/** Ficheros generados y resultado de una ejecucion del pipeline. */
+/** Ficheros generados y resultado de una ejecución del pipeline. */
 import type { Blueprint } from './blueprint.ts';
 import type { RequirementsModel } from './requirements.ts';
 import type { ModuleReport } from './reports.ts';
@@ -8,7 +8,7 @@ export interface VirtualFile {
   /** Ruta relativa POSIX dentro del proyecto generado. */
   readonly path: string;
   readonly contents: string;
-  /** Quien lo produjo: id de modulo, plugin o adaptador. */
+  /** Quien lo produjo: id de módulo, plugin o adaptador. */
   readonly producedBy: string;
   /** Permite reemplazar un fichero ya emitido por otro productor. */
   readonly overwrite?: boolean;
@@ -29,7 +29,7 @@ export interface GenerationMetrics {
   readonly durationMs: number;
   readonly fileCount: number;
   readonly totalBytes: number;
-  /** Lineas de codigo generadas. Es la metrica que pide todo el mundo. */
+  /** Líneas de código generadas. Es la métrica que pide todo el mundo. */
   readonly lineCount: number;
   /** Componentes de interfaz emitidos. */
   readonly componentCount: number;
@@ -55,6 +55,6 @@ export interface GenerationResult {
   readonly template: AppliedTemplate | null;
   /** Paquetes con versiones incompatibles declaradas por productores distintos. */
   readonly dependencyConflicts: readonly DependencyConflict[];
-  /** Identificador de esta ejecucion; correlaciona logs, telemetria y cuotas. */
+  /** Identificador de esta ejecución; correlaciona logs, telemetría y cuotas. */
   readonly requestId: string;
 }

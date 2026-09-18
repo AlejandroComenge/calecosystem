@@ -1,5 +1,5 @@
 /**
- * Adaptadores de scaffolding. Anadir un framework nuevo (Svelte, Solid,
+ * Adaptadores de scaffolding. Añadir un framework nuevo (Svelte, Solid,
  * Remix...) es escribir un adaptador y registrarlo desde un plugin: no se
  * toca el generador.
  */
@@ -20,7 +20,7 @@ export interface ScaffoldContext {
   readonly dependencies: DependencyCollector;
   /**
    * Componentes que otros productores ya han registrado. Permite que una
-   * plantilla reutilice el catalogo de UI del adaptador en vez de duplicarlo.
+   * plantilla reutilice el catálogo de UI del adaptador en vez de duplicarlo.
    */
   readonly components: readonly ComponentSpec[];
 }
@@ -45,9 +45,9 @@ export interface DeploymentAdapter extends ScaffoldAdapter {
 }
 
 /**
- * Puerto de enriquecimiento del analisis. El analizador incluido es
+ * Puerto de enriquecimiento del análisis. El analizador incluido es
  * deterministico (lexicos y reglas). Este puerto es el punto donde un
- * modelo de lenguaje puede mejorar la extraccion sin que el resto del
+ * modelo de lenguaje puede mejorar la extracción sin que el resto del
  * ecosistema se entere del cambio.
  */
 export interface RequirementsEnricher {

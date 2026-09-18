@@ -21,14 +21,14 @@ export interface BuiltManifest {
  * Recoge las dependencias que declaran adaptadores, plantillas y componentes,
  * y construye un `package.json` por workspace.
  *
- * Reglas de resolucion, deliberadamente simples y predecibles:
- *  - Gana la primera version declarada. Quien llega despues no pisa a quien
+ * Reglas de resolución, deliberadamente simples y predecibles:
+ *  - Gana la primera version declarada. Quien llega después no pisa a quien
  *    ya estaba.
  *  - Una version distinta para el mismo paquete se registra como conflicto
- *    con el nombre de ambos solicitantes. No se resuelve automaticamente
+ *    con el nombre de ambos solicitantes. No se resuelve automáticamente
  *    porque adivinar la version correcta es exactamente el tipo de magia que
  *    luego nadie sabe depurar.
- *  - La salida esta ordenada alfabeticamente: dos generaciones identicas
+ *  - La salida está ordenada alfabéticamente: dos generaciones identicas
  *    producen el mismo fichero byte a byte.
  */
 export class DependencyRegistry implements DependencyCollector {
@@ -83,7 +83,7 @@ export class DependencyRegistry implements DependencyCollector {
     return conflicts.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  /** Workspaces con al menos una dependencia o aportacion. */
+  /** Workspaces con al menos una dependencia o aportación. */
   workspaces(): WorkspaceId[] {
     const ids = new Set<WorkspaceId>();
     for (const group of this.#specs.values()) {
@@ -130,7 +130,7 @@ export class DependencyRegistry implements DependencyCollector {
     };
   }
 
-  /** Inventario legible: que dependencia entro, quien la pidio y por que. */
+  /** Inventario legible: que dependencia entro, quien la pidio y por qué. */
   explain(workspace: WorkspaceId): string[] {
     return this.resolved(workspace).map(
       (spec) =>

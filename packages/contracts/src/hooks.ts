@@ -2,8 +2,8 @@
  * Puntos de extension del pipeline.
  *
  * Dos familias, deliberadamente separadas:
- *  - `EventHooks`     : notificacion. El handler observa y no cambia nada.
- *  - `TransformHooks` : transformacion en cascada. Cada handler recibe el
+ *  - `EventHooks`     : notificación. El handler observa y no cambia nada.
+ *  - `TransformHooks` : transformación en cascada. Cada handler recibe el
  *                       valor devuelto por el anterior y devuelve el
  *                       siguiente. Es la via por la que el optimizador o el
  *                       auditor corrigen decisiones antes de que se escriban.
@@ -17,19 +17,19 @@ import type { GenerationResult, PipelinePhase, VirtualFile } from './artifacts.t
 import type { ModuleDescriptor } from './modules.ts';
 import type { ModuleReport } from './reports.ts';
 
-/** Hooks de transformacion: `payload -> payload`. */
+/** Hooks de transformación: `payload -> payload`. */
 export interface TransformHooks {
   /** Requisitos recien extraidos del lenguaje natural. */
   'requirements:analyzed': RequirementsModel;
-  /** Arquitectura decidida, aun sin materializar en ficheros. */
+  /** Arquitectura decidida, aún sin materializar en ficheros. */
   'blueprint:planned': Blueprint;
   /** Plan de despliegue, antes de emitir Dockerfile/CI. */
   'deployment:planned': DeploymentPlan;
-  /** Arbol completo de ficheros justo antes de cerrar el resultado. */
+  /** Árbol completo de ficheros justo antes de cerrar el resultado. */
   'files:finalized': readonly VirtualFile[];
 }
 
-/** Hooks de notificacion: observan, no modifican. */
+/** Hooks de notificación: observan, no modifican. */
 export interface EventHooks {
   'plugin:registered': { name: string; version: string };
   'module:registered': { descriptor: ModuleDescriptor };
@@ -46,7 +46,7 @@ export type TransformHookName = keyof TransformHooks;
 export type EventHookName = keyof EventHooks;
 
 export interface HookMeta {
-  /** Quien registro el handler (plugin o modulo). Util para diagnosticar. */
+  /** Quien registro el handler (plugin o módulo). Útil para diagnosticar. */
   readonly source: string;
   /** Menor valor = se ejecuta antes. Por defecto 100. */
   readonly priority: number;

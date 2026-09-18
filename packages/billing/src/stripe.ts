@@ -12,7 +12,7 @@ import type {
 
 const STRIPE_API = 'https://api.stripe.com/v1';
 
-/** Catalogo por defecto, alineado con `docs/pricing.md`. */
+/** Catálogo por defecto, alineado con `docs/pricing.md`. */
 export const DEFAULT_PLANS: readonly PlanDefinition[] = [
   {
     tier: 'community',
@@ -71,16 +71,16 @@ export class StripeError extends Error {
 }
 
 /**
- * Integracion basica con Stripe.
+ * Integración básica con Stripe.
  *
- * Alcance: crear la sesion de pago para subir de plan y verificar los webhooks
- * que confirman el cambio. Es el minimo que hace falta para cobrar; no cubre
+ * Alcance: crear la sesión de pago para subir de plan y verificar los webhooks
+ * que confirman el cambio. Es el mínimo que hace falta para cobrar; no cubre
  * prorrateos, impuestos ni portal del cliente.
  *
  * Se habla con la API REST directamente y no con el SDK oficial para no
- * introducir una dependencia de ejecucion en un ecosistema que hoy no tiene
+ * introducir una dependencia de ejecución en un ecosistema que hoy no tiene
  * ninguna. El precio es tener que codificar los cuerpos a mano; a cambio, la
- * superficie que auditar es esta clase y nada mas.
+ * superficie que auditar es esta clase y nada más.
  */
 export class StripeBillingProvider implements BillingProvider {
   readonly id = 'stripe';
@@ -144,7 +144,7 @@ export class StripeBillingProvider implements BillingProvider {
     const payload = (await response.json()) as Record<string, unknown>;
     if (!response.ok) {
       const error = payload['error'] as { message?: string } | undefined;
-      throw new StripeError(response.status, error?.message ?? 'Stripe rechazo la peticion.');
+      throw new StripeError(response.status, error?.message ?? 'Stripe rechazo la petición.');
     }
 
     return {
@@ -159,15 +159,15 @@ export class StripeBillingProvider implements BillingProvider {
   }
 
   /**
-   * Verifica la firma del webhook segun el esquema de Stripe.
+   * Verifica la firma del webhook según el esquema de Stripe.
    *
    * La cabecera es `t=<marca>,v1=<firma>` y se firma `<marca>.<cuerpo>` con
    * HMAC-SHA256. Se comprueban las dos cosas:
    *
-   *  - la firma, con comparacion de tiempo constante, porque una comparacion
+   *  - la firma, con comparación de tiempo constante, porque una comparación
    *    normal filtra el valor correcto byte a byte;
-   *  - la marca de tiempo, porque una firma valida capturada ayer sigue siendo
-   *    valida hoy si nadie mira la hora (ataque de repeticion).
+   *  - la marca de tiempo, porque una firma válida capturada ayer sigue siendo
+   *    valida hoy si nadie mira la hora (ataque de repetición).
    */
   verifyWebhook(payload: string, signatureHeader: string): WebhookVerification {
     const parts = new Map<string, string>();
@@ -184,7 +184,7 @@ export class StripeBillingProvider implements BillingProvider {
 
     const timestampSeconds = Number.parseInt(timestamp, 10);
     if (!Number.isFinite(timestampSeconds)) {
-      return { valid: false, reason: 'Marca de tiempo no numerica.' };
+      return { valid: false, reason: 'Marca de tiempo no numérica.' };
     }
 
     const ageSeconds = Math.abs(Date.now() / 1000 - timestampSeconds);
@@ -245,9 +245,9 @@ function mapEventKind(type: string): BillingEventKind {
 }
 
 function resolveTier(kind: BillingEventKind, metadataTier: string | undefined): Tier | null {
-  // Una baja degrada a community: es la unica lectura segura. Dejar el plan
-  // de pago activo tras una cancelacion regala producto; bloquear la cuenta
-  // entera castiga a quien quiza solo cambio de tarjeta.
+  // Una baja degrada a community: es la única lectura segura. Dejar el plan
+  // de pago activo tras una cancelación regala producto; bloquear la cuenta
+  // entera castiga a quien quizá solo cambio de tarjeta.
   if (kind === 'subscription.cancelled') return 'community';
   if (metadataTier === 'community' || metadataTier === 'pro' || metadataTier === 'enterprise') {
     return metadataTier;
@@ -255,7 +255,7 @@ function resolveTier(kind: BillingEventKind, metadataTier: string | undefined): 
   return null;
 }
 
-/** Comparacion en tiempo constante de dos cadenas hexadecimales. */
+/** Comparación en tiempo constante de dos cadenas hexadecimales. */
 function safeEqualHex(expected: string, received: string): boolean {
   if (expected.length !== received.length) return false;
   try {

@@ -7,7 +7,7 @@ import type {
 } from '@calecosystem/contracts';
 import { EcosystemError } from '@calecosystem/core';
 
-/** Se lanza cuando una operacion supera la cuota del plan activo. */
+/** Se lanza cuando una operación supera la cuota del plan activo. */
 export class QuotaExceededError extends EcosystemError {
   constructor(message: string, details: Record<string, unknown>) {
     super('QUOTA_EXCEEDED', message, details);
@@ -18,20 +18,20 @@ export class QuotaExceededError extends EcosystemError {
 export interface QuotaMiddlewareOptions {
   readonly guard: UsageGuard;
   /**
-   * Con `false`, una peticion sin principal se rechaza. Por defecto se deja
-   * pasar: el uso local anonimo de la CLI no deberia requerir cuenta.
+   * Con `false`, una petición sin principal se rechaza. Por defecto se deja
+   * pasar: el uso local anonimo de la CLI no debería requerir cuenta.
    */
   readonly requirePrincipal?: boolean;
 }
 
 /**
- * Middleware de validacion de plan.
+ * Middleware de validación de plan.
  *
  * Orden deliberado de las tres cosas que hace:
  *  1. comprueba la cuota ANTES de analizar nada, para no gastar trabajo en
- *     una peticion que va a rechazarse;
- *  2. deja pasar la generacion;
- *  3. registra el consumo SOLO si termino bien.
+ *     una petición que va a rechazarse;
+ *  2. deja pasar la generación;
+ *  3. registra el consumo SOLO si término bien.
  *
  * El paso 3 es el que evita cobrar por errores propios. Si el pipeline falla,
  * el contador no se mueve.
@@ -41,7 +41,7 @@ export function quotaMiddleware(options: QuotaMiddlewareOptions): MiddlewareRegi
 
   return {
     name: 'billing:quota',
-    // Prioridad baja = el mas externo. Rechazar pronto es todo el objetivo.
+    // Prioridad baja = el más externo. Rechazar pronto es todo el objetivo.
     priority: 10,
     handler: async (context: GenerationContext, next: GenerationNext): Promise<GenerationResult> => {
       const { principal } = context;
@@ -49,7 +49,7 @@ export function quotaMiddleware(options: QuotaMiddlewareOptions): MiddlewareRegi
       if (!principal) {
         if (requirePrincipal) {
           throw new QuotaExceededError(
-            'Esta instalacion exige identificar al usuario antes de generar.',
+            'Esta instalación exige identificar al usuario antes de generar.',
             { requestId: context.requestId },
           );
         }
@@ -77,7 +77,7 @@ export function quotaMiddleware(options: QuotaMiddlewareOptions): MiddlewareRegi
       if (decision.remaining !== null && decision.remaining <= 2) {
         context.logger.warn(
           `Te quedan ${decision.remaining} generaciones en el plan "${principal.tier}".` +
-            (decision.upgradeTo ? ` El plan "${decision.upgradeTo}" amplia el limite.` : ''),
+            (decision.upgradeTo ? ` El plan "${decision.upgradeTo}" amplia el límite.` : ''),
         );
       }
 
@@ -91,7 +91,7 @@ export function quotaMiddleware(options: QuotaMiddlewareOptions): MiddlewareRegi
         template: result.template?.id ?? null,
       });
 
-      // Los modulos de ampliacion tambien consumen: son la parte cara del
+      // Los módulos de ampliación también consumen: son la parte cara del
       // producto y la que justifica el plan Pro.
       if (result.reports.length > 0) {
         await guard.record(principal, 'module-run', result.reports.length, {

@@ -2,7 +2,7 @@ import { appendFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import type { AnalyticsEvent, AnalyticsSink } from './events.ts';
 
-/** Acumula en memoria. Para tests y para inspeccion en desarrollo. */
+/** Acumula en memoria. Para tests y para inspección en desarrollo. */
 export class MemorySink implements AnalyticsSink {
   readonly id = 'memory';
   readonly events: AnalyticsEvent[] = [];
@@ -21,13 +21,13 @@ export class MemorySink implements AnalyticsSink {
 }
 
 /**
- * Escribe una linea JSON por evento.
+ * Escribe una línea JSON por evento.
  *
  * Formato pensado para que `jq`, un `COPY` de Postgres o cualquier
- * recolector de logs lo ingieran sin transformacion previa.
+ * recolector de logs lo ingieran sin transformación previa.
  *
- * Los fallos de escritura se tragan a proposito: la telemetria es un medio,
- * no el producto. Que no se pueda escribir una metrica no puede impedir que
+ * Los fallos de escritura se tragan a propósito: la telemetría es un medio,
+ * no el producto. Qué no se pueda escribir una métrica no puede impedir que
  * un equipo reciba su proyecto.
  */
 export class JsonLinesSink implements AnalyticsSink {
@@ -45,8 +45,8 @@ export class JsonLinesSink implements AnalyticsSink {
       await mkdir(path.dirname(this.#filePath), { recursive: true });
       await appendFile(this.#filePath, `${JSON.stringify(event)}\n`, 'utf8');
     } catch {
-      // Se avisa una sola vez: un log de telemetria que inunda el log real
-      // es peor que no tener telemetria.
+      // Se avisa una sola vez: un log de telemetría que inunda el log real
+      // es peor que no tener telemetría.
       this.#failed = true;
     }
   }

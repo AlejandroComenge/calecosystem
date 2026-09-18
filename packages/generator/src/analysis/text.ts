@@ -41,9 +41,9 @@ export function titleCase(text: string): string {
 }
 
 /**
- * Plural en ingles para nombres de recursos REST. Los identificadores del
+ * Plural en inglés para nombres de recursos REST. Los identificadores del
  * proyecto generado son siempre ingleses aunque los requisitos vengan en
- * espanol: es lo que espera cualquier equipo que herede el codigo.
+ * español: es lo que espera cualquier equipo que herede el código.
  */
 export function pluralizeEnglish(word: string): string {
   const lower = word.toLowerCase();
@@ -52,7 +52,7 @@ export function pluralizeEnglish(word: string): string {
   return `${lower}s`;
 }
 
-/** Singular aproximado para espanol e ingles; solo se usa antes de mapear al lexico. */
+/** Singular aproximado para español e inglés; solo se usa antes de mapear al lexico. */
 export function singularize(word: string): string {
   const lower = normalize(word);
   if (lower.endsWith('ces')) return `${lower.slice(0, -3)}z`;
@@ -65,7 +65,7 @@ export function singularize(word: string): string {
   return lower;
 }
 
-/** Cuenta cuantos terminos de una lista aparecen como palabra completa. */
+/** Cuenta cuántos términos de una lista aparecen como palabra completa. */
 export function countMatches(haystack: string, needles: readonly string[]): number {
   let total = 0;
   for (const needle of needles) {
@@ -74,7 +74,7 @@ export function countMatches(haystack: string, needles: readonly string[]): numb
   return total;
 }
 
-/** Coincidencia por palabra completa; evita que "pago" dispare con "pagina". */
+/** Coincidencia por palabra completa; evita que "pago" dispare con "página". */
 export function containsTerm(haystack: string, term: string): boolean {
   const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, 'i').test(haystack);

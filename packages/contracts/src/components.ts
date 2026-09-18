@@ -1,9 +1,9 @@
 /**
- * Especificacion de componentes de interfaz.
+ * Especificación de componentes de interfaz.
  *
- * Un componente se describe como datos, no como cadena de texto. Asi el mismo
- * catalogo puede renderizarse a React hoy y a Vue o Svelte manana sin
- * reescribir el catalogo, y una plantilla puede componer componentes sin
+ * Un componente se describe como datos, no como cadena de texto. Así el mismo
+ * catálogo puede renderizarse a React hoy y a Vue o Svelte mañana sin
+ * reescribir el catálogo, y una plantilla puede componer componentes sin
  * concatenar JSX a mano.
  */
 import type { DependencySpec } from './dependencies.ts';
@@ -29,24 +29,24 @@ export interface ComponentProp {
 export type ComponentCategory = 'ui' | 'layout' | 'domain' | 'feature';
 
 export interface ComponentSpec {
-  /** Nombre en PascalCase; tambien es el nombre del fichero. */
+  /** Nombre en PascalCase; también es el nombre del fichero. */
   readonly name: string;
   readonly category: ComponentCategory;
   readonly description: string;
   readonly props: readonly ComponentProp[];
-  /** Lineas de import adicionales que necesita el cuerpo. */
+  /** Líneas de import adicionales que necesita el cuerpo. */
   readonly imports?: readonly string[];
-  /** Codigo previo al `return`, ya indentado a dos espacios. */
+  /** Código previo al `return`, ya indentado a dos espacios. */
   readonly setup?: readonly string[];
   /** Cuerpo JSX del `return`, ya indentado a cuatro espacios. */
   readonly body: readonly string[];
   readonly dependencies?: readonly Omit<DependencySpec, 'requestedBy' | 'workspace'>[];
-  /** Subcarpeta dentro de `src/components`. Por defecto, la categoria. */
+  /** Subcarpeta dentro de `src/components`. Por defecto, la categoría. */
   readonly directory?: string;
 }
 
 /**
- * Renderiza especificaciones a codigo de un framework concreto. Cada
+ * Renderiza especificaciones a código de un framework concreto. Cada
  * adaptador de frontend puede traer el suyo.
  */
 export interface ComponentRenderer {

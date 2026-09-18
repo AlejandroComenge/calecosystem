@@ -1,6 +1,6 @@
 /**
- * Modelo de requisitos: la traduccion estructurada de una descripcion de
- * negocio en lenguaje natural. Es la unica entrada que el resto del
+ * Modelo de requisitos: la traducción estructurada de una descripción de
+ * negocio en lenguaje natural. Es la única entrada que el resto del
  * ecosistema necesita entender.
  */
 
@@ -36,7 +36,7 @@ export interface DomainEntity {
   readonly name: string;
   /** Nombre plural en kebab-case para rutas, p.ej. `products`. */
   readonly plural: string;
-  /** Termino original detectado en el texto del usuario. */
+  /** Término original detectado en el texto del usuario. */
   readonly sourceTerm: string;
   readonly fields: readonly EntityField[];
   readonly operations: readonly CrudOperation[];
@@ -80,12 +80,12 @@ export interface NonFunctionalRequirements {
 }
 
 export interface RequirementsInput {
-  /** Descripcion de negocio en lenguaje natural. */
+  /** Descripción de negocio en lenguaje natural. */
   readonly text: string;
   readonly locale?: Locale;
   /** Nombre explicito del proyecto; si falta se infiere del texto. */
   readonly projectName?: string;
-  /** Pistas que ganan a la inferencia automatica. */
+  /** Pistas que ganan a la inferencia automática. */
   readonly hints?: RequirementsHints;
 }
 
@@ -109,7 +109,7 @@ export interface RequirementsModel {
   readonly nonFunctional: NonFunctionalRequirements;
   readonly integrations: readonly string[];
   /**
-   * Confianza del analisis, 0..1. Por debajo de `0.5` conviene pedir
+   * Confianza del análisis, 0..1. Por debajo de `0.5` conviene pedir
    * aclaraciones antes de generar.
    */
   readonly confidence: number;

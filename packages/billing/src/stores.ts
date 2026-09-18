@@ -28,7 +28,7 @@ export class MemoryUsageStore implements UsageStore {
     return this.#records.filter((record) => matches(record, query));
   }
 
-  /** Solo para tests: vacia el contador. */
+  /** Solo para tests: vacía el contador. */
   clear(): void {
     this.#records.length = 0;
   }
@@ -37,12 +37,12 @@ export class MemoryUsageStore implements UsageStore {
 /**
  * Contador persistente en JSON Lines.
  *
- * Se elige JSONL y no JSON por una razon practica: anadir una linea es una
- * escritura atomica del sistema operativo, asi que dos procesos `calec`
- * concurrentes no se pisan el fichero. Un JSON completo habria que leerlo,
+ * Se elige JSONL y no JSON por una razón práctica: añadir una línea es una
+ * escritura atómica del sistema operativo, así que dos procesos `calec`
+ * concurrentes no se pisan el fichero. Un JSON completo habría que leerlo,
  * modificarlo y reescribirlo entero, que es donde se pierden registros.
  *
- * Es un contador local, no una fuente de verdad de facturacion: quien tiene
+ * Es un contador local, no una fuente de verdad de facturación: quien tiene
  * el fichero puede editarlo. La verdad, cuando esto sea un servicio, vive en
  * el servidor. Ver `docs/adr/0004-limites-de-uso.md`.
  */
@@ -88,7 +88,7 @@ export class JsonLinesUsageStore implements UsageStore {
       try {
         records.push(JSON.parse(line) as UsageRecord);
       } catch {
-        // Una linea corrupta (escritura interrumpida) no puede invalidar todo
+        // Una línea corrupta (escritura interrumpida) no puede invalidar todo
         // el historico: se descarta esa y se sigue.
         continue;
       }

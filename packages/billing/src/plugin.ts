@@ -23,11 +23,11 @@ export interface BillingPluginOptions {
 }
 
 /**
- * Plugin de limites de uso y facturacion.
+ * Plugin de límites de uso y facturación.
  *
- * Registra el middleware de cuota y publica el guardian como servicio para
- * que el CLI pueda mostrar el consumo. Stripe es opcional a proposito: medir
- * consumo es util desde el primer dia, cobrar solo cuando hay con que.
+ * Registra el middleware de cuota y pública el guardian como servicio para
+ * que el CLI pueda mostrar el consumo. Stripe es opcional a propósito: medir
+ * consumo es útil desde el primer día, cobrar solo cuando hay con que.
  */
 export function billingPlugin(options: BillingPluginOptions = {}): Plugin {
   const store = options.store ?? new MemoryUsageStore();
@@ -63,7 +63,7 @@ export function billingPlugin(options: BillingPluginOptions = {}): Plugin {
             plans: DEFAULT_PLANS,
           }),
         );
-        api.logger.debug('Proveedor de facturacion Stripe registrado.');
+        api.logger.debug('Proveedor de facturación Stripe registrado.');
       } else {
         api.logger.debug('Sin claves de Stripe: se miden cuotas pero no se puede cobrar.');
       }

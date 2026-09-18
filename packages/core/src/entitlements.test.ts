@@ -34,7 +34,7 @@ test('una licencia con fecha futura sigue vigente', () => {
   assert.equal(valid.effectiveTier, 'pro');
 });
 
-test('assert explica que plan falta y cual esta activo', () => {
+test('assert explica que plan falta y cual está activo', () => {
   const community = new Entitlements();
 
   assert.throws(

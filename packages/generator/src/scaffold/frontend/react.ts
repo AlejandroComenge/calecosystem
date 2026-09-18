@@ -16,9 +16,9 @@ const dep = (name: string, version: string, reason: string, dev = false): Depend
 /**
  * Adaptador de frontend para React + Vite.
  *
- * Genera una aplicacion enrutada con una vista de listado por entidad y un
+ * Genera una aplicación enrutada con una vista de listado por entidad y un
  * cliente HTTP compartido. No genera formularios ni estado global: son
- * decisiones que dependen del producto y es mas barato escribirlas que
+ * decisiones que dependen del producto y es más barato escribirlas que
  * borrar las equivocadas.
  */
 export const reactAdapter: FrontendAdapter = {
@@ -33,12 +33,12 @@ export const reactAdapter: FrontendAdapter = {
     const files: VirtualFile[] = [];
 
     // Las dependencias se declaran, no se escriben: el generador construye
-    // un unico `package.json` por workspace. Ver `dependency-registry.ts`.
+    // un único `package.json` por workspace. Ver `dependency-registry.ts`.
     dependencies.requireAll([
       dep('react', '^19.0.0', 'Libreria de interfaz elegida en el blueprint.'),
       dep('react-dom', '^19.0.0', 'Renderizado de React en el navegador.'),
       dep('react-router-dom', '^7.0.0', `Enrutado de las ${blueprint.pages.length} vistas planificadas.`),
-      dep('@vitejs/plugin-react', '^4.3.0', 'Integracion de React con Vite.', true),
+      dep('@vitejs/plugin-react', '^4.3.0', 'Integración de React con Vite.', true),
       dep('typescript', '^5.9.0', 'Tipado del frontend.', true),
       dep('vite', '^6.0.0', 'Servidor de desarrollo y empaquetado.', true),
     ]);
@@ -114,7 +114,7 @@ export const reactAdapter: FrontendAdapter = {
 
 function apiClient(slug: string): string {
   return [
-    '/** Cliente HTTP compartido. Un unico punto donde cambiar auth o base URL. */',
+    '/** Cliente HTTP compartido. Un único punto donde cambiar auth o base URL. */',
     "const BASE_URL = import.meta.env['VITE_API_URL'] ?? '/api';",
     '',
     'export class ApiError extends Error {',
@@ -141,7 +141,7 @@ function apiClient(slug: string): string {
     '    },',
     '  });',
     '  if (!response.ok) {',
-    "    throw new ApiError(response.status, 'La peticion a ' + path + ' fallo con ' + response.status);",
+    "    throw new ApiError(response.status, 'La petición a ' + path + ' falló con ' + response.status);",
     '  }',
     "  if (response.status === 204) return undefined as T;",
     '  return (await response.json()) as T;',

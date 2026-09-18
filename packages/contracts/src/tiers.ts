@@ -2,8 +2,8 @@
  * Niveles comerciales del ecosistema.
  *
  * El tier no es una frontera de seguridad: es un mecanismo de empaquetado de
- * producto. Sirve para decidir que plugins/modulos se activan en una
- * instalacion concreta, no para proteger codigo frente a un atacante con
+ * producto. Sirve para decidir que plugins/módulos se activan en una
+ * instalación concreta, no para proteger código frente a un atacante con
  * acceso al repositorio. Ver `docs/pricing.md`.
  */
 export type Tier = 'community' | 'pro' | 'enterprise';

@@ -2,7 +2,7 @@
  * @calecosystem/telemetry
  *
  * Registro estructurado del uso del ecosistema. Alimenta las decisiones de
- * producto con datos y no con intuiciones, sin guardar informacion de negocio
+ * producto con datos y no con intuiciones, sin guardar información de negocio
  * de los clientes.
  */
 export * from './events.ts';

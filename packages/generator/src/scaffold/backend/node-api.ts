@@ -22,14 +22,14 @@ const dep = (name: string, version: string, reason: string, dev = false): Depend
   requestedBy: TOOL,
 });
 
-/** Paquetes que hacen falta segun las capacidades activas del blueprint. */
+/** Paquetes que hacen falta según las capacidades activas del blueprint. */
 function capabilityDependencies(blueprint: Blueprint): DependencySpec[] {
   const specs: DependencySpec[] = [];
   const { features } = blueprint.requirements;
 
   if (features.auth) {
     specs.push(
-      dep('@fastify/jwt', '^9.0.0', 'Emision y verificacion de tokens de sesion.'),
+      dep('@fastify/jwt', '^9.0.0', 'Emisión y verificación de tokens de sesión.'),
       dep('argon2', '^0.41.0', 'Hash de contrasenas; el algoritmo recomendado hoy.'),
       dep('@fastify/rate-limit', '^10.0.0', 'Limita intentos de login por IP.'),
     );
@@ -38,13 +38,13 @@ function capabilityDependencies(blueprint: Blueprint): DependencySpec[] {
     specs.push(dep('stripe', '^17.0.0', 'Pasarela de pago detectada en los requisitos.'));
   }
   if (features.fileUploads) {
-    specs.push(dep('@fastify/multipart', '^9.0.0', 'Recepcion de ficheros subidos.'));
+    specs.push(dep('@fastify/multipart', '^9.0.0', 'Recepción de ficheros subidos.'));
   }
   if (features.realtime) {
     specs.push(dep('@fastify/websocket', '^11.0.0', 'Conexiones persistentes en tiempo real.'));
   }
   if (features.i18n) {
-    specs.push(dep('accept-language-parser', '^1.5.0', 'Negociacion de idioma por peticion.'));
+    specs.push(dep('accept-language-parser', '^1.5.0', 'Negociación de idioma por petición.'));
   }
   return specs;
 }
@@ -68,9 +68,9 @@ export const nodeApiAdapter: BackendAdapter = {
     const files: VirtualFile[] = [];
     const { entities } = blueprint;
 
-    // Deteccion de dependencias: el backend pide lo suyo y, ademas, lo que
+    // Detección de dependencias: el backend pide lo suyo y, además, lo que
     // exigen las capacidades detectadas en los requisitos. Un proyecto con
-    // autenticacion no deberia arrancar sin libreria de hash.
+    // autenticación no debería arrancar sin libreria de hash.
     dependencies.require(dep('fastify', '^5.1.0', 'Servidor HTTP elegido en el blueprint.'));
     dependencies.requireAll(capabilityDependencies(blueprint));
     dependencies.requireAll([
@@ -121,10 +121,10 @@ function envConfig(blueprint: Blueprint): string {
     banner(blueprint, TOOL),
     '',
     '/**',
-    ' * Configuracion por entorno.',
+    ' * Configuración por entorno.',
     ' *',
     ' * Se lee una sola vez al arrancar y falla de inmediato si falta algo:',
-    ' * un proceso que arranca a medias es mas caro de diagnosticar que uno',
+    ' * un proceso que arranca a medias es más caro de diagnosticar que uno',
     ' * que no arranca.',
     ' */',
     'function required(name: string): string {',
@@ -215,7 +215,7 @@ function domainModel(blueprint: Blueprint, entity: DomainEntity): string {
     `export type New${entity.name} = Omit<${entity.name}, 'id' | 'createdAt' | 'updatedAt'>;`,
     '',
     '/**',
-    ` * Reglas de negocio de ${entity.name}. Vive en el dominio a proposito:`,
+    ` * Reglas de negocio de ${entity.name}. Vive en el dominio a propósito:`,
     ' * debe poder testearse sin levantar servidor ni base de datos.',
     ' */',
     `export function validate${entity.name}(input: Partial<New${entity.name}>): string[] {`,
@@ -230,7 +230,7 @@ function domainModel(blueprint: Blueprint, entity: DomainEntity): string {
 
 function repositoryPort(): string {
   return [
-    '/** Puerto de persistencia. Sustituye la implementacion, no los casos de uso. */',
+    '/** Puerto de persistencia. Sustituye la implementación, no los casos de uso. */',
     "export interface Repository<T extends { id: string }, TNew> {",
     '  list(): Promise<T[]>;',
     '  findById(id: string): Promise<T | null>;',
@@ -248,8 +248,8 @@ function repository(entity: DomainEntity): string {
     "import type { Repository } from './Repository.ts';",
     '',
     '/**',
-    ' * Implementacion en memoria para arrancar sin infraestructura.',
-    ' * Sustituyela por tu ORM: el contrato `Repository` no cambia.',
+    ' * Implementación en memoria para arrancar sin infraestructura.',
+    ' * Sustitúyela por tu ORM: el contrato `Repository` no cambia.',
     ' */',
     `export class InMemory${entity.name}Repository implements Repository<${entity.name}, New${entity.name}> {`,
     `  readonly #items = new Map<string, ${entity.name}>();`,
@@ -382,16 +382,16 @@ function authMiddleware(): string {
     "import type { FastifyReply, FastifyRequest } from 'fastify';",
     '',
     '/**',
-    ' * Verificacion de token.',
+    ' * Verificación de token.',
     ' *',
-    ' * PENDIENTE: sustituir por una verificacion de firma real (JWT o sesion).',
+    ' * PENDIENTE: sustituir por una verificación de firma real (JWT o sesión).',
     ' * Este esqueleto rechaza peticiones sin token pero NO valida la firma,',
-    ' * asi que no debe llegar a produccion tal cual.',
+    ' * así que no debe llegar a producción tal cual.',
     ' */',
     'export async function authenticate(request: FastifyRequest, reply: FastifyReply): Promise<void> {',
     '  const header = request.headers.authorization;',
     "  if (!header?.startsWith('Bearer ')) {",
-    "    await reply.code(401).send({ message: 'Falta el token de autenticacion' });",
+    "    await reply.code(401).send({ message: 'Falta el token de autenticación' });",
     '  }',
     '}',
   ].join('\n');
@@ -402,10 +402,10 @@ function authRoutes(): string {
     "import type { FastifyInstance } from 'fastify';",
     '',
     '/**',
-    ' * Rutas de autenticacion.',
+    ' * Rutas de autenticación.',
     ' *',
-    ' * PENDIENTE: implementar hash de contrasena (argon2id o bcrypt), emision',
-    ' * y rotacion de tokens, y limitacion de intentos. El auditor de seguridad',
+    ' * PENDIENTE: implementar hash de contraseña (argon2id o bcrypt), emisión',
+    ' * y rotación de tokens, y limitación de intentos. El auditor de seguridad',
     ' * del ecosistema marca este fichero hasta que se complete.',
     ' */',
     'export async function registerAuthRoutes(app: FastifyInstance): Promise<void> {',

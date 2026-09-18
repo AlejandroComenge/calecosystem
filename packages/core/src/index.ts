@@ -2,8 +2,8 @@
  * @calecosystem/core
  *
  * Kernel del ecosistema: carga de plugins, bus de hooks, control de
- * entitlements y sistema de ficheros virtual. No contiene logica de
- * generacion; esa vive en `@calecosystem/generator`.
+ * entitlements y sistema de ficheros virtual. No contiene lógica de
+ * generación; esa vive en `@calecosystem/generator`.
  */
 export * from './errors.ts';
 export * from './logger.ts';

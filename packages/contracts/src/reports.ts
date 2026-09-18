@@ -1,4 +1,4 @@
-/** Formato unico de salida de los cinco modulos del ecosistema. */
+/** Formato único de salida de los cinco módulos del ecosistema. */
 import type { ModuleKind } from './modules.ts';
 
 export type Severity = 'info' | 'low' | 'medium' | 'high' | 'critical';
@@ -12,7 +12,7 @@ export const SEVERITY_RANK: Readonly<Record<Severity, number>> = {
 };
 
 export interface Finding {
-  /** Codigo estable y accionable, p.ej. `SEC-HARDCODED-SECRET`. */
+  /** Código estable y accionable, p.ej. `SEC-HARDCODED-SECRET`. */
   readonly id: string;
   readonly severity: Severity;
   readonly title: string;
@@ -24,14 +24,14 @@ export interface Finding {
 }
 
 export interface ModuleReport {
-  /** Id del modulo que emite el informe. */
+  /** Id del módulo que emite el informe. */
   readonly module: string;
   readonly kind: ModuleKind;
   readonly summary: string;
   readonly findings: readonly Finding[];
-  /** Puntuacion 0..100 propia del modulo (salud, cobertura, rendimiento). */
+  /** Puntuación 0..100 propia del módulo (salud, cobertura, rendimiento). */
   readonly score: number | null;
-  /** Ficheros que el modulo aporto al proyecto generado. */
+  /** Ficheros que el módulo aporto al proyecto generado. */
   readonly emittedFiles: readonly string[];
   readonly durationMs: number;
 }

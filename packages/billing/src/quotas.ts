@@ -3,10 +3,10 @@ import type { QuotaPeriod, QuotaPolicy, Tier, TierQuotas, UsageOperation } from 
 /**
  * Cuotas por plan.
  *
- * Los numeros salen de `docs/pricing.md` y estan puestos con un criterio:
+ * Los números salen de `docs/pricing.md` y están puestos con un criterio:
  * el plan gratuito tiene que permitir **evaluar el producto de verdad**
- * (arrancar varios proyectos, no uno), y llegar al limite tiene que coincidir
- * con el momento en que el equipo ya obtuvo valor. Un limite que muerde antes
+ * (arrancar varios proyectos, no uno), y llegar al límite tiene que coincidir
+ * con el momento en que el equipo ya obtuvo valor. Un límite que muerde antes
  * de eso no convierte, solo ahuyenta.
  */
 export const DEFAULT_QUOTAS: readonly TierQuotas[] = [
@@ -53,9 +53,9 @@ export function policyFor(
 }
 
 /**
- * Primer plan que levanta el limite de una operacion.
+ * Primer plan que levanta el límite de una operación.
  *
- * Es lo que convierte un "has llegado al limite" en un mensaje accionable en
+ * Es lo que convierte un "has llegado al límite" en un mensaje accionable en
  * lugar de un muro.
  */
 export function nextTierFor(
@@ -74,7 +74,7 @@ export function nextTierFor(
   return undefined;
 }
 
-/** Inicio de la ventana de conteo. `null` para periodos acumulados. */
+/** Inicio de la ventana de conteo. `null` para períodos acumulados. */
 export function periodStart(period: QuotaPeriod, now: Date = new Date()): Date | null {
   if (period === 'total') return null;
   if (period === 'day') {

@@ -3,16 +3,16 @@ import type { EntityField, FeatureSet } from '@calecosystem/contracts';
 /**
  * Lexicos del analizador.
  *
- * El analizador incluido es deterministico a proposito: mismas palabras,
- * misma arquitectura. Un modelo de lenguaje puede mejorarlo despues a traves
- * del puerto `RequirementsEnricher`, pero la linea base no depende de una
- * llamada de red, no cuesta dinero por ejecucion y es auditable.
+ * El analizador incluido es deterministico a propósito: mismas palabras,
+ * misma arquitectura. Un modelo de lenguaje puede mejorarlo después a traves
+ * del puerto `RequirementsEnricher`, pero la línea base no depende de una
+ * llamada de red, no cuesta dinero por ejecución y es auditable.
  *
- * Todos los terminos se escriben en minusculas y sin acentos porque el texto
+ * Todos los términos se escriben en minusculas y sin acentos porque el texto
  * de entrada se normaliza antes de comparar.
  */
 
-/** Terminos (es/en) que delatan cada capacidad transversal. */
+/** Términos (es/en) que delatan cada capacidad transversal. */
 export const FEATURE_LEXICON: Readonly<Record<keyof FeatureSet, readonly string[]>> = {
   auth: [
     'login', 'iniciar sesion', 'autenticacion', 'authentication', 'registro',
@@ -94,7 +94,7 @@ export const ACTOR_LEXICON: Readonly<Record<string, string>> = {
   repartidor: 'Repartidor',
 };
 
-/** Traduccion de terminos de dominio al nombre canonico de entidad. */
+/** Traducción de términos de dominio al nombre canonico de entidad. */
 export const ENTITY_LEXICON: Readonly<Record<string, string>> = {
   producto: 'Product', productos: 'Product', articulo: 'Article', articulos: 'Article',
   pedido: 'Order', pedidos: 'Order', orden: 'Order', ordenes: 'Order',
@@ -124,7 +124,7 @@ export const ENTITY_LEXICON: Readonly<Record<string, string>> = {
   publicacion: 'Post', publicaciones: 'Post', post: 'Post', posts: 'Post',
   campana: 'Campaign', campanas: 'Campaign', descuento: 'Discount', descuentos: 'Discount',
   cupon: 'Coupon', cupones: 'Coupon', direccion: 'Address', direcciones: 'Address',
-  // Terminos ya en ingles, por si el texto llega mezclado.
+  // Términos ya en inglés, por si el texto llega mezclado.
   product: 'Product', products: 'Product', order: 'Order', orders: 'Order',
   customer: 'Customer', customers: 'Customer', user: 'User', users: 'User',
   invoice: 'Invoice', booking: 'Booking', bookings: 'Booking', course: 'Course',
@@ -132,7 +132,7 @@ export const ENTITY_LEXICON: Readonly<Record<string, string>> = {
   task: 'Task', tasks: 'Task', event: 'Event', events: 'Event',
 };
 
-/** Verbos que suelen introducir una enumeracion de entidades. */
+/** Verbos que suelen introducir una enumeración de entidades. */
 export const ENTITY_TRIGGERS: readonly string[] = [
   'gestionar', 'administrar', 'gestion de', 'administracion de', 'crear', 'registrar',
   'catalogo de', 'listado de', 'manage', 'listar', 'controlar', 'publicar', 'anadir',
@@ -272,7 +272,7 @@ export const FIELD_TEMPLATES: Readonly<Record<string, readonly EntityField[]>> =
   ],
 };
 
-/** Campos genericos para entidades fuera del lexico. */
+/** Campos genéricos para entidades fuera del lexico. */
 export const DEFAULT_FIELDS: readonly EntityField[] = [
   { name: 'name', type: 'string', required: true },
   { name: 'description', type: 'text', required: false },
@@ -283,7 +283,7 @@ export function fieldsFor(entityName: string): EntityField[] {
   return [{ name: 'id', type: 'uuid', required: true }, ...base, ...TIMESTAMPS];
 }
 
-/** Normas de cumplimiento reconocidas y los terminos que las activan. */
+/** Normas de cumplimiento reconocidas y los términos que las activan. */
 export const COMPLIANCE_LEXICON: Readonly<Record<string, readonly string[]>> = {
   gdpr: ['gdpr', 'rgpd', 'proteccion de datos', 'datos personales', 'lopd'],
   'pci-dss': ['pci', 'pci dss', 'datos de tarjeta', 'tarjetas de credito'],

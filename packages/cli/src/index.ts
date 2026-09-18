@@ -1,8 +1,8 @@
 /**
  * @calecosystem/cli
  *
- * Punto de entrada de linea de comandos. Toda la logica vive en los modulos
- * del ecosistema; aqui solo se interpretan argumentos y se presenta el
+ * Punto de entrada de línea de comandos. Toda la lógica vive en los módulos
+ * del ecosistema; aquí solo se interpretan argumentos y se presenta el
  * resultado.
  */
 export { runCli, VERSION, HELP } from './cli.ts';

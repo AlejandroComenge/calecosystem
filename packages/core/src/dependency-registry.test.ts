@@ -79,7 +79,7 @@ test('el mismo paquete en workspaces distintos son entradas independientes', () 
   assert.equal(registry.resolved('api')[0]?.version, '^5.6.0');
 });
 
-test('la salida esta ordenada: dos generaciones dan el mismo fichero', () => {
+test('la salida está ordenada: dos generaciones dan el mismo fichero', () => {
   const first = new DependencyRegistry();
   first.require(spec('zod', '^3.0.0', 'a'));
   first.require(spec('react', '^19.0.0', 'b'));
@@ -94,19 +94,19 @@ test('la salida esta ordenada: dos generaciones dan el mismo fichero', () => {
   );
 });
 
-test('explain documenta quien pidio cada dependencia y por que', () => {
+test('explain documenta quien pidio cada dependencia y por qué', () => {
   const registry = new DependencyRegistry();
-  registry.require(spec('argon2', '^0.41.0', 'backend', { reason: 'hash de contrasenas' }));
+  registry.require(spec('argon2', '^0.41.0', 'backend', { reason: 'hash de contraseñas' }));
 
   const explained = registry.explain('web');
 
   assert.equal(explained.length, 1);
   assert.match(explained[0] ?? '', /argon2@\^0\.41\.0/);
-  assert.match(explained[0] ?? '', /hash de contrasenas/);
+  assert.match(explained[0] ?? '', /hash de contraseñas/);
   assert.match(explained[0] ?? '', /backend/);
 });
 
-test('un manifiesto sin dependencias omite las claves vacias', () => {
+test('un manifiesto sin dependencias omite las claves vacías', () => {
   const registry = new DependencyRegistry();
   const manifest = JSON.parse(registry.buildManifest('root', { name: 'proyecto' }).json) as Record<
     string,

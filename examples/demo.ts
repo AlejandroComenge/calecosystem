@@ -2,7 +2,7 @@
  * Demo ejecutable del ecosistema completo: `npm run demo`.
  *
  * Genera un proyecto en memoria, muestra las decisiones de arquitectura y los
- * informes de los cinco modulos, y no escribe nada en disco.
+ * informes de los cinco módulos, y no escribe nada en disco.
  */
 import { Entitlements, createKernel, createLogger } from '@calecosystem/core';
 import { CodeGenerator, generatorPlugin } from '@calecosystem/generator';
@@ -13,19 +13,19 @@ import { documenterPlugin } from '@calecosystem/documenter';
 import { definePlugin } from '@calecosystem/contracts';
 
 const BRIEF = `
-Necesitamos una plataforma de reservas para clinicas dentales. Los pacientes
-piden citas con los medicos desde la web, con login de usuarios y roles.
-Hay pagos online con Stripe, valoraciones de los medicos y un panel de
-administracion para gestionar citas, pacientes y facturas. Esperamos 30.000
-usuarios el primer ano y trabajamos con datos medicos, asi que debemos cumplir
+Necesitamos una plataforma de reservas para clínicas dentales. Los pacientes
+piden citas con los médicos desde la web, con login de usuarios y roles.
+Hay pagos online con Stripe, valoraciones de los médicos y un panel de
+administración para gestionar citas, pacientes y facturas. Esperamos 30.000
+usuarios el primer año y trabajamos con datos médicos, así que debemos cumplir
 el RGPD.
 `;
 
-// Plugin de ejemplo: politica corporativa impuesta sin tocar el generador.
+// Plugin de ejemplo: política corporativa impuesta sin tocar el generador.
 const politicaCorporativa = definePlugin({
   name: 'demo-politica-corporativa',
   version: '1.0.0',
-  description: 'Impone PostgreSQL y deja constancia de por que.',
+  description: 'Impone PostgreSQL y deja constancia de por qué.',
   priority: 10,
   register(api) {
     api.onTransform('blueprint:planned', (blueprint) => ({
@@ -37,7 +37,7 @@ const politicaCorporativa = definePlugin({
           id: 'ADR-POLITICA-DB',
           title: 'Motor de datos corporativo',
           choice: 'postgres',
-          rationale: 'Politica de datos: un unico motor soportado por el equipo de Plataforma.',
+          rationale: 'Política de datos: un único motor soportado por el equipo de Plataforma.',
           alternatives: ['mysql', 'mongodb', 'sqlite'],
         },
       ],

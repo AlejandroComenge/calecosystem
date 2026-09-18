@@ -1,17 +1,17 @@
 /**
- * Facturacion y cambio de plan.
+ * Facturación y cambio de plan.
  *
- * `BillingProvider` es un puerto: Stripe es hoy la implementacion, pero la
- * logica de cuotas y de upgrade no depende de el. Un cliente enterprise que
- * factura por contrato puede enchufar su propia implementacion sin tocar
- * nada mas.
+ * `BillingProvider` es un puerto: Stripe es hoy la implementación, pero la
+ * lógica de cuotas y de upgrade no depende de el. Un cliente enterprise que
+ * factura por contrato puede enchufar su propia implementación sin tocar
+ * nada más.
  */
 import type { Tier } from './tiers.ts';
 
 export interface PlanDefinition {
   readonly tier: Tier;
   readonly name: string;
-  /** Precio en la unidad minima de la moneda (centimos). */
+  /** Precio en la unidad mínima de la moneda (centimos). */
   readonly amount: number;
   readonly currency: string;
   readonly interval: 'month' | 'year';
@@ -66,12 +66,12 @@ export interface BillingProvider {
   readonly id: string;
   readonly plans: readonly PlanDefinition[];
 
-  /** Crea la sesion de pago para subir de plan. */
+  /** Crea la sesión de pago para subir de plan. */
   createCheckoutSession(request: CheckoutRequest): Promise<CheckoutSession>;
 
   /**
-   * Verifica la firma del webhook. Es la unica barrera entre "un cliente ha
-   * pagado" y "alguien dice que un cliente ha pagado", asi que no es
+   * Verifica la firma del webhook. Es la única barrera entre "un cliente ha
+   * pagado" y "alguien dice que un cliente ha pagado", así que no es
    * opcional ni puede delegarse en el que llama.
    */
   verifyWebhook(payload: string, signatureHeader: string): WebhookVerification;
