@@ -77,7 +77,7 @@ export async function runGenerate(options: CommandOptions): Promise<CommandResul
     });
 
     const lines = [
-      ...renderResult(result),
+      ...renderResult(result, kernel.diagnostics().skippedPlugins),
       '',
       options.dryRun
         ? `Simulación: se escribirían ${report.written.length} ficheros en ${report.destination}`
@@ -422,7 +422,10 @@ function usageBar(used: number, limit: number, width = 20): string {
 }
 
 
-function renderResult(result: GenerationResult): string[] {
+function renderResult(
+  result: GenerationResult,
+  omitidos: readonly { name: string; reason: string }[] = [],
+): string[] {
   const lines = [
     `Proyecto: ${result.blueprint.projectName}`,
     `Stack: ${result.blueprint.stack.frontend} + ${result.blueprint.stack.backend} + ${result.blueprint.stack.database}`,
@@ -450,7 +453,31 @@ function renderResult(result: GenerationResult): string[] {
     lines.push('', 'Avisos:');
     lines.push(...result.warnings.map((warning) => `  ! ${warning}`));
   }
+
+  // Decir qué NO se ha ejecutado es tan importante como decir qué sí. Sin
+  // esto, el plan gratuito parece el producto completo y el usuario cree que
+  // su proyecto está revisado cuando nadie lo ha mirado.
+  if (omitidos.length > 0) {
+    lines.push('', `Módulos NO ejecutados (${omitidos.length}), tu plan no los incluye:`);
+    for (const plugin of omitidos) {
+      lines.push(`  - ${nombreLegible(plugin.name)}`);
+    }
+    lines.push('', '  Tu proyecto se ha generado, pero nadie ha revisado su seguridad,');
+    lines.push('  su rendimiento ni su cobertura de pruebas.');
+    lines.push('  Para verlos: calec upgrade --tier pro');
+  }
   return lines;
+}
+
+/** Nombre del módulo en lenguaje de usuario, no de paquete npm. */
+function nombreLegible(nombrePaquete: string): string {
+  const nombres: Record<string, string> = {
+    '@calecosystem/optimizer': 'Optimizador de rendimiento',
+    '@calecosystem/security': 'Auditor de seguridad',
+    '@calecosystem/tester': 'Testeador automático',
+    '@calecosystem/documenter': 'Documentador inteligente',
+  };
+  return nombres[nombrePaquete] ?? nombrePaquete;
 }
 
 function summarize(result: GenerationResult) {

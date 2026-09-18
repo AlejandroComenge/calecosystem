@@ -190,12 +190,20 @@ en el texto.
 CALEC_LICENSE_TIER=enterprise npm run calec -- generate "Tienda online con carrito, checkout y pagos" --dry-run
 ```
 
+En Windows (PowerShell), la variable va aparte:
+
+```powershell
+$env:CALEC_LICENSE_TIER="enterprise"
+npm run calec -- generate "Tienda online con carrito, checkout y pagos" --dry-run
+```
+
 **Qué comprobar:**
 
 - [ ] Aparecen los cuatro informes: optimizer, security, tester, documenter
 - [ ] Seguridad detecta `SEC-AUTH-NOT-VERIFIED` (crítico)
 - [ ] El testeador detecta `TEST-UNCOVERED-RISK-STOCK-RACE`
 - [ ] Sin la variable de entorno, solo aparece el documentador (plan gratuito)
+- [ ] Y en ese caso la salida lista los tres módulos NO ejecutados, con su nombre legible
 
 El punto 3 es el más interesante de enseñar: el riesgo lo **añade la plantilla**
 de e-commerce y lo **recoge el testeador**, que no sabe nada de tiendas.

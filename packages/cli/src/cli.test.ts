@@ -118,3 +118,25 @@ test('examples --json sirve para encadenar con otras herramientas', async () => 
   assert.ok(scenarios.length >= 6);
   assert.ok(scenarios.every((scenario) => typeof scenario.id === 'string'));
 });
+
+test('avisa de los módulos que no se han ejecutado por el plan', async () => {
+  // Sin licencia, tres de los cuatro módulos quedan fuera. Callarlo haría
+  // creer que el proyecto está revisado cuando nadie lo ha mirado.
+  const result = await runCli(['generate', BRIEF, '--dry-run', '--quiet']);
+
+  assert.match(result.output, /Módulos NO ejecutados \(3\)/);
+  assert.match(result.output, /Auditor de seguridad/);
+  assert.match(result.output, /Optimizador de rendimiento/);
+  assert.match(result.output, /Testeador automático/);
+  assert.match(result.output, /calec upgrade --tier pro/);
+});
+
+test('los módulos se nombran en lenguaje de usuario, no de paquete', async () => {
+  const result = await runCli(['generate', BRIEF, '--dry-run', '--quiet']);
+
+  assert.equal(
+    result.output.includes('@calecosystem/security'),
+    false,
+    'un nombre de paquete npm no le dice nada a quien no programa',
+  );
+});
